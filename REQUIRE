@@ -1,0 +1,6 @@
+julia 0.6-
+GeometricIntegrators
+BandedMatrices 0.2.3
+ApproxFun
+HDF5
+ProgressMeter
