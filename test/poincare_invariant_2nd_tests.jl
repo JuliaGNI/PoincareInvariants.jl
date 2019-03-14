@@ -134,7 +134,7 @@ module PoincareInvariant2ndTest
 end
 
 
-using PoincareInvariant2ndTest
+using .PoincareInvariant2ndTest
 
 
 ### compute analytical invariant ###
