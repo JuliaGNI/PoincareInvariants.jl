@@ -61,8 +61,8 @@ x2 = [- 2π * scale * cos(2π*pu[i][1]) * sin(2π*pu[i][2]) for i in eachindex(p
 # @test fx2 ≈ x2 atol=1E-15
 
 # this works, but is less compact
-@test (fx1 .- x1) ≈ zeros(length(fx1)) atol=dtol*scale
-@test (fx2 .- x2) ≈ zeros(length(fx2)) atol=dtol*scale
+@test (fx1 .- x1) ≈ zero(fx1) atol=dtol*scale
+@test (fx2 .- x2) ≈ zero(fx2) atol=dtol*scale
 
 
 ### check integral ###
@@ -72,7 +72,7 @@ pu = points(SU, nx*ny)
 x  = zeros(length(pu))
 
 for i in eachindex(x,pu)
-    x[i] .= scale * cos(2π*pu[i][1]) * cos(2π*pu[i][2])
+    x[i] = scale * cos(2π*pu[i][1]) * cos(2π*pu[i][2])
 end
 
 @test compute_integral(x) ≈ 0.0 atol=itol*scale

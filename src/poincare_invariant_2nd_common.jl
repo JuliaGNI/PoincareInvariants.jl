@@ -1,8 +1,7 @@
 
 @generated function compute_integral(Is)
-    SU  = Ultraspherical(1, 0..1)^2
-    Q   = DefiniteIntegral(SU[1]) ⊗ DefiniteIntegral(SU[2])
-    # Q   = DefiniteIntegral(SU)
+    SU = Ultraspherical(1, 0..1)^2
+    Q  = DefiniteIntegral(SU)
 
     quote
         return Number( $Q * Fun($SU, ApproxFun.transform($SU, Is)) )
