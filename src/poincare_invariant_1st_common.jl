@@ -18,11 +18,12 @@ function compute_velocity(γ, γ̇)
     @assert size(γ) == size(γ̇)
 
     n = size(γ,2)
-    k = 1im*2π*collect(0:div(n-1,2)+1)
+    k = collect(0:div(n-1,2)+1)
+    κ = 2π .* 1im .* k ./ n
 
     for l in 1:size(γ,1)
         γ̂ = rfft(γ[l,:])
-        γ̇[l,:] .= irfft(k .* γ̂, n) / n
+        γ̇[l,:] .= irfft(γ̂ .* κ, n)
     end
 end
 

@@ -147,8 +147,8 @@ function integrate(t, γ, γ̇ᵢ, γ̇ⱼ, ω, b::Vector{TT}, c::Vector{TT}, q:
 end
 
 function surface_integral(t, x::Matrix{DT}, ω, nx, ny) where {DT}
-    const b = [0.5, 0.5]
-    const c = [0.0, 1.0]
+    local b = [0.5, 0.5]
+    local c = [0.0, 1.0]
 
     local q  = zeros(DT, size(x,1))
     local vᵢ = zeros(DT, size(x,1))
@@ -193,8 +193,8 @@ function integrate_canonical(γ̇ᵢ, γ̇ⱼ, Θ̇ᵢ, Θ̇ⱼ, b::Vector{TT}, 
 end
 
 function surface_integral_canonical(q::Matrix{DT}, p::Matrix{DT}, nx, ny) where {DT}
-    const b = [0.5, 0.5]
-    const c = [0.0, 1.0]
+    local b = [0.5, 0.5]
+    local c = [0.0, 1.0]
 
     local vᵢ = zeros(DT, size(q,1))
     local vⱼ = zeros(DT, size(q,1))
