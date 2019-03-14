@@ -5,7 +5,7 @@ version = "0.1.0"
 
 [deps]
 ApproxFun = "28f2ccd6-bb30-5033-b560-165f7b14dc2f"
-GeometricIntegrators = "6f062d28-6f76-5edb-94ee-3fe43b1c2f74"
+GeometricIntegrators = "27146772-4646-11e9-29e7-8d57d16137b8"
 HDF5 = "f67ccb44-e63f-5c2f-98bd-6dc0ccc4ba2f"
 ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
 SymPy = "24249f21-da20-56a4-8eb1-6a02cf4ae2e6"
