@@ -13,6 +13,7 @@ module PoincareInvariants
            PoincareInvariant2ndTrapezoidal,
            evaluate_poincare_invariant, write_to_hdf5
 
+    include("matrix_utils.jl")
     include("poincare_invariant_1st_common.jl")
     include("poincare_invariant_1st.jl")
     include("poincare_invariant_1st_canonical.jl")
