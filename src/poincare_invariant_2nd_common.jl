@@ -52,7 +52,7 @@ end
 
         # compute integrands of integral invariants at all points
         for k in 1:NV
-            $Js[k] = dot($pσ[:,k], $qτ[:,k]) - dot($qσ[:,k], $pτ[:,k])
+            $Js[k] = $pσ[:,k]' * $qτ[:,k] - $qσ[:,k]' * $pτ[:,k]
         end
 
         # compute canonical integral invariant

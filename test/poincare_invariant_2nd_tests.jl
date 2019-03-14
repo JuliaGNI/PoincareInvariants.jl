@@ -66,7 +66,7 @@ module PoincareInvariant2ndTest
 
     function gc_surface_p(s,t)
         q = gc_surface_q(s,t)
-        p = zeros(q)
+        p = zero(q)
         gcϑ(zero(eltype(q)), q, p)
         p
     end
@@ -80,7 +80,7 @@ module PoincareInvariant2ndTest
     end
 
     function gc_dummy_iode(q₀)
-        p₀ = zeros(q₀)
+        p₀ = zero(q₀)
 
         if ndims(q₀) == 1
             gcϑ(zero(eltype(q₀)), q₀, p₀)
