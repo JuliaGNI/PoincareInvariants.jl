@@ -1,4 +1,3 @@
-# Documentation: http://docs.travis-ci.com/user/languages/julia/
 language: julia
 os:
   - linux
@@ -14,12 +13,7 @@ matrix:
     - os: osx
 notifications:
   email: false
-sudo: required
-script:
-  - julia --color=yes -e 'if VERSION >= v"0.7.0-" using Pkg; end; Pkg.add(pwd())'
-  - julia --color=yes -e 'if VERSION >= v"0.7.0-" using Pkg; end; Pkg.test("PoincareInvariants", coverage=true)'
-after_success:
-  - julia --color=yes -e 'if VERSION >= v"0.7.0-" using Pkg; end; Pkg.add("Documenter"); Pkg.add("Coverage");'
-  - julia --color=yes -e 'if VERSION >= v"0.7.0-" using Pkg; end; cd(Pkg.dir("PoincareInvariants")); include(joinpath("docs", "make.jl"))'
-  - julia --color=yes -e 'if VERSION >= v"0.7.0-" using Pkg; end; cd(Pkg.dir("PoincareInvariants")); using Coverage; Codecov.submit(process_folder())'
-  - julia --color=yes -e 'if VERSION >= v"0.7.0-" using Pkg; end; cd(Pkg.dir("PoincareInvariants")); using Coverage; Coveralls.submit(process_folder())'
+codecov: true
+coveralls: true
+after_script:
+  - bash ./docs/travis.sh
