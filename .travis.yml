@@ -16,7 +16,7 @@ notifications:
   email: false
 sudo: required
 script:
-  - julia --color=yes -e 'if VERSION >= v"0.7.0-" using Pkg; end; Pkg.clone(pwd())'
+  - julia --color=yes -e 'if VERSION >= v"0.7.0-" using Pkg; end; Pkg.add(pwd())'
   - julia --color=yes -e 'if VERSION >= v"0.7.0-" using Pkg; end; Pkg.test("PoincareInvariants", coverage=true)'
 after_success:
   - julia --color=yes -e 'if VERSION >= v"0.7.0-" using Pkg; end; Pkg.add("Documenter"); Pkg.add("Coverage");'
