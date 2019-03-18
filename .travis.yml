@@ -9,7 +9,9 @@ julia:
   - nightly
 matrix:
   allow_failures:
-    - julia: nightly, 0.7
+    - julia:
+        - nightly
+        - 0.7
     - os: osx
 notifications:
   email: false
