@@ -95,7 +95,7 @@ module PoincareInvariant2ndTest
             end
         end
 
-        IODE(gc_dummy, gc_dummy, gc_dummy, gc_dummy, q₀, p₀)
+        IODE(gc_dummy, gc_dummy, gc_dummy, q₀, p₀; v=gc_dummy)
     end
 
 
@@ -125,7 +125,7 @@ module PoincareInvariant2ndTest
 
         S = simplify(B₀ * (1 + x^2 + y^2) * ( diff(x, s) * diff(y, t) + diff(x, t) * diff(y, s) )
                    + u * ( diff(z, s) * diff(u, t) + diff(z, t) * diff(u, s) ) )
-        I = N(SymPy.integrate(S, (s, 0, 1), (t, 0, 1)), 20)
+        I = N(SymPy.integrate(S, (s, 0, 1), (t, 0, 1)), 16)
     end
 
 
