@@ -1,7 +1,7 @@
 name = "PoincareInvariants"
 uuid = "26663084-47d3-540f-bd97-40ca743aafa4"
 authors = ["Michael Kraus <michael.kraus@ipp.mpg.de>"]
-version = "0.1.1"
+version = "0.2.0"
 
 [deps]
 ApproxFun = "28f2ccd6-bb30-5033-b560-165f7b14dc2f"
