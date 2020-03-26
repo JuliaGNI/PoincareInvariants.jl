@@ -9,6 +9,7 @@
 [![Build Status](https://travis-ci.org/DDMGNI/PoincareInvariants.jl.svg?branch=master)](https://travis-ci.org/DDMGNI/PoincareInvariants.jl)
 [![Coverage Status](https://coveralls.io/repos/github/DDMGNI/PoincareInvariants.jl/badge.svg)](https://coveralls.io/github/DDMGNI/PoincareInvariants.jl)
 [![codecov](https://codecov.io/gh/DDMGNI/PoincareInvariants.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/DDMGNI/PoincareInvariants.jl)
+[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.3661225.svg)](https://doi.org/10.5281/zenodo.3661225)
 
 
 ## License
