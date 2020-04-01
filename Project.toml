@@ -14,7 +14,7 @@ SymPy = "24249f21-da20-56a4-8eb1-6a02cf4ae2e6"
 [compat]
 ApproxFun = "0.10, 0.11"
 Documenter = "0.23, 0.24"
-GeometricIntegrators = "0.2.2, 0.3"
+GeometricIntegrators = "0.3"
 HDF5 = "0.10, 0.12, 0.13"
 ProgressMeter = "^1.0"
 SafeTestsets = "0.0.1"
