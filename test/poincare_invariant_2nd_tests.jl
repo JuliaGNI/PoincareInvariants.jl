@@ -3,7 +3,6 @@ module PoincareInvariant2ndTest
 
     using PoincareInvariants
     using GeometricIntegrators
-    using GeometricIntegrators.Utils
     using SymPy
 
     const nx = 100
@@ -89,9 +88,9 @@ module PoincareInvariant2ndTest
             tp = zeros(eltype(p₀), size(p₀,1))
 
             for i in 1:size(q₀,2)
-                simd_copy_xy_first!(tq, q₀, i)
+                tq .= q₀[:,i]
                 gcϑ(zero(eltype(q₀)), tq, tp)
-                simd_copy_yx_first!(tp, p₀, i)
+                p₀[:,i] .= tp
             end
         end
 
