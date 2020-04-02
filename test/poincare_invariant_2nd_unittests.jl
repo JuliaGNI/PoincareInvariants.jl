@@ -1,4 +1,6 @@
 
+using Test
+
 using ApproxFun
 using PoincareInvariants: compute_integral, compute_derivative1, compute_derivative2
 

@@ -1,4 +1,7 @@
 
+using Test
+
+
 module PoincareInvariant2ndTest
 
     using PoincareInvariants
@@ -145,12 +148,12 @@ Ia = compute_invariant_analytical()
 
 Jn = compute_canonical_invariant_numerical()
 
-@assert Jn ≈ Ia atol=2eps()
+@test Jn ≈ Ia atol=2eps()
 
 
 ### compute and check noncanonical invariant ###
 
 In, Jn = compute_invariant_numerical()
 
-@assert In ≈ Ia atol=2eps()
-@assert Jn ≈ Ia atol=2eps()
+@test In ≈ Ia atol=2eps()
+@test Jn ≈ Ia atol=2eps()
