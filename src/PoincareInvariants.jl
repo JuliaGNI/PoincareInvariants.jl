@@ -2,6 +2,7 @@ module PoincareInvariants
 
     using ApproxFun
     using HDF5
+    using FFTW
     using ProgressMeter
     using GeometricIntegrators
     using GeometricIntegrators.Utils

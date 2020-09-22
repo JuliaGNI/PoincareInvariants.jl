@@ -48,8 +48,8 @@ end
 
 
 function evaluate_poincare_invariant(pinv::PoincareInvariant1st, sol::Solution)
-    p = zeros(sol.q.d)
-    g = zeros(sol.q.d)
+    p = zero(sol.q.d)
+    g = zero(sol.q.d)
     v = zeros(size(sol.q.d,1), size(sol.q.d,3))
     γ = zeros(size(sol.q.d,1), size(sol.q.d,3))
 
