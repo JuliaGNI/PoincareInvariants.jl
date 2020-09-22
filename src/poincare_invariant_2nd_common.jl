@@ -76,7 +76,7 @@ end
             fq = Fun($SC, ApproxFun.transform($SC, q[j,:]))
 
             # obtain values of q at the same points as the derivatives
-            $qs[j,:] .= itransform($SU, resize!(($CU * fq).coefficients, NC))
+            $qs[j,:] .= itransform($SU, resize!(collect(($CU * fq).coefficients), NC))
 
             # compute derivatives of q and store values
             $qσ[j,:] .= compute_derivative1(fq)
