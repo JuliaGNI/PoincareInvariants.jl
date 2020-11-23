@@ -11,5 +11,5 @@ makedocs(
 )
 
 deploydocs(
-    repo   = "github.com/DDMGNI/PoincareInvariants.jl.git"
+    repo   = "github.com/DDMGNI/PoincareInvariants.jl"
 )
