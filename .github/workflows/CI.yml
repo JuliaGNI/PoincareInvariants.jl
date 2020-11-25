@@ -25,6 +25,8 @@ jobs:
         with:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
+      - name: Set environment variables
+        run: echo "PYTHON=''" >> $GITHUB_ENV
       - uses: actions/cache@v1
         env:
           cache-name: cache-artifacts
