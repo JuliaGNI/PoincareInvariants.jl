@@ -2,9 +2,12 @@
 
 *Julia library for the computation of Poincaré integral invariants.*
 
-[![Build Status](https://travis-ci.org/DDMGNI/PoincareInvariants.jl.svg?branch=master)](https://travis-ci.org/DDMGNI/PoincareInvariants.jl)
-[![Coverage Status](https://coveralls.io/repos/github/DDMGNI/PoincareInvariants.jl/badge.svg)](https://coveralls.io/github/DDMGNI/PoincareInvariants.jl)
-[![codecov](https://codecov.io/gh/DDMGNI/PoincareInvariants.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/DDMGNI/PoincareInvariants.jl)
+[![PkgEval Status](https://juliaci.github.io/NanosoldierReports/pkgeval_badges/P/PoincareInvariants.svg)](https://juliaci.github.io/NanosoldierReports/pkgeval_badges/P/PoincareInvariants.html)
+![CI](https://github.com/JuliaGNI/PoincareInvariants.jl/workflows/CI/badge.svg)
+[![Build Status](https://travis-ci.org/JuliaGNI/PoincareInvariants.jl.svg?branch=master)](https://travis-ci.org/JuliaGNI/PoincareInvariants.jl)
+[![Coverage Status](https://coveralls.io/repos/github/JuliaGNI/PoincareInvariants.jl/badge.svg)](https://coveralls.io/github/JuliaGNI/PoincareInvariants.jl)
+[![codecov](https://codecov.io/gh/JuliaGNI/PoincareInvariants.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/JuliaGNI/PoincareInvariants.jl)
+[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.3661225.svg)](https://doi.org/10.5281/zenodo.3661225)
 
 
 ## License
