@@ -37,7 +37,7 @@ end
     pτ = zeros(DT, ND, NV)
 
     quote
-        for j in 1:size(p,1)
+        for j in axes(p,1)
             fq = Fun($SC, ApproxFun.transform($SC, q[j,:]))
             fp = Fun($SC, ApproxFun.transform($SC, p[j,:]))
 
@@ -72,7 +72,7 @@ end
     Ω  = zeros(DT, ND, ND)
 
     quote
-        for j in 1:size(q,1)
+        for j in axes(q,1)
             fq = Fun($SC, ApproxFun.transform($SC, q[j,:]))
 
             # obtain values of q at the same points as the derivatives
@@ -111,7 +111,7 @@ end
     D²ϑ= zeros(DT, ND, ND)
 
     quote
-        for j in 1:size(q,1)
+        for j in axes(q,1)
             fq = Fun($SC, ApproxFun.transform($SC, q[j,:]))
             fλ = Fun($SC, ApproxFun.transform($SC, λ[j,:]))
 
@@ -133,7 +133,7 @@ end
             pinv.ω(t, $qs[:,k], $Ω)
             $Ks[k] = vector_matrix_vector_product($λτ[:,k], $Ω, $λσ[:,k])
 
-            for j in 1:length(pinv.D²ϑ)
+            for j in eachindex(pinv.D²ϑ)
                 pinv.D²ϑ[j](t, $qs[:,k], $D²ϑ)
                 $Ks[k] += 2 * $λs[j,k] * vector_matrix_vector_product($qτ[:,k], $D²ϑ, $λσ[:,k])
                 $Ks[k] -= 2 * $λs[j,k] * vector_matrix_vector_product($qσ[:,k], $D²ϑ, $λτ[:,k])

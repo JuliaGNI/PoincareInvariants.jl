@@ -5,8 +5,8 @@ function compute_one_form(t, x, p, Θ)
 
     tp = zeros(eltype(x), size(x,1))
 
-    for k in 1:size(x,3)
-        for j in 1:size(x,2)
+    for k in axes(x,3)
+        for j in axes(x,2)
             Θ(t[j], x[:,j,k], tp)
             p[:,j,k] .= tp
         end
@@ -21,7 +21,7 @@ function compute_velocity(γ, γ̇)
     k = collect(0:div(n-1,2)+1)
     κ = 2π .* 1im .* k ./ n
 
-    for l in 1:size(γ,1)
+    for l in axes(γ,1)
         γ̂ = rfft(γ[l,:])
         γ̇[l,:] .= irfft(γ̂ .* κ, n)
     end
@@ -34,8 +34,8 @@ function compute_correction(t, x, λ, σ, g)
 
     tσ = zeros(eltype(x), size(x,1))
 
-    for k in 1:size(x,3)
-        for j in 1:size(x,2)
+    for k in axes(x,3)
+        for j in axes(x,2)
             g(t[j], x[:,j,k], λ[:,j,k], tσ)
             σ[:,j,k] .= tσ
         end
@@ -47,8 +47,8 @@ function compute_loop_integral(p::Array{T,2}, v::Array{T,2}) where {T}
     local result = zero(T)
     local error  = zero(T)
 
-    for i in 1:size(v,2)
-        for l in 1:size(v,1)
+    for i in axes(v,2)
+        for l in axes(v,1)
             result, error = compensated_summation(p[l,i] * v[l,i], result, error)
         end
     end

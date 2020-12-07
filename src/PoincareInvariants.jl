@@ -3,6 +3,7 @@ module PoincareInvariants
     using ApproxFun
     using HDF5
     using FFTW
+    using OffsetArrays
     using ProgressMeter
     using GeometricIntegrators
     using GeometricIntegrators.Utils

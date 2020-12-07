@@ -8,9 +8,9 @@ struct PoincareInvariant2ndTrapezoidal{ET,DT,TT,ΩT}
     ntime::Int
     nsave::Int
     nt::Int
-    I::Vector{DT}
-    J::Vector{DT}
-    L::Vector{DT}
+    I::OffsetArray{DT,1,Vector{DT}}
+    J::OffsetArray{DT,1,Vector{DT}}
+    L::OffsetArray{DT,1,Vector{DT}}
 end
 
 function PoincareInvariant2ndTrapezoidal(f_equ::Function, f_surface::Function, ω::ΩT, Δt::TT, d::Int, nx::Int, ny::Int, ntime::Int, nsave::Int, DT=Float64) where {TT,ΩT}
@@ -40,9 +40,9 @@ function PoincareInvariant2ndTrapezoidal(f_equ::Function, f_surface::Function, �
     # create arrays for results
     nt = div(ntime, nsave)
 
-    I = zeros(DT, nt+1)
-    J = zeros(DT, nt+1)
-    L = zeros(DT, nt+1)
+    I = OffsetArray(zeros(DT, nt+1), 0:nt)
+    J = OffsetArray(zeros(DT, nt+1), 0:nt)
+    L = OffsetArray(zeros(DT, nt+1), 0:nt)
 
     PoincareInvariant2ndTrapezoidal{typeof(equ),DT,TT,ΩT}(equ, ω, Δt, nx, ny, ntime, nsave, nt, I, J, L)
 end
@@ -50,9 +50,9 @@ end
 
 
 function evaluate_poincare_invariant(pinv::PoincareInvariant2ndTrapezoidal, sol::Solution)
-    for i in 1:size(sol.q.d,2)
-        pinv.I[i] = surface_integral(sol.t.t[i], sol.q.d[:,i,:], pinv.ω, pinv.nx, pinv.ny)
-        pinv.J[i] = surface_integral_canonical(sol.q.d[:,i,:], sol.p.d[:,i,:], pinv.nx, pinv.ny)
+    for i in axes(sol.q,2)
+        pinv.I[i] = surface_integral(sol.t[i], sol.q[:,i,:], pinv.ω, pinv.nx, pinv.ny)
+        pinv.J[i] = surface_integral_canonical(sol.q[:,i,:], sol.p[:,i,:], pinv.nx, pinv.ny)
     end
 
     return (pinv.I, pinv.J, pinv.L)
@@ -74,7 +74,7 @@ function interpolate_trajectory(x, i1, j1, λ, μ, γ, nx, ny)
     i2 = i1 + 1
     j2 = j1 + 1
 
-    for k in 1:length(γ)
+    for k in eachindex(γ)
         γ[k] = x[k, nx*(j1-1)+i1] * (1-λ) * (1-μ) +
                x[k, nx*(j1-1)+i2] *    λ  * (1-μ) +
                x[k, nx*(j2-1)+i1] * (1-λ) *    μ  +
@@ -98,7 +98,7 @@ function interpolate_derivative_i(x, i1, j1, λ, μ, γ̇, nx, ny)
     i2 = i1 + 1
     j2 = j1 + 1
 
-    for k in 1:length(γ̇)
+    for k in eachindex(γ̇)
         γ̇[k] = (x[k, nx*(j1-1)+i2] - x[k, nx*(j1-1)+i1]) * (1-μ) +
                (x[k, nx*(j2-1)+i2] - x[k, nx*(j2-1)+i1]) *    μ
     end
@@ -120,7 +120,7 @@ function interpolate_derivative_j(x, i1, j1, λ, μ, γ̇, nx, ny)
     i2 = i1 + 1
     j2 = j1 + 1
 
-    for k in 1:length(γ̇)
+    for k in eachindex(γ̇)
         γ̇[k] = (x[k, nx*(j2-1)+i1] - x[k, nx*(j1-1)+i1]) * (1-λ) +
                (x[k, nx*(j2-1)+i2] - x[k, nx*(j1-1)+i2]) *    λ
     end
@@ -132,8 +132,8 @@ function integrate(t, γ, γ̇ᵢ, γ̇ⱼ, ω, b::Vector{TT}, c::Vector{TT}, q:
 
     local result = zero(DT)
 
-    for i in 1:length(b)
-        for j in 1:length(b)
+    for i in eachindex(b)
+        for j in eachindex(b)
             γ(c[i], c[j], q)
             γ̇ᵢ(c[i], c[j], vᵢ)
             γ̇ⱼ(c[i], c[j], vⱼ)
@@ -177,8 +177,8 @@ function integrate_canonical(γ̇ᵢ, γ̇ⱼ, Θ̇ᵢ, Θ̇ⱼ, b::Vector{TT}, 
 
     local result = zero(DT)
 
-    for i in 1:length(b)
-        for j in 1:length(b)
+    for i in eachindex(b)
+        for j in eachindex(b)
             Θ̇ᵢ(c[i], c[j], vᵢ)
             γ̇ⱼ(c[i], c[j], vⱼ)
             result += b[i] * b[j] * dot(vᵢ,vⱼ)
@@ -220,7 +220,7 @@ function CommonFunctions.write_to_hdf5(pinv::PoincareInvariant2ndTrapezoidal, so
     # h5open(output_file, isfile(output_file) ? "r+" : "w") do h5
     h5open(output_file, "w") do h5
 
-        write(h5, "t", sol.t.t)
+        write(h5, "t", sol.t)
         write(h5, "I", pinv.I)
 
         isdefined(sol, :p) ? write(h5, "J", pinv.J) : nothing

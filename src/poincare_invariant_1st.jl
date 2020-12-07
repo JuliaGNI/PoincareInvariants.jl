@@ -7,9 +7,9 @@ struct PoincareInvariant1st{ET,DT,TT,ΘT}
     ntime::Int
     nsave::Int
     nt::Int
-    I::Vector{DT}
-    J::Vector{DT}
-    L::Vector{DT}
+    I::OffsetArray{DT,1,Vector{DT}}
+    J::OffsetArray{DT,1,Vector{DT}}
+    L::OffsetArray{DT,1,Vector{DT}}
 end
 
 function PoincareInvariant1st(f_equ::Function, f_loop::Function, Θ::ΘT, Δt::TT, d::Int, nloop::Int, ntime::Int, nsave::Int=1, DT=Float64) where {TT,ΘT}
@@ -39,36 +39,36 @@ function PoincareInvariant1st(f_equ::Function, f_loop::Function, Θ::ΘT, Δt::T
     # create arrays for results
     nt = div(ntime, nsave)
 
-    I = zeros(DT, nt+1)
-    J = zeros(DT, nt+1)
-    L = zeros(DT, nt+1)
+    I = OffsetArray(zeros(DT, nt+1), 0:nt)
+    J = OffsetArray(zeros(DT, nt+1), 0:nt)
+    L = OffsetArray(zeros(DT, nt+1), 0:nt)
 
     PoincareInvariant1st{typeof(equ),DT,TT,ΘT}(equ, Θ, Δt, nloop, ntime, nsave, nt, I, J, L)
 end
 
 
 function evaluate_poincare_invariant(pinv::PoincareInvariant1st, sol::Solution)
-    p = zero(sol.q.d)
-    g = zero(sol.q.d)
-    v = zeros(size(sol.q.d,1), size(sol.q.d,3))
-    γ = zeros(size(sol.q.d,1), size(sol.q.d,3))
+    p = zero(sol.q)
+    g = zero(sol.q)
+    v = zeros(size(sol.q,1), size(sol.q,3))
+    γ = zeros(size(sol.q,1), size(sol.q,3))
 
-    compute_one_form(sol.t.t, sol.q.d, p, pinv.Θ)
+    compute_one_form(sol.t, sol.q, p, pinv.Θ)
 
     if isdefined(sol, :λ)
-        compute_correction(sol.t.t, sol.q.d, sol.λ.d, g, pinv.equ.g)
+        compute_correction(sol.t, sol.q, sol.λ, g, pinv.equ.g)
     end
 
-    for i in 1:size(sol.q.d,2)
-        compute_velocity(sol.q.d[:,i,:], v)
+    for i in axes(sol.q,2)
+        compute_velocity(sol.q[:,i,:], v)
         pinv.I[i] = compute_loop_integral(p[:,i,:], v)
 
         if isdefined(sol, :p)
-            pinv.J[i] = compute_loop_integral(sol.p.d[:,i,:], v)
+            pinv.J[i] = compute_loop_integral(sol.d[:,i,:], v)
         end
 
         if isdefined(sol, :λ)
-            compute_velocity(sol.λ.d[:,i,:], γ)
+            compute_velocity(sol.λ[:,i,:], γ)
             pinv.L[i] = compute_loop_integral(p[:,i,:] .- pinv.Δt .* g[:,i,:], v .- pinv.Δt .* γ)
         end
     end
@@ -81,7 +81,7 @@ function CommonFunctions.write_to_hdf5(pinv::PoincareInvariant1st, sol::Solution
     # h5open(output_file, isfile(output_file) ? "r+" : "w") do h5
     h5open(output_file, "w") do h5
 
-        write(h5, "t", sol.t.t)
+        write(h5, "t", sol.t)
         write(h5, "I", pinv.I)
 
         isdefined(sol, :p) ? write(h5, "J", pinv.J) : nothing

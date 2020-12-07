@@ -7,7 +7,7 @@ struct PoincareInvariant2ndCanonical{DT,ND,NC,NV,ET}
     ntime::Int
     nsave::Int
     nt::Int
-    I::Vector{DT}
+    I::OffsetArray{DT,1,Vector{DT}}
 end
 
 function PoincareInvariant2ndCanonical(f_equ::Function, f_surface_q::Function, f_surface_p::Function, Δt::TT, nd::Int, nx::Int, ny::Int, ntime::Int, nsave::Int=1, DT=Float64) where {TT}
@@ -32,7 +32,7 @@ function PoincareInvariant2ndCanonical(f_equ::Function, f_surface_q::Function, f
     q₀ = zeros(DT, (nd, length(c)))
     p₀ = zeros(DT, (nd, length(c)))
 
-    for i in 1:length(c)
+    for i in eachindex(c)
         q₀[:,i] .= f_surface_q(c[i][1], c[i][2])
         p₀[:,i] .= f_surface_p(c[i][1], c[i][2])
     end
@@ -43,7 +43,7 @@ function PoincareInvariant2ndCanonical(f_equ::Function, f_surface_q::Function, f
     # create arrays for results
     nt = div(ntime, nsave)
 
-    I = zeros(DT, nt+1)
+    I = OffsetArray(zeros(DT, nt+1), 0:nt)
 
     # get size of coefficient and value vectors
     SC = Chebyshev(0..1)^2
@@ -63,12 +63,12 @@ end
 function evaluate_poincare_invariant(pinv::PoincareInvariant2ndCanonical{DT}, sol::Solution) where {DT}
     local verbosity = get_config(:verbosity)
 
-    verbosity ≤ 1 ? prog = Progress(size(sol.q.d,2), 5) : nothing
+    verbosity ≤ 1 ? prog = Progress(size(sol.q,2), 5) : nothing
 
-    for i in 1:size(sol.q.d,2)
-        verbosity > 1 ? println("      it = ", i-1) : nothing
-        pinv.I[i] = compute_canonical_invariant(pinv, sol.q.d[:,i,:], sol.p.d[:,i,:])
-        verbosity > 1 ? println("           I_p = ", pinv.I[i], ",   ε_p = ", (pinv.I[i]-pinv.I[1])/pinv.I[1]) : nothing
+    for i in axes(sol.q,2)
+        verbosity > 1 ? println("      it = ", i) : nothing
+        pinv.I[i] = compute_canonical_invariant(pinv, sol.q[:,i,:], sol.p[:,i,:])
+        verbosity > 1 ? println("           I_p = ", pinv.I[i], ",   ε_p = ", (pinv.I[i]-pinv.I[0])/pinv.I[0]) : nothing
 
         verbosity ≤ 1 ? next!(prog) : nothing
     end
@@ -80,7 +80,7 @@ end
 function CommonFunctions.write_to_hdf5(pinv::PoincareInvariant2ndCanonical{DT}, sol::Solution, output_file::String) where {DT}
     # h5open(output_file, isfile(output_file) ? "r+" : "w") do h5
     h5open(output_file, "w") do h5
-        write(h5, "t", sol.t.t)
+        write(h5, "t", sol.t)
         write(h5, "I", pinv.I)
     end
 end

@@ -6,9 +6,9 @@ function vector_matrix_vector_product(x::Vector{T}, A::Matrix{T}, y::Vector{T}) 
 local b::T = 0
 local c::T = 0
 
-@inbounds for i in 1:length(x)
+@inbounds for i in eachindex(x)
     c = 0
-    for j in 1:length(y)
+    for j in eachindex(y)
         c += A[i,j] * y[j]
     end
     b += c * x[i]
@@ -26,9 +26,9 @@ function vector_matrix_vector_product(x::Matrix{T}, A::Matrix{T}, y::Matrix{T}, 
 local b::T = 0
 local c::T = 0
 
-@inbounds for i in 1:size(x,1)
+@inbounds for i in axes(x,1)
     c = 0
-    for j in 1:size(y,1)
+    for j in axes(y,1)
         c += A[i,j] * y[j,ind]
     end
     b += c * x[i,ind]
@@ -44,7 +44,7 @@ function vector_vector_product(x::Matrix{T}, y::Matrix{T}, ind::Int) where {T}
 
 local b::T = 0
 
-@inbounds for i in 1:size(x,1)
+@inbounds for i in axes(x,1)
     b += x[i,ind] * y[i,ind]
 end
 

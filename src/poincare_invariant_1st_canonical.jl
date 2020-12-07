@@ -6,7 +6,7 @@ struct PoincareInvariant1stCanonical{ET,DT,TT}
     ntime::Int
     nsave::Int
     nt::Int
-    I::Vector{DT}
+    I::OffsetArray{DT,1,Vector{DT}}
 end
 
 function PoincareInvariant1stCanonical(f_equ::Function, f_loop_q::Function, f_loop_p::Function, Δt::TT, d::Int, nloop::Int, ntime::Int, nsave::Int, DT=Float64) where {TT}
@@ -38,18 +38,18 @@ function PoincareInvariant1stCanonical(f_equ::Function, f_loop_q::Function, f_lo
     # create arrays for results
     nt = div(ntime, nsave)
 
-    I = zeros(DT, nt+1)
+    I = OffsetArray(zeros(DT, nt+1), 0:nt)
 
     PoincareInvariant1stCanonical{typeof(equ),DT,TT}(equ, Δt, nloop, ntime, nsave, nt, I)
 end
 
 
 function evaluate_poincare_invariant(pinv::PoincareInvariant1stCanonical, sol::SolutionPODE)
-    v = zeros(size(sol.q.d,1), size(sol.q.d,3))
+    v = zeros(size(sol.q,1), size(sol.q,3))
 
-    for i in 1:size(sol.q.d,2)
-        compute_velocity(sol.q.d[:,i,:], v)
-        pinv.I[i] = compute_loop_integral(sol.p.d[:,i,:], v)
+    for i in axes(sol.q,2)
+        compute_velocity(sol.q[:,i,:], v)
+        pinv.I[i] = compute_loop_integral(sol.p[:,i,:], v)
     end
 
     pinv.I
@@ -59,7 +59,7 @@ end
 function CommonFunctions.write_to_hdf5(pinv::PoincareInvariant1stCanonical, sol::Solution, output_file::String)
     # h5open(output_file, isfile(output_file) ? "r+" : "w") do h5
     h5open(output_file, "w") do h5
-        write(h5, "t", sol.t.t)
+        write(h5, "t", sol.t)
         write(h5, "I", pinv.I)
     end
 end

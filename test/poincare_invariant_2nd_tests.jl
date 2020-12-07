@@ -90,14 +90,14 @@ module PoincareInvariant2ndTest
             tq = zeros(eltype(q₀), size(q₀,1))
             tp = zeros(eltype(p₀), size(p₀,1))
 
-            for i in 1:size(q₀,2)
+            for i in axes(q₀,2)
                 tq .= q₀[:,i]
                 gcϑ(zero(eltype(q₀)), tq, tp)
                 p₀[:,i] .= tp
             end
         end
 
-        IODE(gc_dummy, gc_dummy, gc_dummy, q₀, p₀; v=gc_dummy)
+        IODE(gc_dummy, gc_dummy, gc_dummy, q₀, p₀; v̄=gc_dummy)
     end
 
 
@@ -107,7 +107,7 @@ module PoincareInvariant2ndTest
 
         I = evaluate_poincare_invariant(pinv, sol)
 
-        return I[1]
+        return I[0]
     end
 
 
@@ -117,7 +117,7 @@ module PoincareInvariant2ndTest
 
         I, J, K, L = evaluate_poincare_invariant(pinv, sol)
 
-        return I[1], J[1]
+        return I[0], J[0]
     end
 
 
