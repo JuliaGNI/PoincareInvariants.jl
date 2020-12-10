@@ -17,9 +17,7 @@ module PoincareInvariants
     include("poincare_invariant_1st_common.jl")
     include("poincare_invariant_1st.jl")
     include("poincare_invariant_1st_canonical.jl")
-    include("poincare_invariant_2nd.jl")
-    include("poincare_invariant_2nd_canonical.jl")
+    include("poincare_invariant_2nd_approxfun.jl")
     include("poincare_invariant_2nd_trapezoidal.jl")
-    include("poincare_invariant_2nd_common.jl")
 
 end
