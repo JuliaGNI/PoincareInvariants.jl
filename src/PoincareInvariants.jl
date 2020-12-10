@@ -3,10 +3,15 @@ module PoincareInvariants
     using ApproxFun
     using HDF5
     using FFTW
+    using LinearAlgebra
     using OffsetArrays
     using ProgressMeter
     using GeometricIntegrators
     using GeometricIntegrators.Utils
+
+    import DoubleFloats: Double64
+
+    include("matrix_utils.jl")
 
     export PoincareInvariant1st, PoincareInvariant1stCanonical,
            PoincareInvariant2nd, PoincareInvariant2ndCanonical,
@@ -17,7 +22,6 @@ module PoincareInvariants
            evaluate_poincare_invariant_correction,
            write_to_hdf5
 
-    include("matrix_utils.jl")
     abstract type AbstractPoincareInvariant2nd{DT} end
     abstract type AbstractPoincareInvariant2ndApproxFun{DT,ND,NC,NV} <: AbstractPoincareInvariant2nd{DT} end
     

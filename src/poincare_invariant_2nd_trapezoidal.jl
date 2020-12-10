@@ -8,9 +8,10 @@ struct PoincareInvariant2ndTrapezoidal{DT,TT,ET,ΩT} <: AbstractPoincareInvarian
     ntime::Int
     nsave::Int
     nt::Int
-    I::OffsetArray{DT,1,Vector{DT}}
-    J::OffsetArray{DT,1,Vector{DT}}
-    L::OffsetArray{DT,1,Vector{DT}}
+    I::OffsetArray{Double64,1,Vector{Double64}}
+    J::OffsetArray{Double64,1,Vector{Double64}}
+    ΔI::OffsetArray{Double64,1,Vector{Double64}}
+    ΔJ::OffsetArray{Double64,1,Vector{Double64}}
 end
 
 function PoincareInvariant2ndTrapezoidal(f_equ::Function, f_surface::Function, ω::ΩT, Δt::TT, d::Int, nx::Int, ny::Int, ntime::Int, nsave::Int=1, DT=Float64) where {TT,ΩT}
@@ -27,7 +28,7 @@ function PoincareInvariant2ndTrapezoidal(f_equ::Function, f_surface::Function, �
     println()
 
     # compute initial conditions
-    q₀ = zeros(d, nx*ny)
+    q₀ = zeros(DT, (d, nx*ny))
 
     for j in 1:ny
         for i in 1:nx
@@ -40,9 +41,10 @@ function PoincareInvariant2ndTrapezoidal(f_equ::Function, f_surface::Function, �
     # create arrays for results
     nt = div(ntime, nsave)
 
-    I = OffsetArray(zeros(DT, nt+1), 0:nt)
-    J = OffsetArray(zeros(DT, nt+1), 0:nt)
-    L = OffsetArray(zeros(DT, nt+1), 0:nt)
+    I  = OffsetArray(zeros(Double64, nt+1), 0:nt)
+    J  = OffsetArray(zeros(Double64, nt+1), 0:nt)
+    ΔI = OffsetArray(zeros(Double64, nt+1), 0:nt)
+    ΔJ = OffsetArray(zeros(Double64, nt+1), 0:nt)
 
     PoincareInvariant2ndTrapezoidal{DT,TT,typeof(equ),ΩT}(equ, ω, Δt, nx, ny, ntime, nsave, nt, I, J, ΔI, ΔJ)
 end
@@ -51,11 +53,18 @@ end
 
 function evaluate_poincare_invariant(pinv::PoincareInvariant2ndTrapezoidal{DT}, sol::Solution) where {DT}
     for i in axes(sol.q,2)
-        pinv.I[i] = surface_integral(sol.t[i], sol.q[:,i,:], pinv.ω, pinv.nx, pinv.ny)
-        pinv.J[i] = surface_integral_canonical(sol.q[:,i,:], sol.p[:,i,:], pinv.nx, pinv.ny)
+        pinv.I[i]  = surface_integral(sol.t[i], sol.q[:,i,:], pinv.ω, pinv.nx, pinv.ny)
+        pinv.ΔI[i] = abs(pinv.I[0]) < sqrt(eps()) ? pinv.I[i] : (pinv.I[i] .- pinv.I[0]) ./ pinv.I[0]
     end
 
-    return (pinv.I, pinv.J, pinv.L)
+    if hasproperty(sol, :p)
+        for i in axes(sol.q,2)
+            pinv.J[i] = surface_integral_canonical(sol.q[:,i,:], sol.p[:,i,:], pinv.nx, pinv.ny)
+            pinv.ΔJ[i] = abs(pinv.J[0]) < sqrt(eps()) ? pinv.J[i] : (pinv.J[i] .- pinv.J[0]) ./ pinv.J[0]
+        end
+    end
+
+    return (DT.(pinv.I), DT.(pinv.J), DT.(pinv.ΔI), DT.(pinv.ΔJ))
 end
 
 
@@ -130,7 +139,7 @@ end
 function integrate(t, γ, γ̇ᵢ, γ̇ⱼ, ω, b::Vector{TT}, c::Vector{TT}, q::Vector{DT}, vᵢ::Vector{DT}, vⱼ::Vector{DT}, B::Matrix{DT}) where {DT,TT}
     @assert length(b) == length(c)
 
-    local result = zero(DT)
+    local result = zero(Double64)
 
     for i in eachindex(b)
         for j in eachindex(b)
@@ -146,7 +155,7 @@ function integrate(t, γ, γ̇ᵢ, γ̇ⱼ, ω, b::Vector{TT}, c::Vector{TT}, q:
     return result
 end
 
-function surface_integral(t, x::Matrix{DT}, ω, nx, ny) where {DT}
+function surface_integral(t, x::AbstractMatrix{DT}, ω, nx, ny) where {DT}
     local b = [0.5, 0.5]
     local c = [0.0, 1.0]
 
@@ -154,7 +163,7 @@ function surface_integral(t, x::Matrix{DT}, ω, nx, ny) where {DT}
     local vᵢ = zeros(DT, size(x,1))
     local vⱼ = zeros(DT, size(x,1))
     local B  = zeros(DT, size(x,1), size(x,1))
-    local I  = zero(DT)
+    local I  = zero(Double64)
 
     integrate_trapezoidal = (γ, γ̇ᵢ, γ̇ⱼ) -> integrate(t, γ, γ̇ᵢ, γ̇ⱼ, ω, b, c, q, vᵢ, vⱼ, B)
 
@@ -175,7 +184,7 @@ end
 function integrate_canonical(γ̇ᵢ, γ̇ⱼ, Θ̇ᵢ, Θ̇ⱼ, b::Vector{TT}, c::Vector{TT}, vᵢ::Vector{DT}, vⱼ::Vector{DT}) where {DT,TT}
     @assert length(b) == length(c)
 
-    local result = zero(DT)
+    local result = zero(Double64)
 
     for i in eachindex(b)
         for j in eachindex(b)
@@ -192,13 +201,13 @@ function integrate_canonical(γ̇ᵢ, γ̇ⱼ, Θ̇ᵢ, Θ̇ⱼ, b::Vector{TT}, 
     return result
 end
 
-function surface_integral_canonical(q::Matrix{DT}, p::Matrix{DT}, nx, ny) where {DT}
+function surface_integral_canonical(q::AbstractMatrix{DT}, p::AbstractMatrix{DT}, nx, ny) where {DT}
     local b = [0.5, 0.5]
     local c = [0.0, 1.0]
 
     local vᵢ = zeros(DT, size(q,1))
     local vⱼ = zeros(DT, size(q,1))
-    local I  = zero(DT)
+    local I  = zero(Double64)
 
     integrate_trapezoidal = (γ, γ̇ᵢ, γ̇ⱼ, Θ̇ᵢ, Θ̇ⱼ) -> integrate_canonical(γ̇ᵢ, γ̇ⱼ, Θ̇ᵢ, Θ̇ⱼ, b, c, vᵢ, vⱼ)
 

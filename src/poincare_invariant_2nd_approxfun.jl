@@ -11,10 +11,12 @@ struct PoincareInvariant2ndApproxFun{DT,ND,NC,NV,ET,ΩT,ϑT} <: AbstractPoincare
     ntime::Int
     nsave::Int
     nt::Int
-    I::OffsetArray{DT,1,Vector{DT}}
-    J::OffsetArray{DT,1,Vector{DT}}
-    K::OffsetArray{DT,1,Vector{DT}}
-    L::OffsetArray{DT,1,Vector{DT}}
+    I::OffsetArray{Double64,1,Vector{Double64}}
+    J::OffsetArray{Double64,1,Vector{Double64}}
+    K::OffsetArray{Double64,1,Vector{Double64}}
+    L::OffsetArray{Double64,1,Vector{Double64}}
+    ΔI::OffsetArray{Double64,1,Vector{Double64}}
+    ΔJ::OffsetArray{Double64,1,Vector{Double64}}
 end
 
 function PoincareInvariant2ndApproxFun(f_equ::Function, f_surface::Function, ω::ΩT, D²ϑ::ϑT, Δt::TT, nd::Int, nx::Int, ny::Int, ntime::Int, nsave::Int=1, DT=Float64) where {TT,ΩT,ϑT}
@@ -48,10 +50,12 @@ function PoincareInvariant2ndApproxFun(f_equ::Function, f_surface::Function, ω:
     # create arrays for results
     nt = div(ntime, nsave)
 
-    I = OffsetArray(zeros(DT, nt+1), 0:nt)
-    J = OffsetArray(zeros(DT, nt+1), 0:nt)
-    K = OffsetArray(zeros(DT, nt+1), 0:nt)
-    L = OffsetArray(zeros(DT, nt+1), 0:nt)
+    I  = OffsetArray(zeros(Double64, nt+1), 0:nt)
+    J  = OffsetArray(zeros(Double64, nt+1), 0:nt)
+    K  = OffsetArray(zeros(Double64, nt+1), 0:nt)
+    L  = OffsetArray(zeros(Double64, nt+1), 0:nt)
+    ΔI = OffsetArray(zeros(Double64, nt+1), 0:nt)
+    ΔJ = OffsetArray(zeros(Double64, nt+1), 0:nt)
 
     # get size of coefficient and value vectors
     SC = Chebyshev(0..1)^2
@@ -90,14 +94,28 @@ function evaluate_poincare_invariant(pinv::PoincareInvariant2ndApproxFun{DT}, so
     for i in axes(sol.q,2)
         verbosity > 1 ? println("      it = ", i-1) : nothing
         pinv.I[i] = compute_noncanonical_invariant(pinv, sol.t[i], sol.q[:,i,:])
+        pinv.ΔI[i] = abs(pinv.I[0]) < sqrt(eps()) ? pinv.I[i] : (pinv.I[i] .- pinv.I[0]) ./ pinv.I[0]
         verbosity > 1 ? println("           I_q = ", pinv.I[i], ",   ε_q = ", (pinv.I[i]-pinv.I[0])/pinv.I[0]) : nothing
-
-        if isdefined(sol, :p)
-            pinv.J[i] = compute_canonical_invariant(pinv, sol.q[:,i,:], sol.p[:,i,:])
-            verbosity > 1 ? println("           I_p = ", pinv.J[i], ",   ε_p = ", (pinv.J[i]-pinv.J[0])/pinv.J[0]) : nothing
         end
 
-        if isdefined(sol, :λ)
+    if isdefined(sol, :p)
+        for i in axes(sol.q,2)
+            pinv.J[i] = compute_canonical_invariant(pinv, sol.q[:,i,:], sol.p[:,i,:])
+            pinv.ΔJ[i] = abs(pinv.J[0]) < sqrt(eps()) ? pinv.J[i] : (pinv.J[i] .- pinv.J[0]) ./ pinv.J[0]
+            verbosity > 1 ? println("           I_p = ", pinv.J[i], ",   ε_p = ", (pinv.J[i]-pinv.J[0])/pinv.J[0]) : nothing
+        end
+    end
+
+    return (DT.(pinv.I), DT.(pinv.J), DT.(pinv.ΔI), DT.(pinv.ΔJ))
+end
+
+
+function evaluate_poincare_invariant_correction(pinv::PoincareInvariant2ndApproxFun{DT}, sol::Solution) where {DT}
+
+    local verbosity = get_config(:verbosity)
+
+    if isdefined(sol, :λ)
+        for i in axes(sol.q,2)
             pinv.K[i] = compute_noncanonical_correction(pinv, sol.t[i], sol.q[:,i,:], sol.λ[:,i,:])
             pinv.L[i] = pinv.I[i] - pinv.Δt^2 * pinv.K[i]
             verbosity > 1 ? println("           I_λ = ", pinv.L[i], ",   ε_λ = ", (pinv.L[i]-pinv.L[0])/pinv.L[0]) : nothing
@@ -107,7 +125,7 @@ function evaluate_poincare_invariant(pinv::PoincareInvariant2ndApproxFun{DT}, so
         verbosity ≤ 1 ? next!(prog) : nothing
     end
 
-    return (pinv.I, pinv.J, pinv.K, pinv.L)
+    return (DT.(pinv.K), DT.(pinv.L))
 end
 
 
@@ -121,7 +139,6 @@ function CommonFunctions.write_to_hdf5(pinv::PoincareInvariant2ndApproxFun{DT}, 
         isdefined(sol, :p) ? write(h5, "J", pinv.J) : nothing
         isdefined(sol, :λ) ? write(h5, "K", pinv.L) : nothing
         isdefined(sol, :λ) ? write(h5, "L", pinv.L) : nothing
-
     end
 end
 
@@ -136,7 +153,8 @@ struct PoincareInvariant2ndApproxFunCanonical{DT,ND,NC,NV,ET} <: AbstractPoincar
     ntime::Int
     nsave::Int
     nt::Int
-    I::OffsetArray{DT,1,Vector{DT}}
+    I::OffsetArray{Double64,1,Vector{Double64}}
+    ΔI::OffsetArray{Double64,1,Vector{Double64}}
 end
 
 function PoincareInvariant2ndApproxFunCanonical(f_equ::Function, f_surface_q::Function, f_surface_p::Function, Δt::TT, nd::Int, nx::Int, ny::Int, ntime::Int, nsave::Int=1, DT=Float64) where {TT}
@@ -172,7 +190,8 @@ function PoincareInvariant2ndApproxFunCanonical(f_equ::Function, f_surface_q::Fu
     # create arrays for results
     nt = div(ntime, nsave)
 
-    I = OffsetArray(zeros(DT, nt+1), 0:nt)
+    I  = OffsetArray(zeros(Double64, nt+1), 0:nt)
+    ΔI = OffsetArray(zeros(Double64, nt+1), 0:nt)
 
     # get size of coefficient and value vectors
     SC = Chebyshev(0..1)^2
