@@ -1,5 +1,5 @@
 
-struct PoincareInvariant2ndTrapezoidal{ET,DT,TT,ΩT}
+struct PoincareInvariant2ndTrapezoidal{DT,TT,ET,ΩT} <: AbstractPoincareInvariant2nd{DT}
     equ::ET
     ω::ΩT
     Δt::TT
@@ -44,12 +44,12 @@ function PoincareInvariant2ndTrapezoidal(f_equ::Function, f_surface::Function, �
     J = OffsetArray(zeros(DT, nt+1), 0:nt)
     L = OffsetArray(zeros(DT, nt+1), 0:nt)
 
-    PoincareInvariant2ndTrapezoidal{typeof(equ),DT,TT,ΩT}(equ, ω, Δt, nx, ny, ntime, nsave, nt, I, J, L)
+    PoincareInvariant2ndTrapezoidal{DT,TT,typeof(equ),ΩT}(equ, ω, Δt, nx, ny, ntime, nsave, nt, I, J, ΔI, ΔJ)
 end
 
 
 
-function evaluate_poincare_invariant(pinv::PoincareInvariant2ndTrapezoidal, sol::Solution)
+function evaluate_poincare_invariant(pinv::PoincareInvariant2ndTrapezoidal{DT}, sol::Solution) where {DT}
     for i in axes(sol.q,2)
         pinv.I[i] = surface_integral(sol.t[i], sol.q[:,i,:], pinv.ω, pinv.nx, pinv.ny)
         pinv.J[i] = surface_integral_canonical(sol.q[:,i,:], sol.p[:,i,:], pinv.nx, pinv.ny)

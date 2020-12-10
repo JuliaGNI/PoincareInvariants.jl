@@ -1,7 +1,7 @@
 
 ## 2nd Poincaré Invariant for general two-form
 
-struct PoincareInvariant2nd{DT,ND,NC,NV,ET,ΩT,ϑT}
+struct PoincareInvariant2ndApproxFun{DT,ND,NC,NV,ET,ΩT,ϑT} <: AbstractPoincareInvariant2ndApproxFun{DT,ND,NC,NV}
     equ::ET
     ω::ΩT
     D²ϑ::ϑT
@@ -17,7 +17,7 @@ struct PoincareInvariant2nd{DT,ND,NC,NV,ET,ΩT,ϑT}
     L::OffsetArray{DT,1,Vector{DT}}
 end
 
-function PoincareInvariant2nd(f_equ::Function, f_surface::Function, ω::ΩT, D²ϑ::ϑT, Δt::TT, nd::Int, nx::Int, ny::Int, ntime::Int, nsave::Int=1, DT=Float64) where {TT,ΩT,ϑT}
+function PoincareInvariant2ndApproxFun(f_equ::Function, f_surface::Function, ω::ΩT, D²ϑ::ϑT, Δt::TT, nd::Int, nx::Int, ny::Int, ntime::Int, nsave::Int=1, DT=Float64) where {TT,ΩT,ϑT}
 
     if get_config(:verbosity) > 1
         println()
@@ -64,16 +64,16 @@ function PoincareInvariant2nd(f_equ::Function, f_surface::Function, ω::ΩT, D²
     nv = length(values(fq))
 
     # initialise Poincare invariant
-    PoincareInvariant2nd{DT,nd,nc,nv,typeof(equ),ΩT,ϑT}(equ, ω, D²ϑ, DT(Δt), nx, ny, ntime, nsave, nt, I, J, K, L)
+    PoincareInvariant2ndApproxFun{DT,nd,nc,nv,typeof(equ),ΩT,ϑT}(equ, ω, D²ϑ, DT(Δt), nx, ny, ntime, nsave, nt, I, J, K, L, ΔI, ΔJ)
 end
 
 
-function PoincareInvariant2nd(f_equ::Function, f_surface::Function, ω::ΩT, Δt::TT, nd::Int, nx::Int, ny::Int, ntime::Int, nsave::Int=1, DT=Float64) where {TT,ΩT}
-    PoincareInvariant2nd(f_equ, f_surface, ω, (), Δt, nd, nx, ny, ntime, nsave, DT)
+function PoincareInvariant2ndApproxFun(f_equ::Function, f_surface::Function, ω::ΩT, Δt::TT, nd::Int, nx::Int, ny::Int, ntime::Int, nsave::Int=1, DT=Float64) where {TT,ΩT}
+    PoincareInvariant2ndApproxFun(f_equ, f_surface, ω, (), Δt, nd, nx, ny, ntime, nsave, DT)
 end
 
 
-function evaluate_poincare_invariant(pinv::PoincareInvariant2nd{DT}, sol::Solution) where {DT}
+function evaluate_poincare_invariant(pinv::PoincareInvariant2ndApproxFun{DT}, sol::Solution) where {DT}
 
     local verbosity = get_config(:verbosity)
 
@@ -111,7 +111,7 @@ function evaluate_poincare_invariant(pinv::PoincareInvariant2nd{DT}, sol::Soluti
 end
 
 
-function CommonFunctions.write_to_hdf5(pinv::PoincareInvariant2nd{DT}, sol::Solution, output_file::String) where {DT}
+function CommonFunctions.write_to_hdf5(pinv::PoincareInvariant2ndApproxFun{DT}, sol::Solution, output_file::String) where {DT}
     # h5open(output_file, isfile(output_file) ? "r+" : "w") do h5
     h5open(output_file, "w") do h5
 
@@ -128,7 +128,7 @@ end
 
 ## 2nd Poincaré Invariant for canonical two-form
 
-struct PoincareInvariant2ndCanonical{DT,ND,NC,NV,ET}
+struct PoincareInvariant2ndApproxFunCanonical{DT,ND,NC,NV,ET} <: AbstractPoincareInvariant2ndApproxFun{DT,ND,NC,NV}
     equ::ET
     Δt::DT
     nx::Int
@@ -139,7 +139,7 @@ struct PoincareInvariant2ndCanonical{DT,ND,NC,NV,ET}
     I::OffsetArray{DT,1,Vector{DT}}
 end
 
-function PoincareInvariant2ndCanonical(f_equ::Function, f_surface_q::Function, f_surface_p::Function, Δt::TT, nd::Int, nx::Int, ny::Int, ntime::Int, nsave::Int=1, DT=Float64) where {TT}
+function PoincareInvariant2ndApproxFunCanonical(f_equ::Function, f_surface_q::Function, f_surface_p::Function, Δt::TT, nd::Int, nx::Int, ny::Int, ntime::Int, nsave::Int=1, DT=Float64) where {TT}
 
     if get_config(:verbosity) > 1
         println()
@@ -185,11 +185,11 @@ function PoincareInvariant2ndCanonical(f_equ::Function, f_surface_q::Function, f
     nv = length(values(fq))
 
     # initialise Poincare invariant
-    PoincareInvariant2ndCanonical{DT,nd,nc,nv,typeof(equ)}(equ, DT(Δt), nx, ny, ntime, nsave, nt, I)
+    PoincareInvariant2ndApproxFunCanonical{DT,nd,nc,nv,typeof(equ)}(equ, DT(Δt), nx, ny, ntime, nsave, nt, I, ΔI)
 end
 
 
-function evaluate_poincare_invariant(pinv::PoincareInvariant2ndCanonical{DT}, sol::Solution) where {DT}
+function evaluate_poincare_invariant(pinv::PoincareInvariant2ndApproxFunCanonical{DT}, sol::Solution) where {DT}
     local verbosity = get_config(:verbosity)
 
     verbosity ≤ 1 ? prog = Progress(size(sol.q,2), 5) : nothing
@@ -206,7 +206,7 @@ function evaluate_poincare_invariant(pinv::PoincareInvariant2ndCanonical{DT}, so
 end
 
 
-function CommonFunctions.write_to_hdf5(pinv::PoincareInvariant2ndCanonical{DT}, sol::Solution, output_file::String) where {DT}
+function CommonFunctions.write_to_hdf5(pinv::PoincareInvariant2ndApproxFunCanonical{DT}, sol::Solution, output_file::String) where {DT}
     # h5open(output_file, isfile(output_file) ? "r+" : "w") do h5
     h5open(output_file, "w") do h5
         write(h5, "t", sol.t)
@@ -244,7 +244,7 @@ end
     end
 end
 
-@generated function compute_canonical_invariant(pinv::Union{PoincareInvariant2nd{DT,ND,NC,NV},PoincareInvariant2ndCanonical{DT,ND,NC,NV}}, q::AbstractArray{DT,2}, p::AbstractArray{DT,2}) where {DT,ND,NC,NV}
+@generated function compute_canonical_invariant(pinv::AbstractPoincareInvariant2ndApproxFun{DT,ND,NC,NV}, q::AbstractArray{DT,2}, p::AbstractArray{DT,2}) where {DT,ND,NC,NV}
     SC = Chebyshev(0..1)^2
     SU = Ultraspherical(1, 0..1)^2
 
@@ -278,7 +278,7 @@ end
     end
 end
 
-@generated function compute_noncanonical_invariant(pinv::PoincareInvariant2nd{DT,ND,NC,NV}, t::DT, q::AbstractArray{DT,2}) where {DT,ND,NC,NV}
+@generated function compute_noncanonical_invariant(pinv::PoincareInvariant2ndApproxFun{DT,ND,NC,NV}, t::DT, q::AbstractArray{DT,2}) where {DT,ND,NC,NV}
     SC = Chebyshev(0..1)^2
     SU = Ultraspherical(1, 0..1)^2
     CU = Conversion(SC, SU)
@@ -313,7 +313,7 @@ end
 end
 
 
-@generated function compute_noncanonical_correction(pinv::PoincareInvariant2nd{DT,ND,NC,NV}, t::DT, q::AbstractArray{DT,2}, λ::AbstractArray{DT,2}) where {DT,ND,NC,NV}
+@generated function compute_noncanonical_correction(pinv::PoincareInvariant2ndApproxFun{DT,ND,NC,NV}, t::DT, q::AbstractArray{DT,2}, λ::AbstractArray{DT,2}) where {DT,ND,NC,NV}
     SC = Chebyshev(0..1)^2
     SU = Ultraspherical(1, 0..1)^2
     CU = Conversion(SC, SU)
