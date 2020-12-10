@@ -106,7 +106,8 @@ function evaluate_poincare_invariant(pinv::PoincareInvariant2ndApproxFun{DT}, so
         pinv.ΔI[i] = abs(pinv.I[0]) < sqrt(eps()) ? pinv.I[i] : (pinv.I[i] .- pinv.I[0]) ./ pinv.I[0]
         verbosity > 1 ? println("           I_q = ", pinv.I[i], ",   ε_q = ", pinv.ΔI[i]) : nothing
 
-        if isdefined(sol, :p)
+    if isdefined(sol, :p)
+        for i in axes(sol.q,2)
             pinv.J[i] = compute_canonical_invariant(pinv, sol.q[:,i,:], sol.p[:,i,:])
             pinv.ΔJ[i] = abs(pinv.J[0]) < sqrt(eps()) ? pinv.J[i] : (pinv.J[i] .- pinv.J[0]) ./ pinv.J[0]
             verbosity > 1 ? println("           I_p = ", pinv.J[i], ",   ε_p = ", pinv.ΔJ[i]) : nothing
