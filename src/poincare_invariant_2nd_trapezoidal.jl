@@ -13,7 +13,7 @@ struct PoincareInvariant2ndTrapezoidal{ET,DT,TT,ΩT}
     L::OffsetArray{DT,1,Vector{DT}}
 end
 
-function PoincareInvariant2ndTrapezoidal(f_equ::Function, f_surface::Function, ω::ΩT, Δt::TT, d::Int, nx::Int, ny::Int, ntime::Int, nsave::Int, DT=Float64) where {TT,ΩT}
+function PoincareInvariant2ndTrapezoidal(f_equ::Function, f_surface::Function, ω::ΩT, Δt::TT, d::Int, nx::Int, ny::Int, ntime::Int, nsave::Int=1, DT=Float64) where {TT,ΩT}
 
     println()
     println("Second Euler-Poincaré Integral Invariant")
