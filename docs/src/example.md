@@ -46,7 +46,7 @@ nothing # hide
 ```
 
 
-## 2nd Poincaré Invariant • Trapezoidal Quadrature
+## Trapezoidal Quadrature
 
 Create Poincaré Invariant
 ```@example 2
@@ -96,7 +96,7 @@ savefig("example_2nd_trapezoidal_evolution2.png")
 Compute Poincarè invariant
 ```@example 2
 I, J, ΔI, ΔJ = evaluate_poincare_invariant(pinv, sol)
-nothing # hide
+pinv.I[0]
 ```
 
 Plot invariant error
@@ -116,7 +116,7 @@ savefig("example_2nd_trapezoidal.svg")
 ![](example_2nd_trapezoidal.svg)
 
 
-## 2nd Poincaré Invariant • ApproxFun
+## ApproxFun
 
 Create Poincaré Invariant
 ```@example 2
@@ -167,7 +167,7 @@ savefig("example_2nd_approxfun_evolution2.png")
 Compute Poincarè invariant
 ```@example 2
 I, J, ΔI, ΔJ = evaluate_poincare_invariant(pinv, sol)
-nothing # hide
+pinv.I[0]
 ```
 
 Plot invariant error
@@ -187,6 +187,72 @@ savefig("example_2nd_approxfun.svg")
 ![](example_2nd_approxfun.svg)
 
 
-## 2nd Poincaré Invariant • OrthogonalPolynomialsQuasi
+## OrthogonalPolynomialsQuasi
 
+Create Poincaré Invariant
+```@example 2
+pinv = PoincareInvariant2ndOPQ(
+            x₀ -> ode = ODE(f, x₀), surface, omega,
+            Δt, nd, n₀, n₀, nt)
+nothing # hide
+```
+
+Compute solution
+```@example 2
+tab = TableauGLRK(1)
+int = Integrator(pinv.equ, tab, pinv.Δt)
+sol = integrate(pinv.equ, int, pinv.ntime)
+nothing # hide
+```
+
+Plot solution
+```@example 2
+fig = figure(figsize=(4,4))
+plot(sol.q[1,0,:], sol.q[2,0,:], ".", markersize=.5)
+savefig("example_2nd_opq_initial_state.svg")
+
+fig = figure(figsize=(4,4))
+plot(sol.q[1,end,:], sol.q[2,end,:], ".", markersize=.5)
+savefig("example_2nd_opq_final_state.svg")
+
+fig = figure(figsize=(4,4))
+for i in 1:n₀
+    plot3D(sol.q[1,:,i], sol.q[2,:,i], collect(0:nt)*Δt)
+end
+savefig("example_2nd_opq_evolution1.png")
+
+fig = figure(figsize=(4,4))
+for i in 0:20:nt
+    plot3D(sol.q[1,i,:], sol.q[2,i,:], i*Δt)
+end
+savefig("example_2nd_opq_evolution2.png")
+```
+
+![Initial State](example_2nd_opq_initial_state.svg)
+![Final State](example_2nd_opq_final_state.svg)
+
+![Evolution](example_2nd_opq_evolution1.png)
+![Evolution](example_2nd_opq_evolution2.png)
+
+Compute Poincarè invariant
+```@example 2
+I, J, ΔI, ΔJ = evaluate_poincare_invariant(pinv, sol)
+pinv.I[0]
+```
+
+Plot invariant error
+```@example 2
+yf = matplotlib[:ticker][:ScalarFormatter]()
+yf[:set_powerlimits]((-1,+1))
+yf[:set_scientific](true)
+yf[:set_useOffset](true)
+
+fig = figure(figsize=(8,4))
+plot((0:nt)*Δt, ΔI)
+ax = gca()
+ax[:yaxis][:set_major_formatter](yf)
+savefig("example_2nd_opq.svg")
+```
+
+![](example_2nd_opq.svg)
 

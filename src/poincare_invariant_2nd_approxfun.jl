@@ -1,4 +1,7 @@
 
+import ApproxFun
+import ApproxFun: Fun, ⊗, (..)
+
 ## 2nd Poincaré Invariant for general two-form
 
 struct PoincareInvariant2ndApproxFun{DT,ND,NC,NV,ET,ΩT,ϑT} <: AbstractPoincareInvariant2ndApproxFun{DT,ND,NC,NV}
@@ -21,21 +24,8 @@ end
 
 function PoincareInvariant2ndApproxFun(f_equ::Function, f_surface::Function, ω::ΩT, D²ϑ::ϑT, Δt::TT, nd::Int, nx::Int, ny::Int, ntime::Int, nsave::Int=1, DT=Float64) where {TT,ΩT,ϑT}
 
-    if get_config(:verbosity) > 1
-        println()
-        println("Second Euler-Poincaré Integral Invariant")
-        println("========================================")
-        println()
-        println(" nx    = ", nx)
-        println(" ny    = ", ny)
-        println(" ntime = ", ntime)
-        println(" nsave = ", nsave)
-        println(" Δt    = ", Δt)
-        println()
-    end
-
     # compute Chebyshev points
-    c = points(Chebyshev(0..1)^2, nx*ny)
+    c = ApproxFun.points(ApproxFun.Chebyshev(0..1)^2, nx*ny)
 
     # compute initial conditions
     q₀ = zeros(DT, (nd, length(c)))
@@ -58,14 +48,33 @@ function PoincareInvariant2ndApproxFun(f_equ::Function, f_surface::Function, ω:
     ΔJ = OffsetArray(zeros(Double64, nt+1), 0:nt)
 
     # get size of coefficient and value vectors
-    SC = Chebyshev(0..1)^2
-    SU = Ultraspherical(1, 0..1)^2
-    Dx = Derivative(SC, [1,0])
-    Dy = Derivative(SC, [0,1])
+    SC = ApproxFun.Chebyshev(0..1)^2
+    SU = ApproxFun.Ultraspherical(1, 0..1)^2
+    Dx = ApproxFun.Derivative(SC, [1,0])
+    Dy = ApproxFun.Derivative(SC, [0,1])
 
-    fq = Fun(Dx * Fun(SC, ApproxFun.transform(SC, q₀[1,:])), SU)
-    nc = ncoefficients(fq)
-    nv = length(values(fq))
+    fqc = Fun(SC, ApproxFun.transform(SC, q₀[1,:]))
+    fqu = Fun(Dx * fqc, SU)
+    nc = ApproxFun.ncoefficients(fqu)
+    nv = length(ApproxFun.values(fqu))
+
+    if get_config(:verbosity) > 1
+        println()
+        println("Second Euler-Poincaré Integral Invariant (ApproxFun)")
+        println("====================================================")
+        println()
+        println(" nx    = ", nx)
+        println(" ny    = ", ny)
+        println(" np    = ", length(c))
+        println(" nc(CC)= ", ApproxFun.ncoefficients(fqc))
+        println(" nv(CC)= ", length(ApproxFun.values(fqc)))
+        println(" nc(US)= ", nc)
+        println(" nv(US)= ", nv)
+        println(" ntime = ", ntime)
+        println(" nsave = ", nsave)
+        println(" Δt    = ", Δt)
+        println()
+    end
 
     # initialise Poincare invariant
     PoincareInvariant2ndApproxFun{DT,nd,nc,nv,typeof(equ),ΩT,ϑT}(equ, ω, D²ϑ, DT(Δt), nx, ny, ntime, nsave, nt, I, J, K, L, ΔI, ΔJ)
@@ -92,17 +101,15 @@ function evaluate_poincare_invariant(pinv::PoincareInvariant2ndApproxFun{DT}, so
     verbosity ≤ 1 ? prog = Progress(size(sol.q,2), 5) : nothing
 
     for i in axes(sol.q,2)
-        verbosity > 1 ? println("      it = ", i-1) : nothing
+        verbosity > 1 ? println("      it = ", i) : nothing
         pinv.I[i] = compute_noncanonical_invariant(pinv, sol.t[i], sol.q[:,i,:])
         pinv.ΔI[i] = abs(pinv.I[0]) < sqrt(eps()) ? pinv.I[i] : (pinv.I[i] .- pinv.I[0]) ./ pinv.I[0]
-        verbosity > 1 ? println("           I_q = ", pinv.I[i], ",   ε_q = ", (pinv.I[i]-pinv.I[0])/pinv.I[0]) : nothing
-        end
+        verbosity > 1 ? println("           I_q = ", pinv.I[i], ",   ε_q = ", pinv.ΔI[i]) : nothing
 
-    if isdefined(sol, :p)
-        for i in axes(sol.q,2)
+        if isdefined(sol, :p)
             pinv.J[i] = compute_canonical_invariant(pinv, sol.q[:,i,:], sol.p[:,i,:])
             pinv.ΔJ[i] = abs(pinv.J[0]) < sqrt(eps()) ? pinv.J[i] : (pinv.J[i] .- pinv.J[0]) ./ pinv.J[0]
-            verbosity > 1 ? println("           I_p = ", pinv.J[i], ",   ε_p = ", (pinv.J[i]-pinv.J[0])/pinv.J[0]) : nothing
+            verbosity > 1 ? println("           I_p = ", pinv.J[i], ",   ε_p = ", pinv.ΔJ[i]) : nothing
         end
     end
 
@@ -161,8 +168,8 @@ function PoincareInvariant2ndApproxFunCanonical(f_equ::Function, f_surface_q::Fu
 
     if get_config(:verbosity) > 1
         println()
-        println("Second Euler-Poincaré Integral Invariant")
-        println("========================================")
+        println("Second Canonical Euler-Poincaré Integral Invariant (ApproxFun)")
+        println("==============================================================")
         println()
         println(" nx    = ", nx)
         println(" ny    = ", ny)
@@ -173,7 +180,7 @@ function PoincareInvariant2ndApproxFunCanonical(f_equ::Function, f_surface_q::Fu
     end
 
     # compute Chebyshev points
-    c = points(Chebyshev(0..1)^2, nx*ny)
+    c = ApproxFun.points(ApproxFun.Chebyshev(0..1)^2, nx*ny)
 
     # compute initial conditions
     q₀ = zeros(DT, (nd, length(c)))
@@ -194,14 +201,14 @@ function PoincareInvariant2ndApproxFunCanonical(f_equ::Function, f_surface_q::Fu
     ΔI = OffsetArray(zeros(Double64, nt+1), 0:nt)
 
     # get size of coefficient and value vectors
-    SC = Chebyshev(0..1)^2
-    SU = Ultraspherical(1, 0..1)^2
-    Dx = Derivative(SC, [1,0])
-    Dy = Derivative(SC, [0,1])
+    SC = ApproxFun.Chebyshev(0..1)^2
+    SU = ApproxFun.Ultraspherical(1, 0..1)^2
+    Dx = ApproxFun.Derivative(SC, [1,0])
+    Dy = ApproxFun.Derivative(SC, [0,1])
 
     fq = Fun(Dx * Fun(SC, ApproxFun.transform(SC, q₀[1,:])), SU)
-    nc = ncoefficients(fq)
-    nv = length(values(fq))
+    nc = ApproxFun.ncoefficients(fq)
+    nv = length(ApproxFun.values(fq))
 
     # initialise Poincare invariant
     PoincareInvariant2ndApproxFunCanonical{DT,nd,nc,nv,typeof(equ)}(equ, DT(Δt), nx, ny, ntime, nsave, nt, I, ΔI)
@@ -237,8 +244,8 @@ end
 ## Common functionality
 
 @generated function compute_integral(Is)
-    SU = Ultraspherical(1, 0..1)^2
-    Q  = DefiniteIntegral(SU)
+    SU = ApproxFun.Ultraspherical(1, 0..1)^2
+    Q  = ApproxFun.DefiniteIntegral(SU)
 
     quote
         return Number( $Q * Fun($SU, ApproxFun.transform($SU, Is)) )
@@ -246,8 +253,8 @@ end
 end
 
 @generated function compute_derivative1(q)
-    Dx = Derivative(Chebyshev(0..1)^2, [1,0])
-    CU = Conversion(Ultraspherical(1, 0..1) ⊗ Chebyshev(0..1), Ultraspherical(1, 0..1)^2)
+    Dx = ApproxFun.Derivative(ApproxFun.Chebyshev(0..1)^2, [1,0])
+    CU = ApproxFun.Conversion(ApproxFun.Ultraspherical(1, 0..1) ⊗ ApproxFun.Chebyshev(0..1), ApproxFun.Ultraspherical(1, 0..1)^2)
 
     quote
         return values($CU * ($Dx * q))
@@ -255,8 +262,8 @@ end
 end
 
 @generated function compute_derivative2(q)
-    Dy = Derivative(Chebyshev(0..1)^2, [0,1])
-    CU = Conversion(Chebyshev(0..1) ⊗ Ultraspherical(1, 0..1), Ultraspherical(1, 0..1)^2)
+    Dy = ApproxFun.Derivative(ApproxFun.Chebyshev(0..1)^2, [0,1])
+    CU = ApproxFun.Conversion(ApproxFun.Chebyshev(0..1) ⊗ ApproxFun.Ultraspherical(1, 0..1), ApproxFun.Ultraspherical(1, 0..1)^2)
 
     quote
         return values($CU * ($Dy * q))
@@ -264,8 +271,8 @@ end
 end
 
 @generated function compute_canonical_invariant(pinv::AbstractPoincareInvariant2ndApproxFun{DT,ND,NC,NV}, q::AbstractArray{DT,2}, p::AbstractArray{DT,2}) where {DT,ND,NC,NV}
-    SC = Chebyshev(0..1)^2
-    SU = Ultraspherical(1, 0..1)^2
+    SC = ApproxFun.Chebyshev(0..1)^2
+    SU = ApproxFun.Ultraspherical(1, 0..1)^2
 
     Js = zeros(DT, NV)
     qσ = zeros(DT, ND, NV)
@@ -298,9 +305,9 @@ end
 end
 
 @generated function compute_noncanonical_invariant(pinv::PoincareInvariant2ndApproxFun{DT,ND,NC,NV}, t::DT, q::AbstractArray{DT,2}) where {DT,ND,NC,NV}
-    SC = Chebyshev(0..1)^2
-    SU = Ultraspherical(1, 0..1)^2
-    CU = Conversion(SC, SU)
+    SC = ApproxFun.Chebyshev(0..1)^2
+    SU = ApproxFun.Ultraspherical(1, 0..1)^2
+    CU = ApproxFun.Conversion(SC, SU)
 
     Is = zeros(DT, NV)
     qs = zeros(DT, ND, NV)
@@ -309,11 +316,13 @@ end
     Ω  = zeros(DT, ND, ND)
 
     quote
+        # loop over dimensions of state vector
         for j in axes(q,1)
+            # obtain Chebyshev coefficients
             fq = Fun($SC, ApproxFun.transform($SC, q[j,:]))
 
             # obtain values of q at the same points as the derivatives
-            $qs[j,:] .= itransform($SU, resize!(collect(($CU * fq).coefficients), NC))
+            $qs[j,:] .= ApproxFun.itransform($SU, resize!(collect(($CU * fq).coefficients), NC))
 
             # compute derivatives of q and store values
             $qσ[j,:] .= compute_derivative1(fq)
@@ -333,9 +342,9 @@ end
 
 
 @generated function compute_noncanonical_correction(pinv::PoincareInvariant2ndApproxFun{DT,ND,NC,NV}, t::DT, q::AbstractArray{DT,2}, λ::AbstractArray{DT,2}) where {DT,ND,NC,NV}
-    SC = Chebyshev(0..1)^2
-    SU = Ultraspherical(1, 0..1)^2
-    CU = Conversion(SC, SU)
+    SC = ApproxFun.Chebyshev(0..1)^2
+    SU = ApproxFun.Ultraspherical(1, 0..1)^2
+    CU = ApproxFun.Conversion(SC, SU)
 
     Ks = zeros(DT, NV)
     qs = zeros(DT, ND, NV)
@@ -353,8 +362,8 @@ end
             fλ = Fun($SC, ApproxFun.transform($SC, λ[j,:]))
 
             # obtain values of q at the same points as the derivatives
-            $qs[j,:] .= itransform($SU, resize!(($CU * fq).coefficients, NC))
-            $λs[j,:] .= itransform($SU, resize!(($CU * fλ).coefficients, NC))
+            $qs[j,:] .= ApproxFun.itransform($SU, resize!(($CU * fq).coefficients, NC))
+            $λs[j,:] .= ApproxFun.itransform($SU, resize!(($CU * fλ).coefficients, NC))
 
             # compute derivatives of q and store values
             $qσ[j,:] .= compute_derivative1(fq)

@@ -16,27 +16,29 @@ end
 
 function PoincareInvariant2ndTrapezoidal(f_equ::Function, f_surface::Function, ω::ΩT, Δt::TT, d::Int, nx::Int, ny::Int, ntime::Int, nsave::Int=1, DT=Float64) where {TT,ΩT}
 
-    println()
-    println("Second Euler-Poincaré Integral Invariant")
-    println("========================================")
-    println()
-    println(" nx    = ", nx)
-    println(" ny    = ", ny)
-    println(" ntime = ", ntime)
-    println(" nsave = ", nsave)
-    println(" Δt    = ", Δt)
-    println()
+    if get_config(:verbosity) > 1
+        println()
+        println("Second Euler-Poincaré Integral Invariant (Trapezoidal)")
+        println("======================================================")
+        println()
+        println(" nx    = ", nx)
+        println(" ny    = ", ny)
+        println(" ntime = ", ntime)
+        println(" nsave = ", nsave)
+        println(" Δt    = ", Δt)
+        println()
+    end
 
     # compute initial conditions
-    q₀ = zeros(DT, (d, nx*ny))
+    q₀ = zeros(DT, (d, nx, ny))
 
     for j in 1:ny
         for i in 1:nx
-            q₀[:,nx*(j-1)+i] = f_surface(i/nx, j/nx)
+            q₀[:,i,j] = f_surface(i/nx, j/ny)
         end
     end
 
-    equ = f_equ(q₀)
+    equ = f_equ(reshape(q₀, (d, nx*ny)))
 
     # create arrays for results
     nt = div(ntime, nsave)
@@ -47,24 +49,6 @@ function PoincareInvariant2ndTrapezoidal(f_equ::Function, f_surface::Function, �
     ΔJ = OffsetArray(zeros(Double64, nt+1), 0:nt)
 
     PoincareInvariant2ndTrapezoidal{DT,TT,typeof(equ),ΩT}(equ, ω, Δt, nx, ny, ntime, nsave, nt, I, J, ΔI, ΔJ)
-end
-
-
-
-function evaluate_poincare_invariant(pinv::PoincareInvariant2ndTrapezoidal{DT}, sol::Solution) where {DT}
-    for i in axes(sol.q,2)
-        pinv.I[i]  = surface_integral(sol.t[i], sol.q[:,i,:], pinv.ω, pinv.nx, pinv.ny)
-        pinv.ΔI[i] = abs(pinv.I[0]) < sqrt(eps()) ? pinv.I[i] : (pinv.I[i] .- pinv.I[0]) ./ pinv.I[0]
-    end
-
-    if hasproperty(sol, :p)
-        for i in axes(sol.q,2)
-            pinv.J[i] = surface_integral_canonical(sol.q[:,i,:], sol.p[:,i,:], pinv.nx, pinv.ny)
-            pinv.ΔJ[i] = abs(pinv.J[0]) < sqrt(eps()) ? pinv.J[i] : (pinv.J[i] .- pinv.J[0]) ./ pinv.J[0]
-        end
-    end
-
-    return (DT.(pinv.I), DT.(pinv.J), DT.(pinv.ΔI), DT.(pinv.ΔJ))
 end
 
 
@@ -180,7 +164,6 @@ function surface_integral(t, x::AbstractMatrix{DT}, ω, nx, ny) where {DT}
 end
 
 
-
 function integrate_canonical(γ̇ᵢ, γ̇ⱼ, Θ̇ᵢ, Θ̇ⱼ, b::Vector{TT}, c::Vector{TT}, vᵢ::Vector{DT}, vⱼ::Vector{DT}) where {DT,TT}
     @assert length(b) == length(c)
 
@@ -209,7 +192,7 @@ function surface_integral_canonical(q::AbstractMatrix{DT}, p::AbstractMatrix{DT}
     local vⱼ = zeros(DT, size(q,1))
     local I  = zero(Double64)
 
-    integrate_trapezoidal = (γ, γ̇ᵢ, γ̇ⱼ, Θ̇ᵢ, Θ̇ⱼ) -> integrate_canonical(γ̇ᵢ, γ̇ⱼ, Θ̇ᵢ, Θ̇ⱼ, b, c, vᵢ, vⱼ)
+    integrate_trapezoidal = (γ̇ᵢ, γ̇ⱼ, Θ̇ᵢ, Θ̇ⱼ) -> integrate_canonical(γ̇ᵢ, γ̇ⱼ, Θ̇ᵢ, Θ̇ⱼ, b, c, vᵢ, vⱼ)
 
     for j in 1:ny-1
         for i in 1:nx-1
@@ -217,11 +200,31 @@ function surface_integral_canonical(q::AbstractMatrix{DT}, p::AbstractMatrix{DT}
             γ̇ⱼ = (λ, μ, y) -> interpolate_derivative_j(q, i, j, λ, μ, y, nx, ny)
             Θ̇ᵢ = (λ, μ, y) -> interpolate_derivative_i(p, i, j, λ, μ, y, nx, ny)
             Θ̇ⱼ = (λ, μ, y) -> interpolate_derivative_j(p, i, j, λ, μ, y, nx, ny)
-            I += integrate_trapezoidal(γ, γ̇ᵢ, γ̇ⱼ, Θ̇ᵢ, Θ̇ⱼ)
+            I += integrate_trapezoidal(γ̇ᵢ, γ̇ⱼ, Θ̇ᵢ, Θ̇ⱼ)
         end
     end
 
     return I
+end
+
+
+function evaluate_poincare_invariant(pinv::PoincareInvariant2ndTrapezoidal{DT}, sol::Solution) where {DT}
+    local verbosity = get_config(:verbosity)
+
+    for i in axes(sol.q,2)
+        verbosity > 1 ? println("      it = ", i) : nothing
+        @views pinv.I[i]  = surface_integral(sol.t[i], sol.q[:,i,:], pinv.ω, pinv.nx, pinv.ny)
+        pinv.ΔI[i] = abs(pinv.I[0]) < sqrt(eps()) ? pinv.I[i] : (pinv.I[i] .- pinv.I[0]) ./ pinv.I[0]
+        verbosity > 1 ? println("           I_q = ", pinv.I[i], ",   ε_q = ", pinv.ΔI[i]) : nothing
+
+        if hasproperty(sol, :p)
+            @views pinv.J[i] = surface_integral_canonical(sol.q[:,i,:], sol.p[:,i,:], pinv.nx, pinv.ny)
+            pinv.ΔJ[i] = abs(pinv.J[0]) < sqrt(eps()) ? pinv.J[i] : (pinv.J[i] .- pinv.J[0]) ./ pinv.J[0]
+            verbosity > 1 ? println("           I_p = ", pinv.J[i], ",   ε_p = ", pinv.ΔJ[i]) : nothing
+        end
+    end
+
+    return (DT.(pinv.I), DT.(pinv.J), DT.(pinv.ΔI), DT.(pinv.ΔJ))
 end
 
 
@@ -233,7 +236,6 @@ function CommonFunctions.write_to_hdf5(pinv::PoincareInvariant2ndTrapezoidal, so
         write(h5, "I", pinv.I)
 
         isdefined(sol, :p) ? write(h5, "J", pinv.J) : nothing
-        isdefined(sol, :λ) ? write(h5, "L", pinv.L) : nothing
 
     end
 end

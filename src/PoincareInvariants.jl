@@ -1,11 +1,11 @@
 module PoincareInvariants
 
-    using ApproxFun
     using HDF5
     using FFTW
     using LinearAlgebra
     using OffsetArrays
     using ProgressMeter
+
     using GeometricIntegrators
     using GeometricIntegrators.Utils
 
@@ -17,6 +17,7 @@ module PoincareInvariants
            PoincareInvariant2nd, PoincareInvariant2ndCanonical,
            PoincareInvariant2ndApproxFun,
            PoincareInvariant2ndApproxFunCanonical,
+           PoincareInvariant2ndOPQ,
            PoincareInvariant2ndTrapezoidal,
            evaluate_poincare_invariant,
            evaluate_poincare_invariant_correction,
@@ -29,6 +30,7 @@ module PoincareInvariants
     include("poincare_invariant_1st.jl")
     include("poincare_invariant_1st_canonical.jl")
     include("poincare_invariant_2nd_approxfun.jl")
+    include("poincare_invariant_2nd_opq.jl")
     include("poincare_invariant_2nd_trapezoidal.jl")
 
     const PoincareInvariant2nd = PoincareInvariant2ndApproxFun
