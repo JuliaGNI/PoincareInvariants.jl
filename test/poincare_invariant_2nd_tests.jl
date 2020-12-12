@@ -1,4 +1,6 @@
 
+include("poincare_invariant_2nd_module.jl")
+
 using Test
 
 using .PoincareInvariant2ndTest

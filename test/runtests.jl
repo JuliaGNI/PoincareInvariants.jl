@@ -4,8 +4,6 @@ using SafeTestsets
 
 set_config(:verbosity, 2)
 
-include("poincare_invariant_2nd_module.jl")
-
 
 @safetestset "1st Poincaré Invariant Unit Tests                                               " begin include("poincare_invariant_1st_unittests.jl") end
 @safetestset "1st Poincaré Invariant Function Tests                                           " begin include("poincare_invariant_1st_tests.jl") end
