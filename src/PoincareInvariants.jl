@@ -2,7 +2,6 @@ module PoincareInvariants
 
     using HDF5
     using FFTW
-    using LinearAlgebra
     using OffsetArrays
     using ProgressMeter
 
@@ -10,6 +9,7 @@ module PoincareInvariants
     using GeometricIntegrators.Utils
 
     import DoubleFloats: Double64
+    import LinearAlgebra: ⋅
 
     include("matrix_utils.jl")
 

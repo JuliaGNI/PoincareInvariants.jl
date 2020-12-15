@@ -173,11 +173,11 @@ function integrate_canonical(γ̇ᵢ, γ̇ⱼ, Θ̇ᵢ, Θ̇ⱼ, b::Vector{TT}, 
         for j in eachindex(b)
             Θ̇ᵢ(c[i], c[j], vᵢ)
             γ̇ⱼ(c[i], c[j], vⱼ)
-            result += b[i] * b[j] * dot(vᵢ,vⱼ)
+            result += b[i] * b[j] * vᵢ ⋅ vⱼ
 
             γ̇ᵢ(c[i], c[j], vᵢ)
             Θ̇ⱼ(c[i], c[j], vⱼ)
-            result -= b[i] * b[j] * dot(vᵢ,vⱼ)
+            result -= b[i] * b[j] * vᵢ ⋅ vⱼ
         end
     end
 
