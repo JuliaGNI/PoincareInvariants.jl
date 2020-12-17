@@ -47,15 +47,9 @@ function PoincareInvariant2ndOPQ(f_equ::Function, f_surface::Function, ω::ΩT, 
     xGrid = OPQ.grid(OPQ.ChebyshevT()[:,1:nx])
     yGrid = OPQ.grid(OPQ.ChebyshevT()[:,1:ny])
 
-    q₀ = zeros(DT, (d, nx, ny))
+    q₀ = reshape([f_surface((xGrid[i] + 1) / 2, (yGrid[j] + 1) / 2) for i in 1:nx, j in 1:ny], nx*ny)
 
-    for j in 1:ny
-        for i in 1:nx
-            q₀[:,i,j] = f_surface((xGrid[i] + 1) / 2, (yGrid[j] + 1) / 2)
-        end
-    end
-
-    equ = f_equ(reshape(q₀, (d, nx*ny)))
+    equ = f_equ(q₀)
 
 
     # compute initial conditions
@@ -452,12 +446,12 @@ function evaluate_poincare_invariant(pinv::PoincareInvariant2ndOPQ{DT}, sol::Sol
 
     for i in axes(sol.q,2)
         verbosity > 1 ? println("      it = ", i) : nothing
-        @views pinv.I[i]  = surface_integral(pinv, sol.t[i], sol.q[:,i,:])
+        @views pinv.I[i]  = surface_integral(pinv, sol.t[i], hcat(sol.q[i,:]...))
         pinv.ΔI[i] = abs(pinv.I[0]) < sqrt(eps()) ? pinv.I[i] : (pinv.I[i] .- pinv.I[0]) ./ pinv.I[0]
         verbosity > 1 ? println("           I_q = ", pinv.I[i], ",   ε_q = ", pinv.ΔI[i]) : nothing
 
         # if hasproperty(sol, :p)
-        #     pinv.J[i] = surface_integral_canonical(pinv, sol.q[:,i,:], sol.p[:,i,:])
+        #     pinv.J[i] = surface_integral_canonical(pinv, hcat(sol.q[i,:]...), hcat(sol.p[i,:]...))
         #     pinv.ΔJ[i] = abs(pinv.J[0]) < sqrt(eps()) ? pinv.J[i] : (pinv.J[i] .- pinv.J[0]) ./ pinv.J[0]
         #     verbosity > 1 ? println("           I_p = ", pinv.J[i], ",   ε_p = ", pinv.ΔJ[i]) : nothing
         # end

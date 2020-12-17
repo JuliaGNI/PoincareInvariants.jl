@@ -28,6 +28,12 @@ module PoincareInvariant2ndTest
         nothing
     end
 
+    function gcϑ(t, q)
+        ϑ = zero(q)
+        gcϑ(t, q, ϑ)
+        return ϑ
+    end
+
     function gcω(t, q, Ω)
         Ω[1,1] = 0
         Ω[1,2] =-B(t,q)
@@ -62,10 +68,7 @@ module PoincareInvariant2ndTest
     end
 
     function gc_surface_p(s,t)
-        q = gc_surface_q(s,t)
-        p = zero(q)
-        gcϑ(zero(eltype(q)), q, p)
-        p
+        gcϑ(0, gc_surface_q(s,t))
     end
 
     function gc_dummy(t, a, b, c)
@@ -77,21 +80,7 @@ module PoincareInvariant2ndTest
     end
 
     function gc_dummy_iode(q₀)
-        p₀ = zero(q₀)
-
-        if ndims(q₀) == 1
-            gcϑ(zero(eltype(q₀)), q₀, p₀)
-        else
-            tq = zeros(eltype(q₀), size(q₀,1))
-            tp = zeros(eltype(p₀), size(p₀,1))
-
-            for i in axes(q₀,2)
-                tq .= q₀[:,i]
-                gcϑ(zero(eltype(q₀)), tq, tp)
-                p₀[:,i] .= tp
-            end
-        end
-
+        p₀ = [gcϑ(0,q) for q in q₀]
         IODE(gc_dummy, gc_dummy, gc_dummy, q₀, p₀; v̄=gc_dummy)
     end
 

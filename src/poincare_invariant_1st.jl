@@ -27,11 +27,7 @@ function PoincareInvariant1st(f_equ::Function, f_loop::Function, Θ::ΘT, Δt::T
     end
 
     # compute initial conditions
-    q₀ = zeros(DT, (d, nloop))
-
-    for i in 1:nloop
-        q₀[:,i] .= f_loop(i/nloop)
-    end
+    q₀ = [f_loop(i/nloop) for i in 1:nloop]
 
     # initialise euation
     equ = f_equ(q₀)
@@ -48,10 +44,10 @@ end
 
 
 function evaluate_poincare_invariant(pinv::PoincareInvariant1st, sol::Solution)
-    p = zero(sol.q)
-    g = zero(sol.q)
-    v = zeros(size(sol.q,1), size(sol.q,3))
-    γ = zeros(size(sol.q,1), size(sol.q,3))
+    p = zeros(size(sol.q[begin],1), size(sol.q,1), size(sol.q,2))
+    g = zeros(size(sol.q[begin],1), size(sol.q,1), size(sol.q,2))
+    v = zeros(size(sol.q[begin],1), size(sol.q,2))
+    γ = zeros(size(sol.q[begin],1), size(sol.q,2))
 
     compute_one_form(sol.t, sol.q, p, pinv.Θ)
 
@@ -59,16 +55,16 @@ function evaluate_poincare_invariant(pinv::PoincareInvariant1st, sol::Solution)
         compute_correction(sol.t, sol.q, sol.λ, g, pinv.equ.g)
     end
 
-    for i in axes(sol.q,2)
-        compute_velocity(sol.q[:,i,:], v)
-        pinv.I[i] = compute_loop_integral(p[:,i,:], v)
+    for i in axes(sol.q,1)
+        compute_velocity(hcat(sol.q[i,:]...), v)
+        pinv.I[i] = compute_loop_integral(hcat(sol.p[i,:]...), v)
 
         if isdefined(sol, :p)
-            pinv.J[i] = compute_loop_integral(sol.d[:,i,:], v)
+            pinv.J[i] = compute_loop_integral(hcat(sol.d[i,:]...), v)
         end
 
         if isdefined(sol, :λ)
-            compute_velocity(sol.λ[:,i,:], γ)
+            compute_velocity(hcat(sol.λ[i,:]...), γ)
             pinv.L[i] = compute_loop_integral(p[:,i,:] .- pinv.Δt .* g[:,i,:], v .- pinv.Δt .* γ)
         end
     end

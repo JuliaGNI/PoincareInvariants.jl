@@ -30,15 +30,9 @@ function PoincareInvariant2ndTrapezoidal(f_equ::Function, f_surface::Function, �
     end
 
     # compute initial conditions
-    q₀ = zeros(DT, (d, nx, ny))
+    q₀ = reshape([f_surface(i/nx, j/ny) for i in 1:nx, j in 1:ny], nx*ny)
 
-    for j in 1:ny
-        for i in 1:nx
-            q₀[:,i,j] = f_surface(i/nx, j/ny)
-        end
-    end
-
-    equ = f_equ(reshape(q₀, (d, nx*ny)))
+    equ = f_equ(q₀)
 
     # create arrays for results
     nt = div(ntime, nsave)
@@ -211,14 +205,14 @@ end
 function evaluate_poincare_invariant(pinv::PoincareInvariant2ndTrapezoidal{DT}, sol::Solution) where {DT}
     local verbosity = get_config(:verbosity)
 
-    for i in axes(sol.q,2)
+    for i in axes(sol.q,1)
         verbosity > 1 ? println("      it = ", i) : nothing
-        @views pinv.I[i]  = surface_integral(sol.t[i], sol.q[:,i,:], pinv.ω, pinv.nx, pinv.ny)
+        @views pinv.I[i]  = surface_integral(sol.t[i], hcat(sol.q[i,:]...), pinv.ω, pinv.nx, pinv.ny)
         pinv.ΔI[i] = abs(pinv.I[0]) < sqrt(eps()) ? pinv.I[i] : (pinv.I[i] .- pinv.I[0]) ./ pinv.I[0]
         verbosity > 1 ? println("           I_q = ", pinv.I[i], ",   ε_q = ", pinv.ΔI[i]) : nothing
 
         if hasproperty(sol, :p)
-            @views pinv.J[i] = surface_integral_canonical(sol.q[:,i,:], sol.p[:,i,:], pinv.nx, pinv.ny)
+            @views pinv.J[i] = surface_integral_canonical(hcat(sol.q[i,:]...), hcat(sol.p[i,:]...), pinv.nx, pinv.ny)
             pinv.ΔJ[i] = abs(pinv.J[0]) < sqrt(eps()) ? pinv.J[i] : (pinv.J[i] .- pinv.J[0]) ./ pinv.J[0]
             verbosity > 1 ? println("           I_p = ", pinv.J[i], ",   ε_p = ", pinv.ΔJ[i]) : nothing
         end

@@ -24,13 +24,8 @@ function PoincareInvariant1stCanonical(f_equ::Function, f_loop_q::Function, f_lo
     end
 
     # compute initial conditions
-    q₀ = zeros(DT, (d, nloop))
-    p₀ = zeros(DT, (d, nloop))
-
-    for i in 1:nloop
-        q₀[:,i] .= f_loop_q(i/nloop)
-        p₀[:,i] .= f_loop_p(i/nloop)
-    end
+    q₀ = [f_loop_q(i/nloop) for i in 1:nloop]
+    p₀ = [f_loop_p(i/nloop) for i in 1:nloop]
 
     # initialise euation
     equ = f_equ(q₀, p₀)
@@ -45,11 +40,11 @@ end
 
 
 function evaluate_poincare_invariant(pinv::PoincareInvariant1stCanonical, sol::SolutionPODE)
-    v = zeros(size(sol.q,1), size(sol.q,3))
+    v = zeros(size(sol.q[begin],1), size(sol.q,2))
 
-    for i in axes(sol.q,2)
-        compute_velocity(sol.q[:,i,:], v)
-        pinv.I[i] = compute_loop_integral(sol.p[:,i,:], v)
+    for i in axes(sol.q,1)
+        compute_velocity(hcat(sol.q[i,:]...), v)
+        pinv.I[i] = compute_loop_integral(hcat(sol.p[i,:]...), v)
     end
 
     pinv.I

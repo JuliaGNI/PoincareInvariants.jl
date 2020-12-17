@@ -28,11 +28,7 @@ function PoincareInvariant2ndApproxFun(f_equ::Function, f_surface::Function, ω:
     c = ApproxFun.points(ApproxFun.Chebyshev(0..1)^2, nx*ny)
 
     # compute initial conditions
-    q₀ = zeros(DT, (nd, length(c)))
-
-    for i in eachindex(c)
-        q₀[:,i] .= f_surface(c[i][1], c[i][2])
-    end
+    q₀ = [f_surface(c[i][1], c[i][2]) for i in eachindex(c)]
 
     # initialise euation
     equ = f_equ(q₀)
@@ -53,7 +49,7 @@ function PoincareInvariant2ndApproxFun(f_equ::Function, f_surface::Function, ω:
     Dx = ApproxFun.Derivative(SC, [1,0])
     Dy = ApproxFun.Derivative(SC, [0,1])
 
-    fqc = Fun(SC, ApproxFun.transform(SC, q₀[1,:]))
+    fqc = Fun(SC, ApproxFun.transform(SC, hcat(q₀...)[1,:]))
     fqu = Fun(Dx * fqc, SU)
     nc = ApproxFun.ncoefficients(fqu)
     nv = length(ApproxFun.values(fqu))
@@ -98,18 +94,18 @@ function evaluate_poincare_invariant(pinv::PoincareInvariant2ndApproxFun{DT}, so
     #     local λ = permutedims(sol.λ, [3,1,2])
     # end
 
-    verbosity ≤ 1 ? prog = Progress(size(sol.q,2), 5) : nothing
+    verbosity ≤ 1 ? prog = Progress(size(sol.q,1), 5) : nothing
 
-    for i in axes(sol.q,2)
+    for i in axes(sol.q,1)
         verbosity > 1 ? println("      it = ", i) : nothing
-        pinv.I[i] = compute_noncanonical_invariant(pinv, sol.t[i], sol.q[:,i,:])
+        pinv.I[i] = compute_noncanonical_invariant(pinv, sol.t[i], hcat(sol.q[i,:]...))
         pinv.ΔI[i] = abs(pinv.I[0]) < sqrt(eps()) ? pinv.I[i] : (pinv.I[i] .- pinv.I[0]) ./ pinv.I[0]
         verbosity > 1 ? println("           I_q = ", pinv.I[i], ",   ε_q = ", pinv.ΔI[i]) : nothing
     end
 
     if isdefined(sol, :p)
-        for i in axes(sol.q,2)
-            pinv.J[i] = compute_canonical_invariant(pinv, sol.q[:,i,:], sol.p[:,i,:])
+        for i in axes(sol.q,1)
+            pinv.J[i] = compute_canonical_invariant(pinv, hcat(sol.q[i,:]...), hcat(sol.p[i,:]...))
             pinv.ΔJ[i] = abs(pinv.J[0]) < sqrt(eps()) ? pinv.J[i] : (pinv.J[i] .- pinv.J[0]) ./ pinv.J[0]
             verbosity > 1 ? println("           I_p = ", pinv.J[i], ",   ε_p = ", pinv.ΔJ[i]) : nothing
         end
@@ -124,8 +120,8 @@ function evaluate_poincare_invariant_correction(pinv::PoincareInvariant2ndApprox
     local verbosity = get_config(:verbosity)
 
     if isdefined(sol, :λ)
-        for i in axes(sol.q,2)
-            pinv.K[i] = compute_noncanonical_correction(pinv, sol.t[i], sol.q[:,i,:], sol.λ[:,i,:])
+        for i in axes(sol.q,1)
+            pinv.K[i] = compute_noncanonical_correction(pinv, sol.t[i], hcat(sol.q[i,:]...), hcat(sol.λ[i,:]...))
             pinv.L[i] = pinv.I[i] - pinv.Δt^2 * pinv.K[i]
             verbosity > 1 ? println("           I_λ = ", pinv.L[i], ",   ε_λ = ", (pinv.L[i]-pinv.L[0])/pinv.L[0]) : nothing
             verbosity > 1 ? println("           K_λ = ", pinv.K[i]) : nothing
@@ -185,13 +181,8 @@ function PoincareInvariant2ndApproxFunCanonical(f_equ::Function, f_surface_q::Fu
     c = ApproxFun.points(ApproxFun.Chebyshev(0..1)^2, nx*ny)
 
     # compute initial conditions
-    q₀ = zeros(DT, (nd, length(c)))
-    p₀ = zeros(DT, (nd, length(c)))
-
-    for i in eachindex(c)
-        q₀[:,i] .= f_surface_q(c[i][1], c[i][2])
-        p₀[:,i] .= f_surface_p(c[i][1], c[i][2])
-    end
+    q₀ = [f_surface_q(c[i][1], c[i][2]) for i in eachindex(c)]
+    p₀ = [f_surface_p(c[i][1], c[i][2]) for i in eachindex(c)]
 
     # initialise euation
     equ = f_equ(q₀, p₀)
@@ -208,7 +199,7 @@ function PoincareInvariant2ndApproxFunCanonical(f_equ::Function, f_surface_q::Fu
     Dx = ApproxFun.Derivative(SC, [1,0])
     Dy = ApproxFun.Derivative(SC, [0,1])
 
-    fq = Fun(Dx * Fun(SC, ApproxFun.transform(SC, q₀[1,:])), SU)
+    fq = Fun(Dx * Fun(SC, ApproxFun.transform(SC, hcat(q₀...)[1,:])), SU)
     nc = ApproxFun.ncoefficients(fq)
     nv = length(ApproxFun.values(fq))
 
@@ -220,11 +211,11 @@ end
 function evaluate_poincare_invariant(pinv::PoincareInvariant2ndApproxFunCanonical{DT}, sol::Solution) where {DT}
     local verbosity = get_config(:verbosity)
 
-    verbosity ≤ 1 ? prog = Progress(size(sol.q,2), 5) : nothing
+    verbosity ≤ 1 ? prog = Progress(size(sol.q,1), 5) : nothing
 
-    for i in axes(sol.q,2)
+    for i in axes(sol.q,1)
         verbosity > 1 ? println("      it = ", i) : nothing
-        pinv.I[i] = compute_canonical_invariant(pinv, sol.q[:,i,:], sol.p[:,i,:])
+        pinv.I[i] = compute_canonical_invariant(pinv, hcat(sol.q[i,:]...), hcat(sol.p[i,:]...))
         verbosity > 1 ? println("           I_p = ", pinv.I[i], ",   ε_p = ", (pinv.I[i]-pinv.I[0])/pinv.I[0]) : nothing
 
         verbosity ≤ 1 ? next!(prog) : nothing
