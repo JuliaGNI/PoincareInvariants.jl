@@ -4,6 +4,7 @@ module PoincareInvariants
     using FFTW
     using OffsetArrays
     using ProgressMeter
+    using Requires
 
     using GeometricIntegrators
     using GeometricIntegrators.Utils
@@ -30,8 +31,13 @@ module PoincareInvariants
     include("poincare_invariant_1st.jl")
     include("poincare_invariant_1st_canonical.jl")
     include("poincare_invariant_2nd_approxfun.jl")
-    include("poincare_invariant_2nd_opq.jl")
     include("poincare_invariant_2nd_trapezoidal.jl")
+
+    @require OrthogonalPolynomialsQuasi = "aa41a628-2c43-45df-899b-83ab96621781" begin
+        @require FastTransforms = "057dd010-8810-581a-b7be-e3fc3b93f78c" begin
+            include("poincare_invariant_2nd_opq.jl")
+        end
+    end
 
     const PoincareInvariant2nd = PoincareInvariant2ndApproxFun
     const PoincareInvariant2ndCanonical = PoincareInvariant2ndApproxFunCanonical

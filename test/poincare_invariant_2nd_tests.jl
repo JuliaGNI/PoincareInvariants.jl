@@ -1,6 +1,7 @@
 
 include("poincare_invariant_2nd_module.jl")
 
+using Requires
 using Test
 
 using .PoincareInvariant2ndTest
@@ -29,10 +30,14 @@ In, Jn = compute_invariant_approxfun(nx, ny)
 @test Jn ≈ Ia atol=2eps()
 
 
-In, Jn = compute_invariant_opq(nx, ny)
+@require OrthogonalPolynomialsQuasi = "aa41a628-2c43-45df-899b-83ab96621781" begin
+    @require FastTransforms = "057dd010-8810-581a-b7be-e3fc3b93f78c" begin
+        In, Jn = compute_invariant_opq(nx, ny)
 
-@test In ≈ Ia atol=1E-1
-#@test Jn ≈ Ia atol=1E-1
+        @test In ≈ Ia atol=1E-1
+        #@test Jn ≈ Ia atol=1E-1
+    end
+end
 
 
 In, Jn = compute_invariant_trapezoidal(nx, ny)

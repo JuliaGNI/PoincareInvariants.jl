@@ -138,7 +138,7 @@ function evaluate_poincare_invariant_correction(pinv::PoincareInvariant2ndApprox
 end
 
 
-function CommonFunctions.write_to_hdf5(pinv::PoincareInvariant2ndApproxFun{DT}, sol::Solution, output_file::String) where {DT}
+function write_to_hdf5(pinv::PoincareInvariant2ndApproxFun{DT}, sol::Solution, output_file::String) where {DT}
     # h5open(output_file, isfile(output_file) ? "r+" : "w") do h5
     h5open(output_file, "w") do h5
 
@@ -234,7 +234,7 @@ function evaluate_poincare_invariant(pinv::PoincareInvariant2ndApproxFunCanonica
 end
 
 
-function CommonFunctions.write_to_hdf5(pinv::PoincareInvariant2ndApproxFunCanonical{DT}, sol::Solution, output_file::String) where {DT}
+function write_to_hdf5(pinv::PoincareInvariant2ndApproxFunCanonical{DT}, sol::Solution, output_file::String) where {DT}
     # h5open(output_file, isfile(output_file) ? "r+" : "w") do h5
     h5open(output_file, "w") do h5
         write(h5, "t", sol.t)

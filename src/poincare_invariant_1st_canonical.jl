@@ -56,7 +56,7 @@ function evaluate_poincare_invariant(pinv::PoincareInvariant1stCanonical, sol::S
 end
 
 
-function CommonFunctions.write_to_hdf5(pinv::PoincareInvariant1stCanonical, sol::Solution, output_file::String)
+function write_to_hdf5(pinv::PoincareInvariant1stCanonical, sol::Solution, output_file::String)
     # h5open(output_file, isfile(output_file) ? "r+" : "w") do h5
     h5open(output_file, "w") do h5
         write(h5, "t", sol.t)
