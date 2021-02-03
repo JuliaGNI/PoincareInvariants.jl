@@ -28,22 +28,22 @@ The following packages will be downloaded:
     gstreamer-1.14.0           |       h28cd5cc_2         3.2 MB
     icu-58.2                   |       he6710b0_3        10.5 MB
     jpeg-9b                    |       h024ee3a_2         214 KB
-    kiwisolver-1.3.0           |   py38h2531618_0          80 KB
+    kiwisolver-1.3.1           |   py38h2531618_0          80 KB
     lcms2-2.11                 |       h396b838_0         307 KB
     libpng-1.6.37              |       hbc83047_0         278 KB
     libtiff-4.1.0              |       h2733197_1         449 KB
     libuuid-1.0.3              |       h1bed415_2          15 KB
     libxcb-1.14                |       h7b6447c_0         505 KB
     libxml2-2.9.10             |       hb55368b_3         1.2 MB
-    lz4-c-1.9.2                |       heb0550a_3         175 KB
+    lz4-c-1.9.3                |       h2531618_0         186 KB
     matplotlib-3.3.2           |       h06a4308_0          24 KB
     matplotlib-base-3.3.2      |   py38h817c723_0         5.1 MB
     olefile-0.46               |             py_0          33 KB
     pcre-8.44                  |       he6710b0_0         212 KB
     pillow-8.1.0               |   py38he98fc37_0         626 KB
-    pyparsing-2.4.7            |             py_0          65 KB
+    pyparsing-2.4.7            |     pyhd3eb1b0_0          59 KB
     pyqt-5.9.2                 |   py38h05f1152_4         4.5 MB
-    python-dateutil-2.8.1      |             py_0         215 KB
+    python-dateutil-2.8.1      |     pyhd3eb1b0_0         221 KB
     qt-5.9.7                   |       h5867ecd_1        68.5 MB
     sip-4.19.13                |   py38he6710b0_0         277 KB
     tornado-6.1                |   py38h27cfd23_0         588 KB
@@ -63,22 +63,22 @@ The following NEW packages will be INSTALLED:
   gstreamer          pkgs/main/linux-64::gstreamer-1.14.0-h28cd5cc_2
   icu                pkgs/main/linux-64::icu-58.2-he6710b0_3
   jpeg               pkgs/main/linux-64::jpeg-9b-h024ee3a_2
-  kiwisolver         pkgs/main/linux-64::kiwisolver-1.3.0-py38h2531618_0
+  kiwisolver         pkgs/main/linux-64::kiwisolver-1.3.1-py38h2531618_0
   lcms2              pkgs/main/linux-64::lcms2-2.11-h396b838_0
   libpng             pkgs/main/linux-64::libpng-1.6.37-hbc83047_0
   libtiff            pkgs/main/linux-64::libtiff-4.1.0-h2733197_1
   libuuid            pkgs/main/linux-64::libuuid-1.0.3-h1bed415_2
   libxcb             pkgs/main/linux-64::libxcb-1.14-h7b6447c_0
   libxml2            pkgs/main/linux-64::libxml2-2.9.10-hb55368b_3
-  lz4-c              pkgs/main/linux-64::lz4-c-1.9.2-heb0550a_3
+  lz4-c              pkgs/main/linux-64::lz4-c-1.9.3-h2531618_0
   matplotlib         pkgs/main/linux-64::matplotlib-3.3.2-h06a4308_0
   matplotlib-base    pkgs/main/linux-64::matplotlib-base-3.3.2-py38h817c723_0
   olefile            pkgs/main/noarch::olefile-0.46-py_0
   pcre               pkgs/main/linux-64::pcre-8.44-he6710b0_0
   pillow             pkgs/main/linux-64::pillow-8.1.0-py38he98fc37_0
-  pyparsing          pkgs/main/noarch::pyparsing-2.4.7-py_0
+  pyparsing          pkgs/main/noarch::pyparsing-2.4.7-pyhd3eb1b0_0
   pyqt               pkgs/main/linux-64::pyqt-5.9.2-py38h05f1152_4
-  python-dateutil    pkgs/main/noarch::python-dateutil-2.8.1-py_0
+  python-dateutil    pkgs/main/noarch::python-dateutil-2.8.1-pyhd3eb1b0_0
   qt                 pkgs/main/linux-64::qt-5.9.7-h5867ecd_1
   sip                pkgs/main/linux-64::sip-4.19.13-py38he6710b0_0
   tornado            pkgs/main/linux-64::tornado-6.1-py38h27cfd23_0
@@ -147,405 +147,405 @@ savefig(&quot;example_2nd_trapezoidal.svg&quot;)</code></pre><p><img src="../exa
             Δt, nd, n₀, n₀, nt)</code></pre><p>Compute solution</p><pre><code class="language-julia">tab = TableauGLRK(1)
 int = Integrator(pinv.equ, tab, pinv.Δt)
 sol = integrate(pinv.equ, int, pinv.ntime)</code></pre><pre class="documenter-example-output">┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94</pre><p>Plot solution</p><pre><code class="language-">fig = figure(figsize=(4,4))
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94</pre><p>Plot solution</p><pre><code class="language-">fig = figure(figsize=(4,4))
 plot(sol.q[1,0,:], sol.q[2,0,:], &quot;.&quot;, markersize=.5)
 savefig(&quot;example_2nd_approxfun_initial_state.svg&quot;)
 
@@ -579,405 +579,405 @@ savefig(&quot;example_2nd_approxfun.svg&quot;)</code></pre><p><img src="../examp
 nothing # hide</code></pre><p>Compute solution</p><pre><code class="language-julia">tab = TableauGLRK(1)
 int = Integrator(pinv.equ, tab, pinv.Δt)
 sol = integrate(pinv.equ, int, pinv.ntime)</code></pre><pre class="documenter-example-output">┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94
 ┌ Warning: q₀ and q₁ in initial guess are identical! Setting q=q₁ and v=0.
-└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/JUHam/src/integrators/initial_guess/initial_guess_ode.jl:94</pre><p>Plot solution</p><pre><code class="language-">fig = figure(figsize=(4,4))
+└ @ GeometricIntegrators.Integrators ~/.julia/packages/GeometricIntegrators/IFNyN/src/integrators/initial_guess/initial_guess_ode.jl:94</pre><p>Plot solution</p><pre><code class="language-">fig = figure(figsize=(4,4))
 plot(sol.q[1,0,:], sol.q[2,0,:], &quot;.&quot;, markersize=.5)
 savefig(&quot;example_2nd_opq_initial_state.svg&quot;)
 
@@ -1005,4 +1005,4 @@ fig = figure(figsize=(8,4))
 plot((0:nt)*Δt, ΔI)
 ax = gca()
 ax[:yaxis][:set_major_formatter](yf)
-savefig(&quot;example_2nd_opq.svg&quot;)</code></pre><p><img src="../example_2nd_opq.svg" alt/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../poincare_invariant_2nd/">« 2nd Poincaré Invariant</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Thursday 14 January 2021 08:25">Thursday 14 January 2021</span>. Using Julia version 1.5.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+savefig(&quot;example_2nd_opq.svg&quot;)</code></pre><p><img src="../example_2nd_opq.svg" alt/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../poincare_invariant_2nd/">« 2nd Poincaré Invariant</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 3 February 2021 08:41">Wednesday 3 February 2021</span>. Using Julia version 1.5.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
