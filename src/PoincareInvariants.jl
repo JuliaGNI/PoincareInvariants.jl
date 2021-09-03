@@ -17,7 +17,7 @@ export AbstractPoincareInvariant, PoincareInvariant2
 abstract type AbstractPoincareInvariant end
 
 # get minimum allowed padua point number ≥ mn
-function _get_min_padua_num(mn)
+function get_min_padua_num(mn)
     n = Int(cld(-3 + sqrt(1 + 8mn), 2))
     return (n + 1) * (n + 2) ÷ 2
 end
@@ -39,7 +39,7 @@ end
 # This is the constructor the user should use
 function PoincareInvariant2{N}(param_func, min_point_num) where N
     # only certain number of padua points possible
-    point_num = _get_min_padua_num(min_point_num)
+    point_num = get_min_padua_num(min_point_num)
 
     # allocate phase_points
 	T = SVector{2, Float64}(0, 0) |> param_func |> eltype
