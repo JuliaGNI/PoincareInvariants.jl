@@ -36,7 +36,7 @@ module PoincareInvariants
     #     @require ClassicalOrthogonalPolynomials = "b30e2e7b-c4ee-47da-9d5f-2c5c27239acd" begin
     #         @require FastTransforms = "057dd010-8810-581a-b7be-e3fc3b93f78c" begin
                 export PoincareInvariant2ndCOP
-                include("poincare_invariant_2nd_opq.jl")
+                include("poincare_invariant_2nd_cop.jl")
     #         end
     #     end
     # end
