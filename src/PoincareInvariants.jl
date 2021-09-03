@@ -18,7 +18,6 @@ module PoincareInvariants
            PoincareInvariant2nd, PoincareInvariant2ndCanonical,
            PoincareInvariant2ndApproxFun,
            PoincareInvariant2ndApproxFunCanonical,
-           PoincareInvariant2ndOPQ,
            PoincareInvariant2ndTrapezoidal,
            evaluate_poincare_invariant,
            evaluate_poincare_invariant_correction,
@@ -33,11 +32,14 @@ module PoincareInvariants
     include("poincare_invariant_2nd_approxfun.jl")
     include("poincare_invariant_2nd_trapezoidal.jl")
 
-    @require OrthogonalPolynomialsQuasi = "aa41a628-2c43-45df-899b-83ab96621781" begin
-        @require FastTransforms = "057dd010-8810-581a-b7be-e3fc3b93f78c" begin
-            include("poincare_invariant_2nd_opq.jl")
-        end
-    end
+    # function __init__()
+    #     @require ClassicalOrthogonalPolynomials = "b30e2e7b-c4ee-47da-9d5f-2c5c27239acd" begin
+    #         @require FastTransforms = "057dd010-8810-581a-b7be-e3fc3b93f78c" begin
+                export PoincareInvariant2ndCOP
+                include("poincare_invariant_2nd_cop.jl")
+    #         end
+    #     end
+    # end
 
     const PoincareInvariant2nd = PoincareInvariant2ndApproxFun
     const PoincareInvariant2ndCanonical = PoincareInvariant2ndApproxFunCanonical
