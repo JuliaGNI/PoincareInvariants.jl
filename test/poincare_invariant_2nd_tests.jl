@@ -30,15 +30,19 @@ In, Jn = compute_invariant_approxfun(nx, ny)
 @test Jn ≈ Ia atol=2eps()
 
 
-@require OrthogonalPolynomialsQuasi = "aa41a628-2c43-45df-899b-83ab96621781" begin
-    @require FastTransforms = "057dd010-8810-581a-b7be-e3fc3b93f78c" begin
-        In, Jn = compute_invariant_opq(nx, ny)
+### compute and check noncanonical invariant computed with Orthogonal Polynomials ###
 
-        @test In ≈ Ia atol=1E-1
-        #@test Jn ≈ Ia atol=1E-1
-    end
-end
+# @require ClassicalOrthogonalPolynomials = "b30e2e7b-c4ee-47da-9d5f-2c5c27239acd" begin
+#     @require FastTransforms = "057dd010-8810-581a-b7be-e3fc3b93f78c" begin
+        In, Jn = compute_invariant_cop(nx, ny)
 
+        @test In ≈ Ia atol=1E-2
+        # @test Jn ≈ Ia atol=1E-2
+#     end
+# end
+
+
+### compute and check noncanonical invariant computed with Finite Differences ###
 
 In, Jn = compute_invariant_trapezoidal(nx, ny)
 

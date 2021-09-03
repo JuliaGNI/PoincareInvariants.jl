@@ -1,11 +1,11 @@
 
 import FastTransforms: paduapoints, plan_chebyshevtransform, plan_ichebyshevtransform
-import OrthogonalPolynomialsQuasi
+import ClassicalOrthogonalPolynomials
 
-const OPQ = OrthogonalPolynomialsQuasi
+const COP = ClassicalOrthogonalPolynomials
 
 
-struct PoincareInvariant2ndOPQ{DT,TT,ET,ΩT,CT} <: AbstractPoincareInvariant2nd{DT}
+struct PoincareInvariant2ndCOP{DT,TT,ET,ΩT,CT} <: AbstractPoincareInvariant2nd{DT}
     equ::ET
     ω::ΩT
     Δt::TT
@@ -25,7 +25,7 @@ struct PoincareInvariant2ndOPQ{DT,TT,ET,ΩT,CT} <: AbstractPoincareInvariant2nd{
     cheb::CT
 end
 
-function PoincareInvariant2ndOPQ(f_equ::Function, f_surface::Function, ω::ΩT, Δt::TT, d::Int, nx::Int, ny::Int, ntime::Int, nsave::Int=1, DT=Float64) where {TT,ΩT}
+function PoincareInvariant2ndCOP(f_equ::Function, f_surface::Function, ω::ΩT, Δt::TT, d::Int, nx::Int, ny::Int, ntime::Int, nsave::Int=1, DT=Float64) where {TT,ΩT}
 
     nx = 2nx
     ny = 2ny
@@ -44,8 +44,8 @@ function PoincareInvariant2ndOPQ(f_equ::Function, f_surface::Function, ω::ΩT, 
     end
 
     # compute initial conditions
-    xGrid = OPQ.grid(OPQ.ChebyshevT()[:,1:nx])
-    yGrid = OPQ.grid(OPQ.ChebyshevT()[:,1:ny])
+    xGrid = COP.grid(COP.ChebyshevT()[:,1:nx])
+    yGrid = COP.grid(COP.ChebyshevT()[:,1:ny])
 
     q₀ = reshape([f_surface((xGrid[i] + 1) / 2, (yGrid[j] + 1) / 2) for i in 1:nx, j in 1:ny], nx*ny)
 
@@ -86,13 +86,13 @@ function PoincareInvariant2ndOPQ(f_equ::Function, f_surface::Function, ω::ΩT, 
     D1 = zeros(DT, d, nx-1, ny-1)
     D2 = zeros(DT, d, nx-1, ny-1)
 
-    Tx = OPQ.ChebyshevT()[:,1:nx]
-    Ty = OPQ.ChebyshevT()[:,1:ny]
-    Ux = OPQ.ChebyshevU()[:,1:nx-1]
-    Uy = OPQ.ChebyshevU()[:,1:ny-1]
+    Tx = COP.ChebyshevT()[:,1:nx]
+    Ty = COP.ChebyshevT()[:,1:ny]
+    Ux = COP.ChebyshevU()[:,1:nx-1]
+    Uy = COP.ChebyshevU()[:,1:ny-1]
 
-    Dx = OPQ.Derivative(axes(Tx,1)) * Tx
-    Dy = OPQ.Derivative(axes(Ty,1)) * Ty
+    Dx = COP.Derivative(axes(Tx,1)) * Tx
+    Dy = COP.Derivative(axes(Ty,1)) * Ty
 
     PTx = plan_chebyshevtransform(zeros(nx), Val(1))
     PTy = plan_chebyshevtransform(zeros(ny), Val(1))
@@ -110,7 +110,7 @@ function PoincareInvariant2ndOPQ(f_equ::Function, f_surface::Function, ω::ΩT, 
             iPUx = iPUx, iPUy = iPUy,
             PTUx = PTUx, PTUy = PTUy)
 
-    PoincareInvariant2ndOPQ{DT,TT,typeof(equ),ΩT,typeof(cheb)}(equ, ω, Δt, nx, ny, ntime, nsave, nt, I, J, ΔI, ΔJ, y, z̃, z, Ω, cheb)
+    PoincareInvariant2ndCOP{DT,TT,typeof(equ),ΩT,typeof(cheb)}(equ, ω, Δt, nx, ny, ntime, nsave, nt, I, J, ΔI, ΔJ, y, z̃, z, Ω, cheb)
 end
 
 
@@ -285,7 +285,7 @@ end
 # end
 
 
-# function _integrate_opq(t, ω, z, nx, ny, D1, D2, Ω::Matrix)
+# function _integrate_cop(t, ω, z, nx, ny, D1, D2, Ω::Matrix)
 #     local result::Double64 = 0
 
 #     for j in axes(z,3)
@@ -300,7 +300,7 @@ end
 
 
 
-function _integrate_opq(t, x, pinv)
+function _integrate_cop(t, x, pinv)
     Di, Dj, D1, D2, Tx, Ty, Ux, Uy, Dx, Dy, PTx, PTy, iPUx, iPUy, PTUx, PTUy = pinv.cheb
 
     pinv.y .= reshape(x, (size(x,1), pinv.nx, pinv.ny))
@@ -390,9 +390,9 @@ function surface_integral(pinv, t, x::AbstractMatrix{DT}) where {DT}
     # compute_derivative_i!(Di, D1, x, pinv.nx, pinv.ny, Dx, PTx, PTy, PTUy, iPUx, iPUy)
     # compute_derivative_j!(Dj, D2, x, pinv.nx, pinv.ny, Dy, PTx, PTy, PTUx, iPUx, iPUy)
 
-    # return _integrate_opq(t, pinv.ω, z, pinv.nx, pinv.ny, D1, D2, B)
+    # return _integrate_cop(t, pinv.ω, z, pinv.nx, pinv.ny, D1, D2, B)
 
-    return _integrate_opq(t, x, pinv)
+    return _integrate_cop(t, x, pinv)
 end
 
 
@@ -441,12 +441,12 @@ end
 # end
 
 
-function evaluate_poincare_invariant(pinv::PoincareInvariant2ndOPQ{DT}, sol::Solution) where {DT}
+function evaluate_poincare_invariant(pinv::PoincareInvariant2ndCOP{DT}, sol::Solution) where {DT}
     local verbosity = get_config(:verbosity)
 
-    for i in axes(sol.q,2)
+    for i in axes(sol.q,1)
         verbosity > 1 ? println("      it = ", i) : nothing
-        @views pinv.I[i]  = surface_integral(pinv, sol.t[i], hcat(sol.q[i,:]...))
+        pinv.I[i]  = surface_integral(pinv, sol.t[i], hcat(sol.q[i,:]...))
         pinv.ΔI[i] = abs(pinv.I[0]) < sqrt(eps()) ? pinv.I[i] : (pinv.I[i] .- pinv.I[0]) ./ pinv.I[0]
         verbosity > 1 ? println("           I_q = ", pinv.I[i], ",   ε_q = ", pinv.ΔI[i]) : nothing
 
@@ -461,7 +461,7 @@ function evaluate_poincare_invariant(pinv::PoincareInvariant2ndOPQ{DT}, sol::Sol
 end
 
 
-function write_to_hdf5(pinv::PoincareInvariant2ndOPQ, sol::Solution, output_file::String)
+function write_to_hdf5(pinv::PoincareInvariant2ndCOP, sol::Solution, output_file::String)
     # h5open(output_file, isfile(output_file) ? "r+" : "w") do h5
     h5open(output_file, "w") do h5
 

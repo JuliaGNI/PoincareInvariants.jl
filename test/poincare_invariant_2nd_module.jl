@@ -105,8 +105,8 @@ module PoincareInvariant2ndTest
     end
 
 
-    function compute_invariant_opq(nx, ny, nt=0)
-        pinv = PoincareInvariant2ndOPQ(gc_dummy_iode, gc_surface_q, gcω, Δt, 4, nx, ny, nt)
+    function compute_invariant_cop(nx, ny, nt=0)
+        pinv = PoincareInvariant2ndCOP(gc_dummy_iode, gc_surface_q, gcω, Δt, 4, nx, ny, nt)
         sol  = Solution(pinv.equ, Δt, nt)
 
         I, J, ΔI, ΔJ = evaluate_poincare_invariant(pinv, sol)
@@ -150,7 +150,7 @@ module PoincareInvariant2ndTest
 
     export compute_canonical_invariant_approxfun,
            compute_invariant_approxfun,
-           compute_invariant_opq,
+           compute_invariant_cop,
            compute_invariant_trapezoidal,
            compute_invariant_analytical
 
