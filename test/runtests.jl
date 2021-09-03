@@ -55,6 +55,9 @@ end
 
     @test pinv.padua_points isa Vector{SVector{2, Float64}}
     @test length(pinv.padua_points) == pinv.point_num
+    @test all(pinv.padua_points) do point
+        0 ≤ point[1] ≤ 1 && 0 ≤ point[2] ≤ 1
+    end
 
     @test pinv.phase_points isa NTuple{2, Vector{Float32}}
     @test all(length.(pinv.phase_points) .== pinv.point_num .>= min_point_num)

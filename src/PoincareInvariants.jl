@@ -26,15 +26,15 @@ end
 
 # Need to wrap paduapoints function since it returns a matrix of the points
 # and a Vector of SVector's is easier to work with
-function _get_padua_points(::Type{T}, point_num::Integer) where T
+function _get_padua_points(::Type{T}, point_num::Integer)::Vector{SVector{2, T}} where T
     mat = paduapoints(T, Int(cld(-3 + sqrt(1 + 8point_num), 2)))
     map(eachrow(mat)) do row
-        SVector{2, T}(row)
+        # rescale from -1..1 to 0..1
+        (SVector{2}(row) .+ 1) ./ 2
     end
 end
 
 # Should the user be free to choose parameter space type?
-# If so, should they also be free to choose the parameter space domain?
 struct PoincareInvariant2{
     N,  # phase space dimension
     T <: Number,  # phase space type
@@ -54,7 +54,7 @@ function PoincareInvariant2{N}(param_func, min_point_num) where N
     point_num = get_min_padua_num(min_point_num)
 
     # allocate phase_points
-	T = SVector{2, PARAM_TYPE}(0, 0) |> param_func |> eltype
+    T = SVector{2, PARAM_TYPE}(0, 0) |> param_func |> eltype
     phase_points = ntuple(_ -> Vector{T}(undef, point_num), Val(N))
 
     # get padua points
