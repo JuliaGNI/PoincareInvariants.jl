@@ -29,4 +29,20 @@ using StaticArrays
 
         @test out[end] == last.(param_func.(param_points))
     end
+
+    @testset "PoincareInvariant2" begin
+        @test PoincareInvariant2 <: AbstractPoincareInvariant
+
+        # pick odd type to make sure types are correct
+        param_func(v) = SVector{2, Float32}(v[1] * v[2], v[1] + v[2])
+        min_point_num = 321
+
+        pinv = PoincareInvariant2{2}(param_func, min_point_num)
+
+        @test pinv isa PoincareInvariant2
+
+        @test pinv.phase_points isa NTuple{2, Vector{Float32}}
+
+        @test all(length.(pinv.phase_points) .== pinv.point_num .>= min_point_num)
+    end
 end

@@ -1,4 +1,8 @@
 name = "PoincareInvariants"
 uuid = "26663084-47d3-540f-bd97-40ca743aafa4"
 authors = ["Michael Kraus <michael.kraus@ipp.mpg.de>"]
-version = "0.3.4"
+version = "0.3.3"
+
+[deps]
+FastTransforms = "057dd010-8810-581a-b7be-e3fc3b93f78c"
+StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
