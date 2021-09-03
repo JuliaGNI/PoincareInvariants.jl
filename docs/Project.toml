@@ -1,6 +1,0 @@
-[deps]
-Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-GeometricIntegrators = "dcce2d33-59f6-5b8d-9047-0defad88ae06"
-Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-PoincareInvariants = "26663084-47d3-540f-bd97-40ca743aafa4"
-PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee"
