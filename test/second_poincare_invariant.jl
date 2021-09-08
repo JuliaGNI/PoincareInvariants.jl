@@ -25,6 +25,12 @@ end
     Ω(::Any) = [0 -1; 1 0]
 
     @test compute(pinv, ppoints, Ω) ≈ 4
+
+    free_particle!.(eachrow(ppoints), 10)
+    @test compute(pinv, ppoints, Ω) ≈ 4
+
+    free_particle!.(eachrow(ppoints), 10)
+    @test compute(pinv, ppoints, Ω) ≈ 4
 end
 
 # out = calculate(pinv, phase_points, Ω)
