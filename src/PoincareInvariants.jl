@@ -5,10 +5,16 @@ using LinearAlgebra: rmul!
 using FastTransforms: paduavalsmat, trianglecfsvec!
 
 # For the Padua transforms and manipulations in Chebyshev base
+using ApproxFunBase: TransformPlan, ITransformPlan, plan_transform, plan_itransform
 using ApproxFunOrthogonalPolynomials
 using FastTransforms: PaduaTransformPlan, plan_paduatransform!, paduapoints
 
-using LinearAlgebra: dot
+using BlockArrays: BlockRange
+
+# For operator preallocation
+using ApproxFunBase: BandedBlockBandedMatrix, FiniteRange
+
+using LinearAlgebra
 
 # to represent points
 using StaticArrays

@@ -1,12 +1,22 @@
-_to_n(N) = (-3 + sqrt(1 + 8N)) / 2
-_to_N(n) = (n + 1) * (n + 2) ÷ 2
+get_n(padua_num) = (sqrt(1 + 8padua_num) - 3) / 2
 
-# get minimum allowed padua point number ≥ N
-_get_min_padua_num(N) = _to_N(ceil(Int, _to_n(N)))
+get_padua_num(n) = (n + 1) * (n + 2) ÷ 2
 
-function _padua_points(N::Integer)::Vector{SVector{2, Float64}}
-    out = Vector{SVector{2, Float64}}(undef, N)
-    n = Int(_to_n(N))
+function check_padua_num(padua_num)
+    if !isinteger(get_n(padua_num))
+        throw(ArgumentError("number of padua points must equal (n + 1) * (n + 2) ÷ 2"))
+    end
+end
+
+"""
+    get_padua_points(N::Integer)::AbstractMatrix{Float64}
+
+returns `N` padua points on square `0..1 × 0..1`.
+"""
+function get_padua_points(padua_num::Integer)::Vector{SVector{2, Float64}}
+    check_padua_num(padua_num)
+    out = Vector{SVector{2, Float64}}(undef, padua_num)
+    n = Int(get_n(padua_num))
     m = 0
     delta = 0
     NN = fld(n + 2, 2)
@@ -17,23 +27,16 @@ function _padua_points(N::Integer)::Vector{SVector{2, Float64}}
         @inbounds for j = NN+delta:-1:1
             m += 1
 
-            v1 = sinpi(k / n - 0.5)
+            v1 = (sinpi(k / n - 0.5) + 1) / 2
 
             a = isodd(n - k) ? 1 : 2
-            v2 = sinpi((2j - a) / (n + 1) - 0.5)
+            v2 = (sinpi((2j - a) / (n + 1) - 0.5) + 1) / 2
 
             out[m] = SVector{2, Float64}(v1, v2)
         end
     end
     return out
 end
-
-"""
-    get_padua_points(N::Integer)::Vector{SVector{2, Float64}}
-
-returns minimum number of padua points ≥ `N` on square `-1..1 × -1..1`.
-"""
-get_padua_points(N::Integer) where T = _padua_points(_get_min_padua_num(N))
 
 function padua_transform!(
     out::AbstractVector{T},
