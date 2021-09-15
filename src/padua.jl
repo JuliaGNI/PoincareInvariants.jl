@@ -2,6 +2,8 @@ get_n(padua_num) = (sqrt(1 + 8padua_num) - 3) / 2
 
 get_padua_num(n) = (n + 1) * (n + 2) ÷ 2
 
+next_padua_num(N) = get_padua_num(ceil(Int, get_n(N)))
+
 function check_padua_num(padua_num)
     if !isinteger(get_n(padua_num))
         throw(ArgumentError("number of padua points must equal (n + 1) * (n + 2) ÷ 2"))
@@ -9,13 +11,14 @@ function check_padua_num(padua_num)
 end
 
 """
-    get_padua_points(N::Integer)::AbstractMatrix{Float64}
+    get_padua_points([T::Type{<:Real}, ]N::Integer)::Matrix{T}
 
-returns `N` padua points on square `0..1 × 0..1`.
+returns `N` padua points on square `0..1 × 0..1` as matrix with elment type `T`. Each row
+represens a point.
 """
-function get_padua_points(padua_num::Integer)::Vector{SVector{2, Float64}}
+function get_padua_points(::Type{T}, padua_num::Integer)::Matrix{T} where T <: Real
     check_padua_num(padua_num)
-    out = Vector{SVector{2, Float64}}(undef, padua_num)
+    out = Matrix{T}(undef, padua_num, 2)
     n = Int(get_n(padua_num))
     m = 0
     delta = 0
@@ -27,16 +30,16 @@ function get_padua_points(padua_num::Integer)::Vector{SVector{2, Float64}}
         @inbounds for j = NN+delta:-1:1
             m += 1
 
-            v1 = (sinpi(k / n - 0.5) + 1) / 2
+            out[m, 1] = (sinpi(T(k) / T(n) - T(0.5)) + 1) / 2
 
             a = isodd(n - k) ? 1 : 2
-            v2 = (sinpi((2j - a) / (n + 1) - 0.5) + 1) / 2
-
-            out[m] = SVector{2, Float64}(v1, v2)
+            out[m, 2] = (sinpi(T(2j - a) / T(n + 1) - T(0.5)) + 1) / 2
         end
     end
     return out
 end
+
+get_padua_points(padua_num::Integer) = get_padua_points(Float64, padua_num)
 
 function padua_transform!(
     out::AbstractVector{T},

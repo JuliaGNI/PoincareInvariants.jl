@@ -22,7 +22,7 @@ using StaticArrays
 # Callable is Union{Function, Type}
 using Base: Callable
 
-export get_padua_points
+export get_padua_points, next_padua_num
 export AbstractPoincareInvariant, PoincareInvariant1, PoincareInvariant2, compute
 
 include("padua.jl")
