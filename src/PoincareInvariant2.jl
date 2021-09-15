@@ -40,6 +40,7 @@ function PoincareInvariant2{N, T}(padua_num::Integer) where {N, T}
 	# make plan for padua transform
 	# Val{true / false} indicates if its lexigraphical (i.e., x, y) or reverse (y, x)
 	# Val{false} is the setting ApproxFun uses, which is why it's used here, too
+    # Why is there a bang (!) at the end? It's not in-place.
 	padua_plan = plan_paduatransform!(T, padua_num, Val{false})
 
 	# preallocate array for coefficients
@@ -76,22 +77,19 @@ function PoincareInvariant2{N, T}(padua_num::Integer) where {N, T}
 	uu_coeffs    = Matrix{T}(undef, uu_coeff_num, N)
 	uu_d1_coeffs = Matrix{T}(undef, uu_coeff_num, N)
 	uu_d2_coeffs = Matrix{T}(undef, uu_coeff_num, N)
-	
-	@assert size(D1toUU) == size(D2toUU) == size(CCtoUU) == (uu_coeff_num, padua_num)
-	@assert typeof(D1toUU) == typeof(D2toUU) <: BandedBlockBandedMatrix
 
 	uu_points = points(UU, uu_point_num) .|> SVector{2, T}
 	uu_plan = plan_transform(UU, T, uu_point_num)  # values to coefficients
 	uu_iplan = plan_itransform(UU, T, uu_coeff_num)  # coefficients to values
-	
+
 	uu_vals    = Matrix{T}(undef, uu_point_num, N)
 	uu_d1_vals = Matrix{T}(undef, uu_point_num, N)
 	uu_d2_vals = Matrix{T}(undef, uu_point_num, N)
-		
+
 	uu_I_vals = Vector{T}(undef, uu_point_num)
 
 	UUIntegral = DefiniteIntegral(UU)[1:1, 1:uu_coeff_num]
-		
+
 	uu_I_coeffs = Vector{T}(undef, uu_coeff_num)
 
 	PoincareInvariant2{N, T}(

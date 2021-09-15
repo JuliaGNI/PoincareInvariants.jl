@@ -1,4 +1,6 @@
-using FastTransforms: PaduaTransformPlan, paduapoints
+using FastTransforms
+using FastTransforms: PaduaTransformPlan
+using LinearAlgebra
 
 @testset "Coefficient and Point Counts" begin
     for n in 1:11:10_000
@@ -19,22 +21,67 @@ end
 @testset "PoincareInvariant2 Constructor" begin
     @test PoincareInvariant2 <: AbstractPoincareInvariant
 
-    N = 2
-    T = Float64
+    @testset "PoincareInvariant2{$N, $T} with n=$n" for T in [Float32, Float64], N in [2, 36], n in [62, 140]
+        padua_num = PoincareInvariants.get_padua_num(n) # testing for 2016 and 10011 points
+        uu_coeff_num = PoincareInvariants.get_uu_coeff_num(n)
+        uu_point_num = PoincareInvariants.get_uu_point_num(n)
 
-    padua_num = 10_011
-    n = PoincareInvariants.get_n(padua_num)
-    ppoints = get_padua_points(padua_num)
-    pinv = PoincareInvariant2{N, T}(padua_num::Integer)
+        pinv = PoincareInvariant2{N, T}(padua_num)
 
-    @test pinv.n == n
+        @test pinv isa PoincareInvariant2
 
-    @test pinv.cc_coeffs isa Matrix{Float64}
-    @test size(pinv.cc_coeffs) == (padua_num, N)
+        @test pinv.n == n
 
-    @test size(pinv.D1toUU) == (PoincareInvariants.get_uu_coeff_num(n), padua_num)
-    @test size(pinv.D2toUU) == (PoincareInvariants.get_uu_coeff_num(n), padua_num)
-    @test size(pinv.CCtoUU) == (PoincareInvariants.get_uu_coeff_num(n), padua_num)
+        @test pinv.cc_coeffs isa Matrix{T}
+        @test size(pinv.cc_coeffs) == (padua_num, N)
+
+        let v = [cos(v[1]) * sin(v[2]) for v in get_padua_points(padua_num)]
+            coeffs = pinv.padua_plan * copy(v)
+            @test ipaduatransform(coeffs, Val{false}) ≈ v rtol=1e-3
+        end
+
+        @test size(pinv.D1toUU) == (uu_coeff_num, padua_num)
+        @test size(pinv.D2toUU) == (uu_coeff_num, padua_num)
+        @test size(pinv.CCtoUU) == (uu_coeff_num, padua_num)
+
+        @test size(pinv.uu_coeffs) == (uu_coeff_num, N)
+        @test size(pinv.uu_d1_coeffs) == (uu_coeff_num, N)
+        @test size(pinv.uu_d2_coeffs) == (uu_coeff_num, N)
+
+        @test eltype(pinv.uu_coeffs) == T
+        @test eltype(pinv.uu_d1_coeffs) == T
+        @test eltype(pinv.uu_d2_coeffs) == T
+
+        @test size(pinv.uu_points) == (uu_point_num,)
+        @test eltype(pinv.uu_points) == SVector{2, T}
+
+        @test size(pinv.uu_vals) == (uu_point_num, N)
+        @test size(pinv.uu_d1_vals) == (uu_point_num, N)
+        @test size(pinv.uu_d2_vals) == (uu_point_num, N)
+
+        @test eltype(pinv.uu_vals) == T
+        @test eltype(pinv.uu_d1_vals) == T
+        @test eltype(pinv.uu_d2_vals) == T
+
+        let v = [cos(v[1]) * sin(v[2]) for v in pinv.uu_points]
+            coeffs = pinv.uu_plan * copy(v)
+            @test pinv.uu_iplan * copy(coeffs) ≈ v rtol=1e-3
+        end
+
+        @test size(pinv.uu_I_vals) == (uu_point_num,)
+        @test eltype(pinv.uu_I_vals) == T
+
+        @test size(pinv.uu_I_coeffs) == (uu_coeff_num,)
+        @test eltype(pinv.uu_I_coeffs) == T
+
+        @test size(pinv.UUIntegral) == (1, uu_coeff_num)
+        @test eltype(pinv.UUIntegral) == T
+
+        let v = [v[1] + 4 * v[2]^3 for v in pinv.uu_points]
+            coeffs = pinv.uu_plan * copy(v)
+            @test dot(pinv.UUIntegral, coeffs) ≈ 0.5 + 1 rtol=1e-3
+        end
+    end
 end
 
 @testset "1D Free Particle" begin
