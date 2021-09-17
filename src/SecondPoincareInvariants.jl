@@ -1,8 +1,43 @@
-get_uu_coeff_num(n) = n * (n + 1) ÷ 2
+using ApproxFunOrthogonalPolynomials
+using FastTransforms: PaduaTransformPlan, plan_paduatransform!
+using ApproxFunBase: TransformPlan, ITransformPlan, plan_transform, plan_itransform
 
-get_uu_point_num(n) = n^2
+using BlockBandedMatrices: BandedBlockBandedMatrix
+using BlockArrays: BlockRange
+using StaticArrays: SVector
 
-struct PoincareInvariant2{
+using LinearAlgebra: mul!, dot
+
+# Callable is Union{Function, Type}
+using Base: Callable
+
+using ..PoincareInvariants: AbstractPoincareInvariant
+import ..PoincareInvariants: compute
+
+export SecondPoincareInvariant
+export get_padua_points, next_padua_num
+
+get_n(padua_num) = (sqrt(1 + 8padua_num) - 3) / 2
+
+get_padua_num(degree) = (degree + 1) * (degree + 2) ÷ 2
+
+next_padua_num(N) = get_padua_num(ceil(Int, get_n(N)))
+
+function check_padua_num(padua_num)
+    if !isinteger(get_n(padua_num))
+        throw(ArgumentError("number of padua points must equal (n + 1) * (n + 2) ÷ 2"))
+    end
+end
+
+include("padua.jl")
+
+get_uu_coeff_num(degree) = degree * (degree + 1) ÷ 2
+
+get_uu_point_num(degree) = degree^2
+
+## SecondPoincareInvariant ##
+
+struct SecondPoincareInvariant{
 	N,  # phase space dimension
 	T <: Number,  # phase space type
 	PTP <: PaduaTransformPlan,
@@ -11,7 +46,7 @@ struct PoincareInvariant2{
 	UUTP <: TransformPlan,
 	UUITP <: ITransformPlan
 } <: AbstractPoincareInvariant
-	n::Int
+	degree::Int
 	padua_plan::PTP
 	cc_coeffs::AbstractMatrix{T}
 	D1toUU::DBBB
@@ -31,11 +66,11 @@ struct PoincareInvariant2{
 	UUIntegral::Matrix{T}
 end
 
-function PoincareInvariant2{N, T}(padua_num::Integer) where {N, T}
+function SecondPoincareInvariant{N, T}(padua_num::Integer) where {N, T}
 	# n such that (n + 1) * (n + 2) ÷ 2 == padua_num
 	# padua coefficients on upper triangular of matrix of size (n + 1) × (n + 1)
 	check_padua_num(padua_num)
-	n = Int(get_n(padua_num))
+	degree = Int(get_n(padua_num))
 
 	# make plan for padua transform
 	# Val{true / false} indicates if its lexigraphical (i.e., x, y) or reverse (y, x)
@@ -46,10 +81,10 @@ function PoincareInvariant2{N, T}(padua_num::Integer) where {N, T}
 	# preallocate array for coefficients
 	cc_coeffs = Matrix{T}(undef, padua_num, N)
 
-	CC = Chebyshev(0..1)         ⊗ Chebyshev(0..1)
-	UC = Ultraspherical(1, 0..1) ⊗ Chebyshev(0..1)
-	CU = Chebyshev(0..1)         ⊗ Ultraspherical(1, 0..1)
-	UU = Ultraspherical(1, 0..1) ⊗ Ultraspherical(1, 0..1)
+	CC = Chebyshev(-1..1)         ⊗ Chebyshev(-1..1)
+	UC = Ultraspherical(1, -1..1) ⊗ Chebyshev(-1..1)
+	CU = Chebyshev(-1..1)         ⊗ Ultraspherical(1, -1..1)
+	UU = Ultraspherical(1, -1..1) ⊗ Ultraspherical(1, -1..1)
 
 	# preallocate Operators
 	#
@@ -59,20 +94,20 @@ function PoincareInvariant2{N, T}(padua_num::Integer) where {N, T}
 	#
 	# differentiation converts to chebyshev basis of the second kind,
 	# so we convert everything to chebyshev polynomials of the second kind
-	D1 = Derivative(CC, [1,0])[BlockRange(1:n), BlockRange(1:n+1)]
-	UCtoUU = Conversion(UC, UU)[BlockRange(1:n), BlockRange(1:n)]
+	D1 = Derivative(CC, [1,0])[BlockRange(1:degree), BlockRange(1:degree+1)]
+	UCtoUU = Conversion(UC, UU)[BlockRange(1:degree), BlockRange(1:degree)]
 	D1toUU = UCtoUU * D1
 
-	D2 = Derivative(CC, [0,1])[BlockRange(1:n), BlockRange(1:n+1)]
-	CUtoUU = Conversion(CU, UU)[BlockRange(1:n), BlockRange(1:n)]
+	D2 = Derivative(CC, [0,1])[BlockRange(1:degree), BlockRange(1:degree+1)]
+	CUtoUU = Conversion(CU, UU)[BlockRange(1:degree), BlockRange(1:degree)]
 	D2toUU = CUtoUU * D2
 
 	# truncate highest order coefficients,
 	# so number of coeffs matches number after differentiating
-	CCtoUU = Conversion(CC, UU)[BlockRange(1:n), BlockRange(1:n+1)]
+	CCtoUU = Conversion(CC, UU)[BlockRange(1:degree), BlockRange(1:degree+1)]
 	
-	uu_coeff_num = get_uu_coeff_num(n)
-	uu_point_num = get_uu_point_num(n)
+	uu_coeff_num = get_uu_coeff_num(degree)
+	uu_point_num = get_uu_point_num(degree)
 	
 	uu_coeffs    = Matrix{T}(undef, uu_coeff_num, N)
 	uu_d1_coeffs = Matrix{T}(undef, uu_coeff_num, N)
@@ -92,27 +127,31 @@ function PoincareInvariant2{N, T}(padua_num::Integer) where {N, T}
 
 	uu_I_coeffs = Vector{T}(undef, uu_coeff_num)
 
-	PoincareInvariant2{N, T}(
-		n, padua_plan, cc_coeffs, D1toUU, D2toUU, CCtoUU,
+	SecondPoincareInvariant{N, T}(
+		degree, padua_plan, cc_coeffs, D1toUU, D2toUU, CCtoUU,
 		uu_coeffs, uu_d1_coeffs, uu_d2_coeffs,
 		uu_points, uu_iplan, uu_vals, uu_d1_vals, uu_d2_vals,
 		uu_I_vals, uu_plan, uu_I_coeffs, UUIntegral
 	)
 end
 
-function PoincareInvariant2{N, T}(
-	n, padua_plan::PTP, cc_coeffs, D1toUU::DBBB, D2toUU::DBBB, CCtoUU::CBBB,
+function SecondPoincareInvariant{N, T}(
+	degree, padua_plan::PTP, cc_coeffs, D1toUU::DBBB, D2toUU::DBBB, CCtoUU::CBBB,
 	uu_coeffs, uu_d1_coeffs, uu_d2_coeffs,
 	uu_points, uu_iplan::UUITP, uu_vals, uu_d1_vals, uu_d2_vals,
 	uu_I_vals, uu_plan::UUTP, uu_I_coeffs, UUIntegral
 ) where {N, T, PTP, DBBB, CBBB, UUITP, UUTP}
-	PoincareInvariant2{N, T, PTP, DBBB, CBBB, UUTP, UUITP}(
-		n, padua_plan, cc_coeffs, D1toUU, D2toUU, CCtoUU,
+	SecondPoincareInvariant{N, T, PTP, DBBB, CBBB, UUTP, UUITP}(
+		degree, padua_plan, cc_coeffs, D1toUU, D2toUU, CCtoUU,
 		uu_coeffs, uu_d1_coeffs, uu_d2_coeffs,
 		uu_points, uu_iplan, uu_vals, uu_d1_vals, uu_d2_vals,
 		uu_I_vals, uu_plan, uu_I_coeffs, UUIntegral
 	)
 end
+
+const PI2 = SecondPoincareInvariant
+
+## compute ##
 
 function checkΩ(Ω::AbstractMatrix, N)
 	size(Ω) == (N, N) || throw(ArgumentError(
@@ -120,8 +159,8 @@ function checkΩ(Ω::AbstractMatrix, N)
 	))
 end
 
-function check_phase_points(phase_points::AbstractMatrix, n, N)
-	num = get_padua_num(n)
+function check_phase_points(phase_points::AbstractMatrix, degree, N)
+	num = get_padua_num(degree)
 	size(phase_points) == (num, N) || throw(ArgumentError(string(
 		"phase_points must be a $num × $N AbstractMatrix,",
 		"not $(size(phase_points, 1)) × $(size(phase_points, 2))"
@@ -129,12 +168,12 @@ function check_phase_points(phase_points::AbstractMatrix, n, N)
 end
 
 function compute(
-    pinv::PoincareInvariant2{N, T},
-    phase_points::AbstractMatrix{T},
+    pinv::SecondPoincareInvariant{N, T},
+    phase_points::AbstractMatrix,
     Ω::AbstractMatrix
 ) where {N, T}
     checkΩ(Ω, N)
-    check_phase_points(phase_points, pinv.n, N)
+    check_phase_points(phase_points, pinv.degree, N)
 
     # Transform to Chebyshev basis via Padua transform
     for i in 1:N
@@ -153,7 +192,7 @@ function compute(
         pinv.uu_d2_vals[:, i] .= pinv.uu_iplan * copy(pinv.uu_d2_coeffs[:, i])
     end
 
-    for i in 1:get_uu_point_num(pinv.n)
+    for i in 1:get_uu_point_num(pinv.degree)
         pinv.uu_I_vals[i] = dot(pinv.uu_d2_vals[i, :], Ω, pinv.uu_d1_vals[i, :])
     end
 

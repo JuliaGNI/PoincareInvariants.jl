@@ -1,34 +1,25 @@
 module PoincareInvariants
 
-# For copy of paduatransform!
-using LinearAlgebra: rmul!
-using FastTransforms: paduavalsmat, trianglecfsvec!
+using Reexport
 
-# For the Padua transforms and manipulations in Chebyshev base
-using ApproxFunBase: TransformPlan, ITransformPlan, plan_transform, plan_itransform
-using ApproxFunOrthogonalPolynomials
-using FastTransforms: PaduaTransformPlan, plan_paduatransform!, paduapoints
+export AbstractPoincareInvariant, compute
 
-using BlockArrays: BlockRange
+"""
+    AbstractPoincareInvariant
 
-# For operator preallocation
-using ApproxFunBase: BandedBlockBandedMatrix, FiniteRange
-
-using LinearAlgebra
-
-# to represent points
-using StaticArrays
-
-# Callable is Union{Function, Type}
-using Base: Callable
-
-export get_padua_points, next_padua_num
-export AbstractPoincareInvariant, PoincareInvariant1, PoincareInvariant2, compute
-
-include("padua.jl")
-
+supertype of setup objects `FirstPoincareInvariant` and `SecondPoincareInvariant`.
+"""
 abstract type AbstractPoincareInvariant end
 
-include("PoincareInvariant2.jl")
+"""
+    compute(pinv::AbstractPoincareInvariant, args...)
+
+computes a Poincaré invariant.
+"""
+function compute end
+
+@reexport module CanonicalSymplecticMatrices include("CanonicalSymplecticMatrices.jl") end
+@reexport module FirstPoincareInvariants include("FirstPoincareInvariants.jl") end
+@reexport module SecondPoincareInvariants include("SecondPoincareInvariants.jl") end
 
 end  # module

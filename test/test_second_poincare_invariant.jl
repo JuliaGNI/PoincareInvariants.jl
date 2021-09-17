@@ -20,19 +20,19 @@ using FastTransforms: PaduaTransformPlan
     end
 end
 
-@testset "PoincareInvariant2 Struct" begin
-    @test PoincareInvariant2 <: AbstractPoincareInvariant
+@testset "SecondPoincareInvariant Struct" begin
+    @test SecondPoincareInvariant <: AbstractPoincareInvariant
 
     nums = next_padua_num.([10_000, 20_000])
 
-    @testset "PoincareInvariant2{$N, $T}($padua_num)" for T in [Float32, Float64], N in [2, 36], padua_num in nums
+    @testset "SecondPoincareInvariant{$N, $T}($padua_num)" for T in [Float32, Float64], N in [2, 36], padua_num in nums
         n = PoincareInvariants.get_n(padua_num)
         uu_coeff_num = PoincareInvariants.get_uu_coeff_num(n)
         uu_point_num = PoincareInvariants.get_uu_point_num(n)
 
-        pinv = PoincareInvariant2{N, T}(padua_num)
+        pinv = SecondPoincareInvariant{N, T}(padua_num)
 
-        @test pinv isa PoincareInvariant2
+        @test pinv isa SecondPoincareInvariant
 
         @test pinv.n == n
 
@@ -41,7 +41,7 @@ end
 
         let v = [cos(v[1]) * sin(v[2]) for v in eachrow(get_padua_points(padua_num))]
             coeffs = pinv.padua_plan * copy(v)
-            @test ipaduatransform(coeffs, Val{false}) ≈ v rtol=1e-6
+            @test ipaduatransform(coeffs, Val{false}) ≈ v rtol=√eps(T)
         end
 
         @test size(pinv.D1toUU) == (uu_coeff_num, padua_num)
@@ -69,7 +69,7 @@ end
 
         let v = [cos(v[1]) * sin(v[2]) for v in pinv.uu_points]
             coeffs = pinv.uu_plan * copy(v)
-            @test pinv.uu_iplan * copy(coeffs) ≈ v rtol=1e-6
+            @test pinv.uu_iplan * copy(coeffs) ≈ v rtol=√eps(T)
         end
 
         @test size(pinv.uu_I_vals) == (uu_point_num,)
@@ -83,30 +83,41 @@ end
 
         let v = [v[1] + 4 * v[2]^3 for v in pinv.uu_points]
             coeffs = pinv.uu_plan * copy(v)
-            @test dot(pinv.UUIntegral, coeffs) ≈ 0.5 + 1 rtol=1e-6
+            @test dot(pinv.UUIntegral, coeffs) ≈ 0.5 + 1 rtol=√eps(T)
         end
     end
 end
 
 @testset "Free Particles" begin
-    @testset "$np $(nd)D Free Particle(s)" for np in 1:3, nd in 1:3
+    @testset "$np Free Particles in 3D" for np in [2, 5], T in [Float32, Float64]
         padua_num = next_padua_num(10_000)
-        ppoints = get_padua_points(padua_num)
 
-        pinv = PoincareInvariant2{2, Float64}(padua_num)
+        N = np * 6
+
+        pinv = SecondPoincareInvariant{N, T}(padua_num)
 
         function free_particle!(init, δt)
-            init[1] += init[2] .* δt
+            mid = length(init) ÷ 2
+            init[1:mid] += init[mid+1:end] .* δt
         end
 
-        Ω = [0 -1; 1 0]
+        Ω = BlockArray(zeros(Int, N, N), [N ÷ 2, N ÷ 2], [N ÷ 2, N ÷ 2])
+        Ω[Block(1, 2)] - I
+        Ω[Block(2, 1)] + I
 
-        @test compute(pinv, ppoints, Ω) ≈ 1
+        ppoints = get_padua_points(padua_num)
+        phasepoints = ones(T, padua_num, N)
 
-        free_particle!.(eachrow(ppoints), 10)
-        @test compute(pinv, ppoints, Ω) ≈ 1
+        for i in 1:padua_num
+            phasepoints[i, end-1:end] .+= ppoints[i, 1:2]
+        end
 
-        free_particle!.(eachrow(ppoints), 10)
-        @test compute(pinv, ppoints, Ω) ≈ 1
+        @test compute(pinv, phasepoints, Ω) ≈ 1
+
+        free_particle!.(eachrow(phasepoints), 10)
+        @test compute(pinv, phasepoints, Ω) ≈ 1 rtol=1e-12
+
+        free_particle!.(eachrow(phasepoints), 10)
+        @test compute(pinv, phasepoints, Ω) ≈ 1
     end
 end

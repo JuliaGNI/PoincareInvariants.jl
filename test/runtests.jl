@@ -1,11 +1,8 @@
-using Test, PoincareInvariants
+using SafeTestsets, Test
 
-using Random: MersenneTwister
+@safetestset "CanoincalSymplecticMatrices" begin include("test_CanonicalSymplecticMatrices.jl") end
+@safetestset "FirstPoincareInvariants" begin include("test_FirstPoincareInvariants.jl") end
+@safetestset "SecondPoincareInvariants" begin include("test_SecondPoincareInvariants.jl") end
 
-using StaticArrays
-using LinearAlgebra
-
-using FastTransforms
-
-include("padua.jl")
-include("second_poincare_invariant.jl")
+# include("padua.jl")
+# include("second_poincare_invariant.jl")

@@ -1,14 +1,6 @@
-get_n(padua_num) = (sqrt(1 + 8padua_num) - 3) / 2
-
-get_padua_num(n) = (n + 1) * (n + 2) ÷ 2
-
-next_padua_num(N) = get_padua_num(ceil(Int, get_n(N)))
-
-function check_padua_num(padua_num)
-    if !isinteger(get_n(padua_num))
-        throw(ArgumentError("number of padua points must equal (n + 1) * (n + 2) ÷ 2"))
-    end
-end
+# For copy of paduatransform!
+using LinearAlgebra: rmul!
+using FastTransforms: paduavalsmat, trianglecfsvec!
 
 """
     get_padua_points([T::Type{<:Real}, ]N::Integer)::Matrix{T}
