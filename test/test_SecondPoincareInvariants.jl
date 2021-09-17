@@ -1,4 +1,4 @@
-@safetestset "Coefficient and Point Counts" begin
+@safetestset "Unit Tests: Coefficient and Point Counts" begin
     using PoincareInvariants
     using PoincareInvariants.SecondPoincareInvariants: get_padua_num, get_n, check_padua_num,
         get_uu_coeff_num, get_uu_point_num
@@ -22,7 +22,7 @@
     end
 end
 
-@safetestset "SecondPoincareInvariant Unit Tests" begin
+@safetestset "Unit Tests: 0..1 × 0..1 Square with degree 2" begin
     using PoincareInvariants
     using StaticArrays: SVector
 
@@ -181,81 +181,61 @@ end
     end
 end
 
-# @safetestset "SecondPoincareInvariant Constructor" begin
-#     using PoincareInvariants
-#     using PoincareInvariants.SecondPoincareInvariants: get_padua_num, get_n, get_uu_coeff_num, get_uu_point_num
-#     using FastTransforms: ipaduatransform
-#     using LinearAlgebra: dot
-#     using StaticArrays: SVector
+@safetestset "Function Tests: Free Particle" begin
+    using PoincareInvariants
 
-#     @test SecondPoincareInvariant <: AbstractPoincareInvariant
+    function free_particle!(state, δt)
+        mid = length(state) ÷ 2
+        state[1:mid] += state[mid+1:end] .* δt
+    end
 
-#     nums = next_padua_num.([10_000, 20_000])
+    padua_num = next_padua_num(50 * 50)
+    paduapoints = get_padua_points(padua_num)
 
-#     @testset "SecondPoincareInvariant{$N, $T}($padua_num)" for T in [Float32, Float64], N in [2, 36], padua_num in nums
-#         n = get_n(padua_num)
-#         uu_coeff_num = get_uu_coeff_num(n)
-#         uu_point_num = get_uu_point_num(n)
+    @testset "Free Particle in $(N)D on 0..1 × 0..1" for N in [2, 6]
+        pinv = SecondPoincareInvariant{N, Float64}(padua_num)
+        Ω = CanonicalSymplecticMatrix(N)
 
-#         rtol = 1e-6
+        phasepoints = ones(Float64, padua_num, N)
+        phasepoints[:, 1] .= paduapoints[:, 1]
+        phasepoints[:, N ÷ 2 + 1] .= paduapoints[:, 2]
 
-#         pinv = SecondPoincareInvariant{N, T}(padua_num)
+        @test compute(pinv, phasepoints, Ω) ≈ 1 atol=1e-10
 
-#         @test pinv isa SecondPoincareInvariant
+        free_particle!.(eachrow(phasepoints), 10)
+        @test compute(pinv, phasepoints, Ω) ≈ 1 atol=1e-10
 
-#         @test pinv.n == n
+        free_particle!.(eachrow(phasepoints), 100)
+        @test compute(pinv, phasepoints, Ω) ≈ 1 atol=1e-10
 
-#         @test pinv.cc_coeffs isa Matrix{T}
-#         @test size(pinv.cc_coeffs) == (padua_num, N)
+        free_particle!.(eachrow(phasepoints), 1000)
+        @test compute(pinv, phasepoints, Ω) ≈ 1 atol=1e-10
+    end
 
-#         let v = [cos(v[1]) * sin(v[2]) for v in eachrow(get_padua_points(padua_num))]
-#             coeffs = pinv.padua_plan * copy(v)
-#             @test ipaduatransform(coeffs, Val{false}) ≈ v rtol=rtol
-#         end
+    @testset "Free Particle in $(N)D on Quarter Circle" for N in [2, 6]
+        pinv = SecondPoincareInvariant{N, Float64}(padua_num)
+        Ω = CanonicalSymplecticMatrix(N)
 
-#         @test size(pinv.D1toUU) == (uu_coeff_num, padua_num)
-#         @test size(pinv.D2toUU) == (uu_coeff_num, padua_num)
-#         @test size(pinv.CCtoUU) == (uu_coeff_num, padua_num)
+        phasepoints = ones(Float64, padua_num, N)
+        phasepoints[:, 1] .= map(eachrow(paduapoints)) do row
+            row[1] * cos(row[2] * π/2)
+        end
+        phasepoints[:, N ÷ 2 + 1] .= map(eachrow(paduapoints)) do row
+            row[1] * sin(row[2] * π/2)
+        end
 
-#         @test size(pinv.uu_coeffs) == (uu_coeff_num, N)
-#         @test size(pinv.uu_d1_coeffs) == (uu_coeff_num, N)
-#         @test size(pinv.uu_d2_coeffs) == (uu_coeff_num, N)
+        @test compute(pinv, phasepoints, Ω) ≈ π/4 atol=1e-10
 
-#         @test eltype(pinv.uu_coeffs) == T
-#         @test eltype(pinv.uu_d1_coeffs) == T
-#         @test eltype(pinv.uu_d2_coeffs) == T
+        free_particle!.(eachrow(phasepoints), 10)
+        @test compute(pinv, phasepoints, Ω) ≈ π/4 atol=1e-10
 
-#         @test size(pinv.uu_points) == (uu_point_num,)
-#         @test eltype(pinv.uu_points) == SVector{2, T}
+        free_particle!.(eachrow(phasepoints), 100)
+        @test compute(pinv, phasepoints, Ω) ≈ π/4 atol=1e-10
 
-#         @test size(pinv.uu_vals) == (uu_point_num, N)
-#         @test size(pinv.uu_d1_vals) == (uu_point_num, N)
-#         @test size(pinv.uu_d2_vals) == (uu_point_num, N)
-
-#         @test eltype(pinv.uu_vals) == T
-#         @test eltype(pinv.uu_d1_vals) == T
-#         @test eltype(pinv.uu_d2_vals) == T
-
-#         let v = [cos(v[1]) * sin(v[2]) for v in pinv.uu_points]
-#             coeffs = pinv.uu_plan * copy(v)
-#             @test pinv.uu_iplan * copy(coeffs) ≈ v rtol=rtol
-#         end
-
-#         @test size(pinv.uu_I_vals) == (uu_point_num,)
-#         @test eltype(pinv.uu_I_vals) == T
-
-#         @test size(pinv.uu_I_coeffs) == (uu_coeff_num,)
-#         @test eltype(pinv.uu_I_coeffs) == T
-
-#         @test size(pinv.UUIntegral) == (1, uu_coeff_num)
-#         @test eltype(pinv.UUIntegral) == T
-
-#         let v = [v[1] + 4 * v[2]^3 for v in pinv.uu_points]
-#             coeffs = pinv.uu_plan * copy(v)
-#             @test dot(pinv.UUIntegral, coeffs) ≈ 0.5 + 1 rtol=rtol
-#         end
-#     end
-# end
+        free_particle!.(eachrow(phasepoints), 1000)
+        @test compute(pinv, phasepoints, Ω) ≈ π/4 atol=1e-10
+    end
+end
 
 # @safetestset "Simple Surfaces" begin
 #     using PoincareInvariants
