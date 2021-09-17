@@ -212,15 +212,15 @@ end
         @test compute(pinv, phasepoints, Ω) ≈ 1 atol=1e-10
     end
 
-    @testset "Free Particle in $(N)D on Quarter Circle" for N in [2, 6]
+    @testset "Free Particle in $(N)D on Quarter Circle" for N in [4, 12]
         pinv = SecondPoincareInvariant{N, Float64}(padua_num)
         Ω = CanonicalSymplecticMatrix(N)
 
         phasepoints = ones(Float64, padua_num, N)
-        phasepoints[:, 1] .= map(eachrow(paduapoints)) do row
+        phasepoints[:, 2] .= map(eachrow(paduapoints)) do row
             row[1] * cos(row[2] * π/2)
         end
-        phasepoints[:, N ÷ 2 + 1] .= map(eachrow(paduapoints)) do row
+        phasepoints[:, N ÷ 2 + 2] .= map(eachrow(paduapoints)) do row
             row[1] * sin(row[2] * π/2)
         end
 
@@ -236,112 +236,3 @@ end
         @test compute(pinv, phasepoints, Ω) ≈ π/4 atol=1e-10
     end
 end
-
-# @safetestset "Simple Surfaces" begin
-#     using PoincareInvariants
-#     using RandomMatrices
-#     using LinearAlgebra: I
-
-#     @testset "0..1 × 0..1 Square in $(N)D" for N in [2, 4, 10]
-#         padua_num = next_padua_num(6)
-#         pinv = SecondPoincareInvariant{N, Float64}(padua_num)
-#         Ω = CanonicalSymplecticMatrix(N)
-
-#         paduapoints = get_padua_points(padua_num)
-
-#         phasepoints = zeros(Float64, padua_num, N)
-#         phasepoints[:, 1:2] = paduapoints
-
-#         @test compute(pinv, phasepoints, Ω) ≈ 1 rtol=1e-12
-
-#         # 1 : 1 * 1
-#         # 2 : 1 * y
-#         # 3 : x * 1
-#         @test pinv.cc_coeffs[:, 1] ≈ Float64[i == 1 || i == 3 ? 0.5 : 0 for i in 1:padua_num] atol=1e-10
-#         @test pinv.cc_coeffs[:, 2] ≈ Float64[i == 1 || i == 2 ? 0.5 : 0 for i in 1:padua_num] atol=1e-10
-
-#         N > 2 && (@test all(isapprox.(pinv.cc_coeffs[:, 3:end], 0, atol=1e-10)))
-
-#         uu_coeff_num = size(pinv.uu_coeffs, 1)
-#         # 1 : 1 * 1
-#         # 2 : 1 * 2y
-#         # 3 : 2x * 1
-#         @test pinv.uu_coeffs[:, 1] ≈ map(1:uu_coeff_num) do i
-#             i == 1 && return 0.5
-#             i == 3 && return 0.25
-#             return 0.0
-#         end atol=1e-10
-#         @test pinv.uu_coeffs[:, 2] ≈ map(1:uu_coeff_num) do i
-#             i == 1 && return 0.5
-#             i == 2 && return 0.25
-#             return 0.0
-#         end atol=1e-10
-
-#         N > 2 && (@test all(isapprox.(pinv.uu_coeffs[:, 3:end], 0, atol=1e-10)))
-
-#         @test pinv.D1toUU ≈ [0 0 0.5 0 0 0;
-#                              0 0 0 0 0.5 0;
-#                              0 0 0 0 0 2  ]
-
-#         display(pinv.D1toUU)
-
-#         @test pinv.uu_d1_coeffs[:, 1] ≈ Float64[i == 1 ? 2 * 0.25 : 0 for i in 1:uu_coeff_num] atol=1e-10
-#         @test pinv.uu_d2_coeffs[:, 2] ≈ Float64[i == 1 ? 2 * 0.25 : 0 for i in 1:uu_coeff_num] atol=1e-10
-
-#         @test pinv.uu_d1_coeffs[:, 2] ≈ zeros(uu_coeff_num) atol=1e-10
-#         @test pinv.uu_d2_coeffs[:, 1] ≈ zeros(uu_coeff_num) atol=1e-10
-#     end
-
-#     # @testset "Plane in $(N)D" for N in [2, 4, 10]
-#     #     padua_num = next_padua_num(10_000)
-#     #     pinv = SecondPoincareInvariant{N, Float64}(padua_num)
-#     #     Ω = CanonicalSymplecticMatrix(N)
-
-#     #     # Pick random orthogonal matrix
-#     #     # and select two vectors
-#     #     Q = rand(Haar(1), N)
-#     #     @assert Q * Q' ≈ I
-#     #     P = Q[1:2, 1:N]
-
-#     #     paduapoints = get_padua_points(padua_num)
-        
-#     #     phasepoints = paduapoints * P
-#     #     @assert size(phasepoints) == (padua_num, N)
-
-#     #     @test compute(pinv, phasepoints, Ω) ≈ 1 rtol=1e-12
-#     # end
-# end
-
-# @safetestset "Free Particles" begin
-#     using PoincareInvariants
-
-#     @testset "$np Free Particles in 3D" for np in [2, 5], T in [Float32, Float64]
-#         padua_num = next_padua_num(10_000)
-
-#         N = np * 6
-
-#         pinv = SecondPoincareInvariant{N, T}(padua_num)
-
-#         function free_particle!(init, δt)
-#             mid = length(init) ÷ 2
-#             init[1:mid] += init[mid+1:end] .* δt
-#         end
-
-#         Ω = CanonicalSymplecticMatrix(N)
-
-#         ppoints = get_padua_points(padua_num)
-#         phasepoints = ones(T, padua_num, N)
-
-#         for i in 1:padua_num
-#             phasepoints[i, np * 3 .+ (1:2)] .+= ppoints[i, :]
-#         end
-
-#         @test compute(pinv, phasepoints, Ω) ≈ 1 rtol=1e-12
-
-#         free_particle!.(eachrow(phasepoints), 10)
-#         @test compute(pinv, phasepoints, Ω) ≈ 1 rtol=1e-12
-
-#         free_particle!.(eachrow(phasepoints), 10)
-#         @test compute(pinv, phasepoints, Ω) ≈ 1 rtol=1e-12
-#     end
-# end
