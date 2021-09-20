@@ -2,16 +2,28 @@
 using LinearAlgebra: rmul!
 using FastTransforms: paduavalsmat, trianglecfsvec!
 
-"""
-    get_padua_points([T::Type{<:Real}, ]N::Integer)::Matrix{T}
+getdegree(coeffnum) = (sqrt(1 + 8coeffnum) - 3) / 2
+getcoeffnum(degree) = (degree + 1) * (degree + 2) ÷ 2
+getpointnum(degree) = (degree + 1)^2
 
-returns `N` padua points on square `0..1 × 0..1` as matrix with elment type `T`. Each row
-represens a point.
+getpaduanum(degree) = getcoeffnum(degree)
+nextpaduanum(N) = getpaduanum(ceil(Int, getdegree(N)))
+
+function checkpaduanum(paduanum)
+    if !isinteger(getdegree(paduanum))
+        throw(ArgumentError("number of Padua points / coeffs must equal (n + 1) * (n + 2) ÷ 2"))
+    end
+end
+
 """
-function get_padua_points(::Type{T}, padua_num::Integer)::Matrix{T} where T <: Real
-    check_padua_num(padua_num)
-    out = Matrix{T}(undef, padua_num, 2)
-    n = Int(get_n(padua_num))
+    getpaduapoints([T::Type{<:Real}, ]n::Integer)::Matrix{T}
+
+returns padua points corresponding to degree `n` chebyshev polynomial on square `0..1 × 0..1`
+as matrix with element type `T`. Each row represens a point.
+"""
+function getpaduapoints(::Type{T}, n::Integer)::Matrix{T} where T <: Real
+    paduanum = getpaduanum(n)
+    out = Matrix{T}(undef, paduanum, 2)
     m = 0
     delta = 0
     NN = fld(n + 2, 2)
@@ -31,16 +43,17 @@ function get_padua_points(::Type{T}, padua_num::Integer)::Matrix{T} where T <: R
     return out
 end
 
-get_padua_points(padua_num::Integer) = get_padua_points(Float64, padua_num)
+getpaduapoints(n::Integer) = getpaduapoints(Float64, n)
 
-function padua_transform!(
+function paduatransform!(
     out::AbstractVector{T},
     v::AbstractVector{T},
     P::PaduaTransformPlan
 ) where T
     axes(out, 1) == axes(v, 1) || error("axes of input and output vectors must match")
-    N=length(v)
-    n=Int(cld(-3+sqrt(1+8N),2))
+    N = length(v)
+    checkpaduanum(N)
+    n = Int(getdegree(N))
     vals=paduavalsmat(P,v)
     tensorcfs = P.dctplan*vals
     m,l=size(tensorcfs)

@@ -7,7 +7,7 @@ export AbstractPoincareInvariant, compute
 """
     AbstractPoincareInvariant
 
-supertype of setup objects `FirstPoincareInvariant` and `SecondPoincareInvariant`.
+supertype of `FirstPoincareInvariant` and `SecondPoincareInvariant`.
 """
 abstract type AbstractPoincareInvariant end
 
@@ -18,8 +18,12 @@ computes a Poincaré invariant.
 """
 function compute end
 
-@reexport module CanonicalSymplecticMatrices include("CanonicalSymplecticMatrices.jl") end
-@reexport module FirstPoincareInvariants include("FirstPoincareInvariants.jl") end
-@reexport module SecondPoincareInvariants include("SecondPoincareInvariants.jl") end
+@reexport module FirstPoincareInvariants
+    include("FirstPoincareInvariants.jl")
+end
+
+@reexport module SecondPoincareInvariants
+    include("SecondPoincareInvariants/SecondPoincareInvariants.jl")
+end
 
 end  # module

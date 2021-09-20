@@ -1,14 +1,14 @@
-using PoincareInvariants.CanonicalSymplecticMatrices
+using PoincareInvariants: CanonicalSymplecticMatrix
 using LinearAlgebra: dot
 
 @test CanonicalSymplecticMatrix{Int}(2) == [0 -1; 1 0]
 @test CanonicalSymplecticMatrix{Int}(4) == [0 0 -1 0; 0 0 0 -1; 1 0 0 0; 0 1 0 0]
-@test CanonicalSymplecticMatrix{Int}(6) == [0 0 0 -1 0 0;
-                                            0 0 0 0 -1 0;
-                                            0 0 0 0 0 -1;
-                                            1 0 0 0 0 0;
-                                            0 1 0 0 0 0;
-                                            0 0 1 0 0 0]
+@test CanonicalSymplecticMatrix{Int}(6) == [0  0  0 -1  0  0;
+                                            0  0  0  0 -1  0;
+                                            0  0  0  0  0 -1;
+                                            1  0  0  0  0  0;
+                                            0  1  0  0  0  0;
+                                            0  0  1  0  0  0]
 
 @testset "CanonicalSymplecticMatrix{$T}($n)" for T in [Int, Float64], n in [2:2:10..., 20:10:100...]
     @test CanonicalSymplecticMatrix(n) === CanonicalSymplecticMatrix{Int}(n)
