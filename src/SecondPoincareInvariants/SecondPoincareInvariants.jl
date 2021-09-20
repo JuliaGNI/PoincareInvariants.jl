@@ -12,7 +12,7 @@ using LinearAlgebra: mul!, dot
 using Base: Callable
 
 using ..PoincareInvariants: AbstractPoincareInvariant
-import ..PoincareInvariants: compute
+import ..PoincareInvariants: compute, getpoints
 
 export SecondPoincareInvariant
 export getpoints, nextpointnum
@@ -30,37 +30,45 @@ function checkΩ(Ω::Callable, D::Integer, ::Type{T}) where T
 end
 
 """
-	makesetup(D::Integer, T::Type{T}, N::Integer, Ω::Union{Callable, AbstractMatrix})
+	getsetup(D::Integer, T::Type{T}, Ω::Union{Callable, AbstractMatrix}, N::Integer)
 
-creates setup object for preallocating arrays, transform plans and operators.
+gets setup object for preallocating arrays, transform plans and operators.
 """
-function makesetup end
+function getsetup end
 
 struct SecondPoincareInvariant{
 	D, T,  # phase space dimension and type
 	ΩT <: Union{Callable, AbstractMatrix}, 
-	S} <: AbstractPoincareInvariant
-	N::Int  # number of points
+	S
+} <: AbstractPoincareInvariant
 	Ω::ΩT  # symplectic matrix
+	N::Int  # number of points
 	setup::S  # setup object for preallocating operators, transform plans, etc.
+
+	function SecondPoincareInvariant{D, T}(
+		Ω::ΩT, N::Integer, setup::S
+	) where {D, T, ΩT <: Union{Callable, AbstractMatrix}, S}
+		checkΩ(Ω, D, T)
+		checkpaduanum(N)
+		new{D, T, ΩT, S}(Ω, N, setup)
+	end
 end
 
-# The user should use this method
-function SecondPoincareInvariant{D, T}(N::Integer, Ω::ΩT) where {D, T, ΩT}
-	checkΩ(Ω)
-
-	setup = makesetup(D, T, N, Ω)
-	S = typeof(setup)
-
-	SecondPoincareInvariant{D, T, ΩT, S}(N, Ω, setup)
+function SecondPoincareInvariant{D, T}(
+	Ω::ΩT, N::Integer
+) where {D, T, ΩT <: Union{Callable, AbstractMatrix}}
+	paduanum = nextpaduanum(N)
+	SecondPoincareInvariant{D, T}(Ω, paduanum, getsetup(D, T, Ω, paduanum))
 end
 
 const PI2 = SecondPoincareInvariant
 
 include("Chebyshev.jl")
 
-# include("implementation1.jl")
+getpoints(pinv::SecondPoincareInvariant{<:Any, T}) where T = getpaduapoints(T, ceil(Int, getdegree(pinv.N)))
 
-makesetup(D::Integer, ::Type{T}, N::Integer, Ω::AbstractMatrix) where T = Setup1(D, T, N, Ω)
+include("implementation1.jl")
+
+getsetup(D::Integer, ::Type{T}, Ω::AbstractMatrix, N::Integer) where T = Setup1(D, T, Ω, N)
 
 include("CanonicalSymplecticMatrices.jl")

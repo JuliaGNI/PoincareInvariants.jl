@@ -2,7 +2,7 @@ module PoincareInvariants
 
 using Reexport
 
-export AbstractPoincareInvariant, compute
+export AbstractPoincareInvariant, compute, getpoints
 
 """
     AbstractPoincareInvariant
@@ -17,6 +17,14 @@ abstract type AbstractPoincareInvariant end
 computes a Poincaré invariant.
 """
 function compute end
+
+"""
+    getpoints(pinv::AbstractPoincareInvariant)
+
+returns points on which to evaluate the phase space line or surface parameterisation
+so as to `compute` `pinv`.
+"""
+function getpoints end
 
 @reexport module FirstPoincareInvariants
     include("FirstPoincareInvariants.jl")

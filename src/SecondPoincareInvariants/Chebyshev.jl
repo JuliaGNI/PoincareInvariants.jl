@@ -11,7 +11,7 @@ nextpaduanum(N) = getpaduanum(ceil(Int, getdegree(N)))
 
 function checkpaduanum(paduanum)
     if !isinteger(getdegree(paduanum))
-        throw(ArgumentError("number of Padua points / coeffs must equal (n + 1) * (n + 2) ÷ 2"))
+        throw(ArgumentError("number of Padua points / coeffs must be a triangle number 1, 3, 6, 10, 15..."))
     end
 end
 

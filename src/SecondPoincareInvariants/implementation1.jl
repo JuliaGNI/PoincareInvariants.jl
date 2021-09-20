@@ -1,5 +1,4 @@
 struct Setup1{
-	D,  # phase space dimension
 	T <: Number,  # phase space type
 	PTP <: PaduaTransformPlan,
 	DBBB <: BandedBlockBandedMatrix,
@@ -7,40 +6,36 @@ struct Setup1{
 	UUTP <: TransformPlan,
 	UUITP <: ITransformPlan
 } <: AbstractPoincareInvariant
-	degree::Int
-	padua_plan::PTP
-	cc_coeffs::AbstractMatrix{T}
-	D1toUU::DBBB
-	D2toUU::DBBB
-	CCtoUU::CBBB
-	uu_coeffs::Matrix{T}
-	uu_d1_coeffs::Matrix{T}
-	uu_d2_coeffs::Matrix{T}
-	uu_points::Vector{SVector{2, T}}
-	uu_iplan::UUITP
-	uu_vals::Matrix{T}
-	uu_d1_vals::Matrix{T}
-	uu_d2_vals::Matrix{T}
-	uu_I_vals::Vector{T}
-	uu_plan::UUTP
-	uu_I_coeffs::Vector{T}
-	UUIntegral::Matrix{T}
+	paduaplan::PTP
+	C1coeffs::AbstractMatrix{T}
+	DutoC2::DBBB
+	DvtoC2::DBBB
+	C1toC2::CBBB
+	C2coeffs::Matrix{T}
+	C2Ducoeffs::Matrix{T}
+	C2Dvcoeffs::Matrix{T}
+	C2iplan::UUITP
+	C2vals::Matrix{T}
+	C2Duvals::Matrix{T}
+	C2Dvvals::Matrix{T}
+	C2Ivals::Vector{T}
+	C2plan::UUTP
+	C2Icoeffs::Vector{T}
+	C2Integral::Matrix{T}
 end
 
-function Setup1{D, T}(padua_num::Integer) where {D, T}
-	# n such that (n + 1) * (n + 2) ÷ 2 == padua_num
-	# padua coefficients on upper triangular of matrix of size (n + 1) × (n + 1)
-	check_padua_num(padua_num)
-	degree = Int(get_n(padua_num))
+function Setup1(D, ::Type{T}, ::AbstractMatrix, paduanum) where T
+	checkpaduanum(paduanum)
+	degree = Int(getdegree(paduanum))
 
-	# make plan for padua transform
+	# make plan for Padua transform
 	# Val{true / false} indicates if its lexigraphical (i.e., x, y) or reverse (y, x)
 	# Val{false} is the setting ApproxFun uses, which is why it's used here, too
     # Why is there a bang (!) at the end? It's not in-place.
-	padua_plan = plan_paduatransform!(T, padua_num, Val{false})
+	paduaplan = plan_paduatransform!(T, paduanum, Val{false})
 
 	# preallocate array for coefficients
-	cc_coeffs = Matrix{T}(undef, padua_num, D)
+	C1coeffs = Matrix{T}(undef, paduanum, D)
 
 	CC = Chebyshev(-1..1)         ⊗ Chebyshev(-1..1)
 	UC = Ultraspherical(1, -1..1) ⊗ Chebyshev(-1..1)
@@ -55,99 +50,86 @@ function Setup1{D, T}(padua_num::Integer) where {D, T}
 	#
 	# differentiation converts to chebyshev basis of the second kind,
 	# so we convert everything to chebyshev polynomials of the second kind
-	D1 = Derivative(CC, [1,0])[BlockRange(1:degree), BlockRange(1:degree+1)]
-	UCtoUU = Conversion(UC, UU)[BlockRange(1:degree), BlockRange(1:degree)]
-	D1toUU = UCtoUU * D1
+	Du = Derivative(CC, [1,0])[BlockRange(1:degree), BlockRange(1:degree+1)]
+	UCtoC2 = Conversion(UC, UU)[BlockRange(1:degree), BlockRange(1:degree)]
+	DutoC2 = UCtoC2 * Du
 
-	D2 = Derivative(CC, [0,1])[BlockRange(1:degree), BlockRange(1:degree+1)]
-	CUtoUU = Conversion(CU, UU)[BlockRange(1:degree), BlockRange(1:degree)]
-	D2toUU = CUtoUU * D2
+	Dv = Derivative(CC, [0,1])[BlockRange(1:degree), BlockRange(1:degree+1)]
+	CUtoC2 = Conversion(CU, UU)[BlockRange(1:degree), BlockRange(1:degree)]
+	DvtoC2 = CUtoC2 * Dv
 
 	# truncate highest order coefficients,
 	# so number of coeffs matches number after differentiating
-	CCtoUU = Conversion(CC, UU)[BlockRange(1:degree), BlockRange(1:degree+1)]
+	C1toC2 = Conversion(CC, UU)[BlockRange(1:degree), BlockRange(1:degree+1)]
 	
-	uu_coeff_num = get_uu_coeff_num(degree)
-	uu_point_num = get_uu_point_num(degree)
+	C2coeffnum = getcoeffnum(degree - 1)
+	C2pointnum = getpointnum(degree - 1)
 	
-	uu_coeffs    = Matrix{T}(undef, uu_coeff_num, D)
-	uu_d1_coeffs = Matrix{T}(undef, uu_coeff_num, D)
-	uu_d2_coeffs = Matrix{T}(undef, uu_coeff_num, D)
+	C2coeffs   = Matrix{T}(undef, C2coeffnum, D)
+	C2Ducoeffs = Matrix{T}(undef, C2coeffnum, D)
+	C2Dvcoeffs = Matrix{T}(undef, C2coeffnum, D)
 
-	uu_points = points(UU, uu_point_num) .|> SVector{2, T}
-	uu_plan = plan_transform(UU, T, uu_point_num)  # values to coefficients
-	uu_iplan = plan_itransform(UU, T, uu_coeff_num)  # coefficients to values
+	C2plan = plan_transform(UU, T, C2pointnum)  # values to coefficients
+	C2iplan = plan_itransform(UU, T, C2coeffnum)  # coefficients to values
 
-	uu_vals    = Matrix{T}(undef, uu_point_num, D)
-	uu_d1_vals = Matrix{T}(undef, uu_point_num, D)
-	uu_d2_vals = Matrix{T}(undef, uu_point_num, D)
+	C2vals   = Matrix{T}(undef, C2pointnum, D)
+	C2Duvals = Matrix{T}(undef, C2pointnum, D)
+	C2Dvvals = Matrix{T}(undef, C2pointnum, D)
 
-	uu_I_vals = Vector{T}(undef, uu_point_num)
+	C2Ivals = Vector{T}(undef, C2pointnum)
 
-	UUIntegral = DefiniteIntegral(UU)[1:1, 1:uu_coeff_num]
+	C2Integral = DefiniteIntegral(UU)[1:1, 1:C2coeffnum]
 
-	uu_I_coeffs = Vector{T}(undef, uu_coeff_num)
+	C2Icoeffs = Vector{T}(undef, C2coeffnum)
 
-	SecondPoincareInvariant{D, T}(
-		degree, padua_plan, cc_coeffs, D1toUU, D2toUU, CCtoUU,
-		uu_coeffs, uu_d1_coeffs, uu_d2_coeffs,
-		uu_points, uu_iplan, uu_vals, uu_d1_vals, uu_d2_vals,
-		uu_I_vals, uu_plan, uu_I_coeffs, UUIntegral
+	Setup1{
+		T, typeof(paduaplan), typeof(DutoC2), typeof(C1toC2),
+		typeof(C2plan), typeof(C2iplan)
+	}(
+		paduaplan, C1coeffs, DutoC2, DvtoC2, C1toC2,
+		C2coeffs, C2Ducoeffs, C2Dvcoeffs,
+		C2iplan, C2vals, C2Duvals, C2Dvvals,
+		C2Ivals, C2plan, C2Icoeffs, C2Integral
 	)
 end
 
-function SecondPoincareInvariant{D, T}(
-	degree, padua_plan::PTP, cc_coeffs, D1toUU::DBBB, D2toUU::DBBB, CCtoUU::CBBB,
-	uu_coeffs, uu_d1_coeffs, uu_d2_coeffs,
-	uu_points, uu_iplan::UUITP, uu_vals, uu_d1_vals, uu_d2_vals,
-	uu_I_vals, uu_plan::UUTP, uu_I_coeffs, UUIntegral
-) where {D, T, PTP, DBBB, CBBB, UUITP, UUTP}
-	SecondPoincareInvariant{D, T, PTP, DBBB, CBBB, UUTP, UUITP}(
-		degree, padua_plan, cc_coeffs, D1toUU, D2toUU, CCtoUU,
-		uu_coeffs, uu_d1_coeffs, uu_d2_coeffs,
-		uu_points, uu_iplan, uu_vals, uu_d1_vals, uu_d2_vals,
-		uu_I_vals, uu_plan, uu_I_coeffs, UUIntegral
-	)
-end
-
-function check_phase_points(phase_points::AbstractMatrix, degree, D)
-	num = get_padua_num(degree)
-	size(phase_points) == (num, D) || throw(ArgumentError(string(
-		"phase_points must be a $num × $D AbstractMatrix,",
-		"not $(size(phase_points, 1)) × $(size(phase_points, 2))"
+function checkphasepoints(phasepoints::AbstractMatrix, N, D)
+	size(phasepoints) == (N, D) || throw(ArgumentError(string(
+		"phasepoints must be a $N × $D and not a",
+		"$(size(phasepoints, 1)) × $(size(phasepoints, 2)) AbstractMatrix"
 	)))
 end
 
 function compute(
     pinv::SecondPoincareInvariant{D, T},
-    phase_points::AbstractMatrix,
-    Ω::AbstractMatrix
+    phasepoints::AbstractMatrix
 ) where {D, T}
-    checkΩ(Ω, D)
-    check_phase_points(phase_points, pinv.degree, D)
+	checkphasepoints(phasepoints, pinv.N, D)
+
+	setup = pinv.setup
 
     # Transform to Chebyshev basis via Padua transform
     for i in 1:D
-        pinv.cc_coeffs[:, i] .= pinv.padua_plan * copy(phase_points[:, i])
+        setup.C1coeffs[:, i] .= setup.paduaplan * copy(phasepoints[:, i])
     end
 
     # Calculate derivatives and convert to chebyshev basis of second kind
-    mul!(   pinv.uu_coeffs, pinv.CCtoUU, pinv.cc_coeffs)
-    mul!(pinv.uu_d1_coeffs, pinv.D1toUU, pinv.cc_coeffs)
-    mul!(pinv.uu_d2_coeffs, pinv.D2toUU, pinv.cc_coeffs)
+    mul!(  setup.C2coeffs, setup.C1toC2, setup.C1coeffs)
+    mul!(setup.C2Ducoeffs, setup.DutoC2, setup.C1coeffs)
+    mul!(setup.C2Dvcoeffs, setup.DvtoC2, setup.C1coeffs)
 
     # Convert back to values to get dot product with Ω
     for i in 1:D
-        pinv.uu_vals[:, i]    .= pinv.uu_iplan * copy(pinv.uu_coeffs[:, i])
-        pinv.uu_d1_vals[:, i] .= pinv.uu_iplan * copy(pinv.uu_d1_coeffs[:, i])
-        pinv.uu_d2_vals[:, i] .= pinv.uu_iplan * copy(pinv.uu_d2_coeffs[:, i])
+        setup.C2vals[:, i]   .= setup.C2iplan * copy(setup.C2coeffs[:, i])
+        setup.C2Duvals[:, i] .= setup.C2iplan * copy(setup.C2Ducoeffs[:, i])
+        setup.C2Dvvals[:, i] .= setup.C2iplan * copy(setup.C2Dvcoeffs[:, i])
     end
 
-    for i in 1:get_uu_point_num(pinv.degree)
-        pinv.uu_I_vals[i] = dot(pinv.uu_d2_vals[i, :], Ω, pinv.uu_d1_vals[i, :])
+    for i in 1:Int(getpointnum(getdegree(pinv.N) - 1))
+        setup.C2Ivals[i] = dot(setup.C2Dvvals[i, :], pinv.Ω, setup.C2Duvals[i, :])
     end
 
     # Convert to coefficients and calculate integral
-    pinv.uu_I_coeffs .= pinv.uu_plan * copy(pinv.uu_I_vals)
-    dot(pinv.UUIntegral, pinv.uu_I_coeffs)
+    setup.C2Icoeffs .= setup.C2plan * copy(setup.C2Ivals)
+    dot(setup.C2Integral, setup.C2Icoeffs)
 end
