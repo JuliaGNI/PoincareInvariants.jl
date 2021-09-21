@@ -5,6 +5,7 @@ using ApproxFunBase: TransformPlan, ITransformPlan, plan_transform, plan_itransf
 using BlockBandedMatrices: BandedBlockBandedMatrix
 using BlockArrays: BlockRange
 using StaticArrays: SVector
+using SparseArrays: sparse
 
 using LinearAlgebra: mul!, dot
 
@@ -68,7 +69,8 @@ include("Chebyshev.jl")
 getpoints(pinv::SecondPoincareInvariant{<:Any, T}) where T = getpaduapoints(T, ceil(Int, getdegree(pinv.N)))
 
 include("implementation1.jl")
+include("implementation2.jl")
 
-getsetup(D::Integer, ::Type{T}, Ω::AbstractMatrix, N::Integer) where T = Setup1(D, T, Ω, N)
+getsetup(D::Integer, ::Type{T}, Ω::AbstractMatrix, N::Integer) where T = Setup2(D, T, Ω, N)
 
 include("CanonicalSymplecticMatrices.jl")

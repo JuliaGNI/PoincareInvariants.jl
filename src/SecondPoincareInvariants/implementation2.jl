@@ -1,4 +1,4 @@
-struct Setup1{
+struct Setup2{
 	T <: Number,  # phase space type
 	PTP <: PaduaTransformPlan,
 	DM <: AbstractMatrix,
@@ -24,7 +24,7 @@ struct Setup1{
 	C2Integral::Matrix{T}
 end
 
-function Setup1(D, ::Type{T}, ::AbstractMatrix, paduanum) where T
+function Setup2(D, ::Type{T}, ::AbstractMatrix, paduanum) where T
 	checkpaduanum(paduanum)
 	degree = Int(getdegree(paduanum))
 
@@ -52,15 +52,15 @@ function Setup1(D, ::Type{T}, ::AbstractMatrix, paduanum) where T
 	# so we convert everything to chebyshev polynomials of the second kind
 	Du = Derivative(CC, [1,0])[BlockRange(1:degree), BlockRange(1:degree+1)]
 	UCtoC2 = Conversion(UC, UU)[BlockRange(1:degree), BlockRange(1:degree)]
-	DutoC2 = UCtoC2 * Du
+	DutoC2 = sparse(UCtoC2 * Du)
 
 	Dv = Derivative(CC, [0,1])[BlockRange(1:degree), BlockRange(1:degree+1)]
 	CUtoC2 = Conversion(CU, UU)[BlockRange(1:degree), BlockRange(1:degree)]
-	DvtoC2 = CUtoC2 * Dv
+	DvtoC2 = sparse(CUtoC2 * Dv)
 
 	# truncate highest order coefficients,
 	# so number of coeffs matches number after differentiating
-	C1toC2 = Conversion(CC, UU)[BlockRange(1:degree), BlockRange(1:degree+1)]
+	C1toC2 = sparse(Conversion(CC, UU)[BlockRange(1:degree), BlockRange(1:degree+1)])
 	
 	C2coeffnum = getcoeffnum(degree - 1)
 	C2pointnum = getpointnum(degree - 1)
@@ -82,7 +82,7 @@ function Setup1(D, ::Type{T}, ::AbstractMatrix, paduanum) where T
 
 	C2Icoeffs = Vector{T}(undef, C2coeffnum)
 
-	Setup1{
+	Setup2{
 		T, typeof(paduaplan), typeof(DutoC2), typeof(C1toC2),
 		typeof(C2plan), typeof(C2iplan)
 	}(
@@ -93,17 +93,10 @@ function Setup1(D, ::Type{T}, ::AbstractMatrix, paduanum) where T
 	)
 end
 
-function checkphasepoints(phasepoints::AbstractMatrix, N, D)
-	size(phasepoints) == (N, D) || throw(ArgumentError(string(
-		"phasepoints must be a $N × $D and not a",
-		"$(size(phasepoints, 1)) × $(size(phasepoints, 2)) AbstractMatrix"
-	)))
-end
-
 function compute(
     pinv::SecondPoincareInvariant{D, T, ΩT, S},
     phasepoints::AbstractMatrix
-) where {D, T, ΩT, S <: Setup1}
+) where {D, T, ΩT, S <: Setup2}
 	checkphasepoints(phasepoints, pinv.N, D)
 
 	setup = pinv.setup

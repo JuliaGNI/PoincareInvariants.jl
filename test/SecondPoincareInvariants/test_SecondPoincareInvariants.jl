@@ -4,7 +4,7 @@
 
 @safetestset "Unit Tests for Implementation 1" begin
     using PoincareInvariants
-    using PoincareInvariants.SecondPoincareInvariants: getpaduapoints, Setup1
+    using PoincareInvariants.SecondPoincareInvariants: getpaduapoints, Setup1, Setup2
     using StaticArrays: SVector
 
     # We will use the following parameterisation as a test:
@@ -29,9 +29,9 @@
     paduapoints = getpaduapoints(2)
 
     # For testing we will add some extra dimensions, but the extra components will be set to 0
-    @testset "Setup1($D, $T, Ω, $paduanum)" for D in [2, 6], T in [Float32, Float64]
+    @testset "$S($D, $T, Ω, $paduanum)" for D in [2, 6], T in [Float32, Float64], S in [Setup1, Setup2]
         Ω = CanonicalSymplecticMatrix(D)
-        setup = Setup1(D, T, Ω, paduanum)
+        setup = S(D, T, Ω, paduanum)
         pinv = SecondPoincareInvariant{D, T}(Ω, paduanum, setup)
 
         @test pinv isa AbstractPoincareInvariant
