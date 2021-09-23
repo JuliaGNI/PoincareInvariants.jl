@@ -1,8 +1,10 @@
 @safetestset "CanoincalSymplecticMatrices" begin include("test_CanonicalSymplecticMatrices.jl") end
 
-@safetestset "Chebyshev" begin include("test_Chebyshev.jl") end
+@safetestset "ChebyshevSetup" begin include("test_Chebyshev.jl") end
 
-@safetestset "Unit Tests for Implementation 1" begin
+@safetestset "SecondPoincareInvariant Interface" begin include("test_interface.jl") end
+
+@safetestset "Unit Tests for ConstantΩSetup" begin
     using PoincareInvariants
     using PoincareInvariants.SecondPoincareInvariants: getpaduapoints, Setup1, Setup2
     using StaticArrays: SVector

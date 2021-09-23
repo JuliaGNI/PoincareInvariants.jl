@@ -1,6 +1,6 @@
 @safetestset "Coefficient and Point Counts" begin
-    using PoincareInvariants.SecondPoincareInvariants: getpaduanum, checkpaduanum,
-        nextpaduanum, getdegree, getcoeffnum, getpointnum
+    using PoincareInvariants.SecondPoincareInvariants.Chebyshev: getpaduanum, checkpaduanum,
+        nextpaduanum, getdegree, getcoeffnum, _getpointnum
 
     for n in [1:100..., 135, 752, 1000, 5531]
         paduanum = getpaduanum(n)
@@ -35,6 +35,7 @@ end
         
         @test ftpoints ≈ pipoints
         @test eltype(pipoints) == T
+        @test all(0 .≤ pipoints .≤ 1)
     end
 end
 

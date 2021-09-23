@@ -1,3 +1,5 @@
+@reexport module CanonicalSymplecticMatrices
+
 import Base
 
 export CanonicalSymplecticMatrix
@@ -23,3 +25,5 @@ function Base.getindex(C::CanonicalSymplecticMatrix{T}, i1::Int, i2::Int) where 
         return T(0)
     end
 end
+
+end  # module

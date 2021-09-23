@@ -4,7 +4,10 @@ using FastTransforms: paduavalsmat, trianglecfsvec!
 
 getdegree(coeffnum) = (sqrt(1 + 8coeffnum) - 3) / 2
 getcoeffnum(degree) = (degree + 1) * (degree + 2) ÷ 2
-getpointnum(degree) = (degree + 1)^2
+
+# Don't confuse with function that gets number of points from a PoincareInvariant struct
+# This function gets the number of points on a 2D Chebyshev grid with polynomials up to `degree`
+_getpointnum(degree) = (degree + 1)^2
 
 getpaduanum(degree) = getcoeffnum(degree)
 nextpaduanum(N) = getpaduanum(ceil(Int, getdegree(N)))
@@ -16,7 +19,7 @@ function checkpaduanum(paduanum)
 end
 
 """
-    getpaduapoints([T::Type{<:Real}, ]n::Integer)::Matrix{T}
+    getpaduapoints([::Type{T}, ]n::Integer)::Matrix{T} where {T <: Real}
 
 returns padua points corresponding to degree `n` chebyshev polynomial on square `0..1 × 0..1`
 as matrix with element type `T`. Each row represens a point.

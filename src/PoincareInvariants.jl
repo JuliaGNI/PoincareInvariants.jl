@@ -14,7 +14,7 @@ abstract type AbstractPoincareInvariant end
 """
     compute(pinv::AbstractPoincareInvariant, args...)
 
-computes a Poincaré invariant.
+computes a Poincaré invariant. 
 """
 function compute end
 
@@ -25,6 +25,15 @@ returns points on which to evaluate the phase space line or surface parameterisa
 so as to `compute` `pinv`.
 """
 function getpoints end
+
+"""
+    getpointnum(pinv::AbstractPoincareInvariant)
+
+returns number of points to sample in phase space to `compute` `pinv`.
+"""
+function getpointnum end
+
+
 
 @reexport module FirstPoincareInvariants
     include("FirstPoincareInvariants.jl")
