@@ -1,6 +1,6 @@
 @safetestset "Coefficient and Point Counts" begin
     using PoincareInvariants.SecondPoincareInvariants.Chebyshev: getpaduanum, checkpaduanum,
-        nextpaduanum, getdegree, getcoeffnum, _getpointnum
+        nextpaduanum, getdegree, getcoeffnum, getfullpointnum
 
     for n in [1:100..., 135, 752, 1000, 5531]
         paduanum = getpaduanum(n)

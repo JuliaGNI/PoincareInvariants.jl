@@ -1,4 +1,4 @@
-@reexport module CanonicalSymplecticMatrices
+@reexport module CanonicalSymplecticStructures
 
 import Base
 
