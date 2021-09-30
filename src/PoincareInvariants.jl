@@ -43,9 +43,7 @@ function getdim end
 include("utils.jl")
 
 include("CanonicalSymplecticStructures.jl")
-
 include("FirstPoincareInvariants.jl")
-
-include("SecondPoincareInvariants.jl")
+include("SecondPoincareInvariants/SecondPoincareInvariants.jl")
 
 end  # module

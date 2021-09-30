@@ -1,16 +1,19 @@
-module Chebyshev
+module ChebyshevImplementation
+
+using ...PoincareInvariants: @argcheck
 
 using ApproxFunOrthogonalPolynomials
 using FastTransforms: PaduaTransformPlan, plan_paduatransform!
 using FastTransforms: paduavalsmat, trianglecfsvec!
 using ApproxFunBase: TransformPlan, ITransformPlan, plan_transform, plan_itransform
 
-using BlockBandedMatrices: BandedBlockBandedMatrix
 using BlockArrays: BlockRange
 using StaticArrays: SVector
 using SparseArrays: sparse
 
 using LinearAlgebra: mul!, rmul!, dot
+
+include("Padua.jl")
 
 getdegree(coeffnum) = (sqrt(1 + 8coeffnum) - 3) / 2
 getcoeffnum(degree) = (degree + 1) * (degree + 2) ÷ 2
@@ -20,20 +23,55 @@ getcoeffnum(degree) = (degree + 1) * (degree + 2) ÷ 2
 # not just on the Padua grid
 getfullpointnum(degree) = (degree + 1)^2
 
-# happens to be same number since padua grid is halved
+# happens to be same number since Padua grid is halved
 getpaduanum(degree) = getcoeffnum(degree)
-nextpaduanum(N) = getpaduanum(ceil(Int, getdegree(N)))
 
 function checkpaduanum(paduanum)
-    @argcheck !isinteger(getdegree(paduanum)) "number of Padua points or coeffs must be a triangle number 1, 3, 6, 10, 15..."
+    check = isinteger(getdegree(paduanum))
+    @argcheck check "number of Padua points or coeffs must be a triangle number 1, 3, 6, 10, 15..."
 end
+
+## getpaduapoints ##
+
+"""
+    getpaduapoints([::Type{T}, ]n::Integer)::Vector{SVector{T}} where T
+
+returns Padua points corresponding to degree `n` Chebyshev polynomial on square `0..1 × 0..1`.
+"""
+function getpaduapoints(::Type{T}, n::Integer)::Vector{SVector{2, T}} where T <: Real
+    paduanum = getpaduanum(n)
+    out = Vector{SVector{2, T}}(undef, paduanum)
+    m = 0
+    delta = 0
+    NN = fld(n + 2, 2)
+    @inbounds for k = n:-1:0
+        if isodd(n)
+            delta = mod(k, 2)
+        end
+        @inbounds for j = NN+delta:-1:1
+            m += 1
+
+            v1 = (sinpi(T(k) / T(n) - T(0.5)) + 1) / 2
+
+            a = isodd(n - k) ? 1 : 2
+            v2 = (sinpi(T(2j - a) / T(n + 1) - T(0.5)) + 1) / 2
+
+            out[m] = SVector{2, T}(v1, v2)
+        end
+    end
+    return out
+end
+
+getpaduapoints(n::Integer) = getpaduapoints(Float64, n)
+
+## Padua Transform ##
 
 struct PaduaSetup{T, PTP}
     plan::PTP
     coeffs::Matrix{T}
 end
 
-function PaduaSetup{T}(D, degree)
+function PaduaSetup{T}(D, degree) where T
     N = getpaduanum(degree)
 
 	# Val{true / false} indicates if its lexigraphical (i.e., x, y) or reverse (y, x)
@@ -220,9 +258,8 @@ struct ChebyshevSetup{T, I}
     int::I
 end
 
-function ChebyshevSetup{T}(::AbstractMatrix, D::Integer, N::Integer)
-    checkpaduanum(N)
-    degree = getdegree(N)
+function ChebyshevSetup{T}(::AbstractMatrix, D::Integer, N::Integer) where T
+    degree = ceil(Int, getdegree(N))
 
     padua = PaduaSetup{T}(D, degree)
     diff = DiffSetup{T}(D, degree)
@@ -242,36 +279,6 @@ function _compute(setup::ChebyshevSetup, Ω, D, phasepoints, t, p)
 	integrate!(setup.int, Ω, D, C1coeffs, C2∂x, C2∂y, t, p)
 end
 
-"""
-    getpaduapoints([::Type{T}, ]n::Integer)::Matrix{T} where {T <: Real}
+getpoints(setup::ChebyshevSetup) where T = getpaduapoints(T, setup.degree)
 
-returns padua points corresponding to degree `n` Chebyshev polynomial on square `0..1 × 0..1`
-as matrix with element type `T`. Each row represens a point.
-"""
-function getpaduapoints(::Type{T}, n::Integer)::Matrix{T} where T <: Real
-    paduanum = getpaduanum(n)
-    out = Matrix{T}(undef, paduanum, 2)
-    m = 0
-    delta = 0
-    NN = fld(n + 2, 2)
-    @inbounds for k = n:-1:0
-        if isodd(n)
-            delta = mod(k, 2)
-        end
-        @inbounds for j = NN+delta:-1:1
-            m += 1
-
-            out[m, 1] = (sinpi(T(k) / T(n) - T(0.5)) + 1) / 2
-
-            a = isodd(n - k) ? 1 : 2
-            out[m, 2] = (sinpi(T(2j - a) / T(n + 1) - T(0.5)) + 1) / 2
-        end
-    end
-    return out
-end
-
-getpaduapoints(n::Integer) = getpaduapoints(Float64, n)
-
-getpoints(pinv::SecondPoincareInvariant{<:Any, T}) where T = getpaduapoints(T, ceil(Int, getdegree(pinv.N)))
-
-end  # module Chebyshev
+end  # module ChebyshevImplementation

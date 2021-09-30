@@ -3,12 +3,12 @@
 # Callable is Union{Function, Type}
 using Base: Callable
 
-using ..PoincareInvariants: AbstractPoincareInvariant
+using ..PoincareInvariants: AbstractPoincareInvariant, @argcheck
 import ..PoincareInvariants: compute!, getpoints, getpointnum, getdim
 
 export SecondPoincareInvariant
 
-include("Chebyshev.jl")
+include("ChebyshevImplementation.jl")
 
 ## SecondPoincareInvariant ##
 
@@ -28,7 +28,7 @@ function SecondPoincareInvariant{T}(Ω::ΩT, D::Integer, N::Integer) where {T, �
 	SecondPoincareInvariant{T, ΩT, typeof(setup)}(Ω, D, setup)
 end
 
-function SecondPoincareInvariant{D, T}(
+function SecondPoincareInvariant{T}(
 	Ω::ΩT, D::Integer, N::Integer, ::Val{inplace}
 ) where {T, ΩT <: Callable, inplace}
 	setup = Chebyshev.ChebyshevSetup{T}(Ω, D, N, Val(inplace))

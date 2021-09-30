@@ -2,7 +2,7 @@
     using PoincareInvariants
 
     for D in [2, 10], T in [Float32, Float64], N in [1, 2, 5, 10, 100]
-        # SecondPoincareInvariant{D, T}(Ω::AbstractMatrix, N::Integer)
+        # SecondPoincareInvariant{T}(Ω::AbstractMatrix, D::Integer, N::Integer)
         Ω = rand(Int, D, D)
 
         let pinv = SecondPoincareInvariant{D, T}(Ω, N)
