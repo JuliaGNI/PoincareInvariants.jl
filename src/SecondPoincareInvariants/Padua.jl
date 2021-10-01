@@ -4,7 +4,7 @@ using StaticArrays: SVector
 using FFTW
 using LinearAlgebra: rmul!
 
-export getpaduanum, getdegree
+export getpaduanum, getdegree, checkpaduanum
 export getpaduapoints
 export PaduaTransformPlan, paduatransform!
 
@@ -34,6 +34,12 @@ julia> getdegree(105)
 ```
 """
 getdegree(pointnum) = (sqrt(1 + 8pointnum) - 3) / 2
+
+function checkpaduanum(paduanum)
+    check = isinteger(getdegree(paduanum))
+    check || throw(ArgumentError(
+        "number of Padua points or coeffs must be a triangle number 1, 3, 6, 10, 15..."))
+end
 
 """
     chebyshevpoint(T, ix, iy, nx, ny)

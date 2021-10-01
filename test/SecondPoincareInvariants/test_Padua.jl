@@ -1,9 +1,14 @@
-@safetestset "getpaduanum and getdegree" begin
+@safetestset "getpaduanum, getdegree and checkpaduanum" begin
     using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.Padua
 
     for n in [1:10..., 50, 123, 511, 10_000]
-        @test getpaduanum(n) == (n + 1) * (n + 2) ÷ 2
-        @test isinteger(getdegree(getpaduanum(n)))
+        paduanum = getpaduanum(n)
+        @test paduanum == (n + 1) * (n + 2) ÷ 2
+        @test isinteger(getdegree(paduanum))
+        @test (checkpaduanum(paduanum); true)
+
+        @test_throws ArgumentError checkpaduanum(paduanum + 1)
+        @test_throws ArgumentError checkpaduanum(paduanum - 1)
     end
 end
 
