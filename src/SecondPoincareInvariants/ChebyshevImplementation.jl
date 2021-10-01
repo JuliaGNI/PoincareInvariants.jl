@@ -1,10 +1,14 @@
+"""
+    ChebyshevImplementation
+
+implementation of computation of second Poincare invariant by approximating surface with
+Chebyshev polynomials
+"""
 module ChebyshevImplementation
 
 using ...PoincareInvariants: @argcheck
 
 using ApproxFunOrthogonalPolynomials
-using FastTransforms: PaduaTransformPlan, plan_paduatransform!
-using FastTransforms: paduavalsmat, trianglecfsvec!
 using ApproxFunBase: TransformPlan, ITransformPlan, plan_transform, plan_itransform
 
 using BlockArrays: BlockRange
@@ -14,55 +18,14 @@ using SparseArrays: sparse
 using LinearAlgebra: mul!, rmul!, dot
 
 include("Padua.jl")
+import .Padua: paduatransform!
 
-getdegree(coeffnum) = (sqrt(1 + 8coeffnum) - 3) / 2
-getcoeffnum(degree) = (degree + 1) * (degree + 2) ÷ 2
+using .Padua
 
-# Don't confuse with function getpointnum
+
 # This function gets the number of points on the full 2D Chebyshev grid with polynomials,
 # not just on the Padua grid
 getfullpointnum(degree) = (degree + 1)^2
-
-# happens to be same number since Padua grid is halved
-getpaduanum(degree) = getcoeffnum(degree)
-
-function checkpaduanum(paduanum)
-    check = isinteger(getdegree(paduanum))
-    @argcheck check "number of Padua points or coeffs must be a triangle number 1, 3, 6, 10, 15..."
-end
-
-## getpaduapoints ##
-
-"""
-    getpaduapoints([::Type{T}, ]n::Integer)::Vector{SVector{T}} where T
-
-returns Padua points corresponding to degree `n` Chebyshev polynomial on square `0..1 × 0..1`.
-"""
-function getpaduapoints(::Type{T}, n::Integer)::Vector{SVector{2, T}} where T <: Real
-    paduanum = getpaduanum(n)
-    out = Vector{SVector{2, T}}(undef, paduanum)
-    m = 0
-    delta = 0
-    NN = fld(n + 2, 2)
-    @inbounds for k = n:-1:0
-        if isodd(n)
-            delta = mod(k, 2)
-        end
-        @inbounds for j = NN+delta:-1:1
-            m += 1
-
-            v1 = (sinpi(T(k) / T(n) - T(0.5)) + 1) / 2
-
-            a = isodd(n - k) ? 1 : 2
-            v2 = (sinpi(T(2j - a) / T(n + 1) - T(0.5)) + 1) / 2
-
-            out[m] = SVector{2, T}(v1, v2)
-        end
-    end
-    return out
-end
-
-getpaduapoints(n::Integer) = getpaduapoints(Float64, n)
 
 ## Padua Transform ##
 
@@ -74,49 +37,17 @@ end
 function PaduaSetup{T}(D, degree) where T
     N = getpaduanum(degree)
 
-	# Val{true / false} indicates if its lexigraphical (i.e., x, y) or reverse (y, x)
-	# Val{false} is the setting ApproxFun uses, which is why it's used here, too
-    # Why is there a bang (!) at the end? It's not in-place.
-	plan = plan_paduatransform!(T, paduanum, Val{false})
+	plan = PaduaTransformPlan{T}(degree)
     coeffs = Matrix{T}(undef, N, D)
 
     PaduaSetup{T, typeof(plan)}(plan, coeffs)
 end
 
-function paduatransform!(
-    out::AbstractVector{T},
-    v::AbstractVector{T},
-    P::PaduaTransformPlan
-) where T
-    axes(out, 1) == axes(v, 1) || error("axes of input and output vectors must match")
-    N = length(v)
-    checkpaduanum(N)
-    n = Int(getdegree(N))
-    
-    vals = paduavalsmat(P, v)
-    tensorcfs = P.dctplan * vals
-    
-    m, l = size(tensorcfs)
-    rmul!(tensorcfs, T(2) / (n * (n + 1)))
-    rmul!(view(tensorcfs,1,:), 0.5)
-    rmul!(view(tensorcfs,:,1), 0.5)
-    rmul!(view(tensorcfs,m,:), 0.5)
-    rmul!(view(tensorcfs,:,l), 0.5)
-    
-    trianglecfsvec!(out, P, tensorcfs)
-
-    out
+function paduatransform!(setup::PaduaSetup, values, args...)
+    paduatransform!(setup.coeffs, setup.plan, values, args...)
 end
 
-function paduatransform!(setup::PaduaSetup, values)
-    @argcheck axes(setup.coeffs) == axes(values) "axes of value array and preallocated coefficient array do not match"
-
-    @views for i in axes(values, 2)
-        paduatransform!(setup.coeffs[:, i], values[:, i], setup.plan)
-    end
-
-    return setup.coeffs
-end
+## Differentiation ##
 
 const CC = Chebyshev(-1..1)         ⊗ Chebyshev(-1..1)
 const UC = Ultraspherical(1, -1..1) ⊗ Chebyshev(-1..1)
@@ -140,16 +71,16 @@ function DiffSetup{T}(D, degree) where T
 	# differentiation converts to chebyshev basis of the second kind,
 	# so we convert other axis to chebyshev of second kind, too
 
-	D1raw = Derivative(CC, [1,0])[BlockRange(1:degree), BlockRange(1:degree+1)]
+	D1UC = Derivative(CC, [1,0])[BlockRange(1:degree), BlockRange(1:degree+1)]
 	UCtoUU = Conversion(UC, UU)[BlockRange(1:degree), BlockRange(1:degree)]
-    Dx = sparse(UCtoUU * D1raw)
+    Dx = sparse(UCtoUU * D1UC)
 
-	D2raw = Derivative(CC, [0,1])[BlockRange(1:degree), BlockRange(1:degree+1)]
+	D2CU = Derivative(CC, [0,1])[BlockRange(1:degree), BlockRange(1:degree+1)]
 	CUtoUU = Conversion(CU, UU)[BlockRange(1:degree), BlockRange(1:degree)]
-	Dy = sparse(CUtoUU * D2raw)
+	Dy = sparse(CUtoUU * D2CU)
 
     # differentiating reduces degree by one
-    coeffnum = getcoeffnum(degree - 1)
+    coeffnum = getpaduanum(degree - 1)
 
     ∂xcoeffs = Matrix{T}(undef, coeffnum, D)
 	∂ycoeffs = Matrix{T}(undef, coeffnum, D)

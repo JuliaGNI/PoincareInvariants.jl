@@ -1,63 +1,46 @@
 @safetestset "Padua" begin include("test_Padua.jl") end
 
-# @safetestset "Coefficient and Point Counts" begin
-#     using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation:
-#         getdegree, getcoeffnum, getfullpointnum, getpaduanum, checkpaduanum
+@safetestset "PaduaSetup and paduatransform!" begin
+    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.Padua
+    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation:
+        PaduaSetup, paduatransform!
+    
+    degree = 20
+    dims = 5
+    plan = PaduaTransformPlan{Float64}(degree)
 
-#     for n in [1:100..., 135, 752, 1000, 5531]
-#         paduanum = getpaduanum(n)
-#         @test paduanum == (n + 1) * (n + 2) ÷ 2
-#         @test getdegree(paduanum) == n
-#         @test (checkpaduanum(paduanum); true)
-#         @test_throws ArgumentError checkpaduanum(paduanum + 1)
-#         @test_throws ArgumentError checkpaduanum(paduanum - 1)
-        
-#         @test getcoeffnum(n) == paduanum
-#         @test getfullpointnum(n - 1) == n^2
-#         @test getcoeffnum(n - 1) == (getfullpointnum(n - 1) - n) ÷ 2 + n
-#     end
-# end
+    vals = rand(getpaduanum(degree), dims)
+    out = Matrix{Float64}(undef, getpaduanum(degree), dims)
 
-# @safetestset "getpaduapoints" begin
-#     using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation:
-#         getpaduapoints, getpaduanum
+    paduatransform!(out, plan, vals, Val(false))
 
-#     x(m) = cospi(m / 2)
-#     y(m, l, n) = iseven(m) ? cospi((2l - 1) / (n + 1)) : cospi((2l - 2) / (n + 1))
+    setup = PaduaSetup{Float64}(dims, degree)
+    coeffs = paduatransform!(setup, vals, Val(false))
 
-#     @testset "Points for Degree $n" for n in 2:2
-#         points = getpaduapoints(n)
+    @test coeffs == out
+end
 
-#         @test points isa Vector{SVector{Float64}}
-#         @test length(points) == getpaduanum(n)
+@safetestset "DiffSetup and differentiate!" begin
+    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation:
+        DiffSetup, differentiate!
+    
+    setup = DiffSetup{Float64}(3, 2)
 
-#         c = 1
-#         for m in n:-1:0
-#             lmax = fld(n, 2) + mod(m, 2) + 1
-#             for l in lmax:-1:1
-#                 @test points[c] ≈ [x(m), y(m, l, n)]
-#                 c += 1
-#             end
-#         end
-#     end
-# end
+    @test setup.Dx == [0 0 1 0  0  0; # U00
+                       0 0 0 0 0.5 0; # U01
+                       0 0 0 0  0  2] # U10
 
-# @safetestset "paduatransform!" begin
-#     using PoincareInvariants.SecondPoincareInvariants: getpaduapoints, paduatransform!
-#     using FastTransforms: plan_paduatransform!
+    @test setup.Dy == [0 1 0 0  0  0; # U00
+                       0 0 0 2  0  0; # U01
+                       0 0 0 0 0.5 0] # U10
+    
+    coeffs = rand(6, 3)
 
-#     f(v) = v[1] * sin(v[2])
+    differentiate!(setup, coeffs)
 
-#     paduapoints = getpaduapoints(20)
-#     v = f.(eachrow(paduapoints))
+    @test setup.∂xcoeffs == setup.Dx * coeffs
+    @test size(setup.∂xcoeffs) == (3, 3)
 
-#     plan = plan_paduatransform!(v, Val{false})
-
-#     coeffs = plan * copy(v)
-
-#     out = similar(v)
-#     paduatransform!(out, v, plan)
-
-#     @test out == coeffs
-#     @test v == f.(eachrow(paduapoints))
-# end
+    @test setup.∂ycoeffs == setup.Dy * coeffs
+    @test size(setup.∂ycoeffs) == (3, 3)
+end

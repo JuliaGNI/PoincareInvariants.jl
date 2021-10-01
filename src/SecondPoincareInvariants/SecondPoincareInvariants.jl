@@ -8,9 +8,13 @@ import ..PoincareInvariants: compute!, getpoints, getpointnum, getdim
 
 export SecondPoincareInvariant
 
+## Implementations
+
 include("ChebyshevImplementation.jl")
 
 ## SecondPoincareInvariant ##
+
+# TODO: add isinplace check
 
 struct SecondPoincareInvariant{
 	T,  # phase space and return type
@@ -24,14 +28,14 @@ end
 
 function SecondPoincareInvariant{T}(Ω::ΩT, D::Integer, N::Integer) where {T, ΩT <: AbstractMatrix}
 	@argcheck size(Ω) == (D, D) "Ω must be a $D × $D matrix"
-	setup = Chebyshev.ChebyshevSetup{T}(Ω, D, N)
+	setup = ChebyshevImplementation.ChebyshevSetup{T}(Ω, D, N)
 	SecondPoincareInvariant{T, ΩT, typeof(setup)}(Ω, D, setup)
 end
 
 function SecondPoincareInvariant{T}(
 	Ω::ΩT, D::Integer, N::Integer, ::Val{inplace}
 ) where {T, ΩT <: Callable, inplace}
-	setup = Chebyshev.ChebyshevSetup{T}(Ω, D, N, Val(inplace))
+	setup = ChebyshevImplementation.ChebyshevSetup{T}(Ω, D, N, Val(inplace))
 	SecondPoincareInvariant{T, ΩT, typeof(setup)}(Ω, D, setup)
 end
 
@@ -44,12 +48,5 @@ getdim(pinv::SecondPoincareInvariant) = pinv.D
 compute!(pinv::SecondPoincareInvariant, args...) = _compute(pinv.setup, pinv.Ω, pinv.D, args...)
 getpoints(pinv::SecondPoincareInvariant) = getpoints(pinv.setup)
 getpointnum(pinv::SecondPoincareInvariant) = getpointnum(pinv.setup)
-
-function checkphasepoints(phasepoints::AbstractMatrix, N, D)
-	size(phasepoints) == (N, D) || throw(ArgumentError(string(
-		"phasepoints must be a $N × $D matrix, not a",
-		"$(size(phasepoints, 1)) × $(size(phasepoints, 2)) matrix"
-	)))
-end
 
 end  # module SecondPoincareInvariants
