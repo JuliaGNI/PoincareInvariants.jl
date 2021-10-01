@@ -115,34 +115,20 @@ end
 	T2(x) = 2x^2 - 1
 	T3(x) = 4x^3 - 3x
 
-    T00(v) = T0(v[1]) * T0(v[2])
-
-    T10(v) = T1(v[1]) * T0(v[2])
-    T01(v) = T0(v[1]) * T1(v[2])
-
-    T20(v) = T2(v[1]) * T0(v[2])
-    T11(v) = T1(v[1]) * T1(v[2])
-    T02(v) = T0(v[1]) * T2(v[2])
-
-    T30(v) = T3(v[1]) * T0(v[2])
-    T21(v) = T2(v[1]) * T1(v[2])
-    T12(v) = T1(v[1]) * T2(v[2])
-    T03(v) = T0(v[1]) * T3(v[2])
-
     function T(v, cfs)
-        cfs[1] * T00(v) +
+        cfs[1] * T0(v[1]) * T0(v[2]) +
 
-        cfs[2] * T10(v) +
-        cfs[3] * T01(v) +
+        cfs[2] * T1(v[1]) * T0(v[2]) +
+        cfs[3] * T0(v[1]) * T1(v[2]) +
 
-        cfs[4] * T20(v) +
-        cfs[5] * T11(v) +
-        cfs[6] * T02(v) +
+        cfs[4] * T2(v[1]) * T0(v[2]) +
+        cfs[5] * T1(v[1]) * T1(v[2]) +
+        cfs[6] * T0(v[1]) * T2(v[2]) +
 
-        cfs[7] * T30(v) +
-        cfs[8] * T21(v) +
-        cfs[9] * T12(v) +
-        cfs[10] * T03(v)
+        cfs[7] * T3(v[1]) * T0(v[2]) +
+        cfs[8] * T2(v[1]) * T1(v[2]) +
+        cfs[9] * T1(v[1]) * T2(v[2]) +
+        cfs[10] * T0(v[1]) * T3(v[2])
     end
 
     for degree in 4:10
@@ -159,4 +145,32 @@ end
         @test out[1:10] ≈ coeffs atol=10eps()
         @test out[11:end] ≈ zeros(length(out) - 10) atol=10eps()
     end
+end
+
+@safetestset "multi-dimensional paduatransform!" begin
+    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.Padua
+    using StaticArrays
+
+    degree = 20
+    dims = 5
+    plan = PaduaTransformPlan{Float64}(degree)
+
+    valsmat = rand(getpaduanum(degree), dims)
+    outmat = Matrix{Float64}(undef, getpaduanum(degree), dims)
+
+    paduatransform!(outmat, plan, valsmat, Val(false))
+
+    valsvec = map(SVector{dims, Float64}, eachrow(valsmat))
+    outvec = Matrix{Float64}(undef, getpaduanum(degree), dims)
+
+    paduatransform!(outvec, plan, valsvec, Val(false))
+
+    outcompare = Matrix{Float64}(undef, getpaduanum(degree), dims)
+
+    for i in 1:dims
+        paduatransform!(view(outcompare, :, i), plan, valsmat[:, i], Val(false))
+    end
+
+    @test outcompare == outmat
+    @test outcompare == outvec
 end

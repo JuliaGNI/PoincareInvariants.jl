@@ -53,9 +53,9 @@ julia> [chebyshevpoint(Float64, x, y, 2, 3) for y in 0:3, x in 0:2]
 ```
 """
 function chebyshevpoint(::Type{T}, ix, iy, nx, ny) where T
-	x = cospi(T(ix) / T(nx))
-	y = cospi(T(iy) / T(ny))
-	SVector{2, T}(x, y)
+    x = cospi(T(ix) / T(nx))
+    y = cospi(T(iy) / T(ny))
+    SVector{2, T}(x, y)
 end
 
 """
@@ -78,7 +78,7 @@ julia> [paduapoint(Float32, x, y, 1) for y in 0:1+1, x in 0:1]
 
 """
 function paduapoint(::Type{T}, ix, iy, n) where T
-	chebyshevpoint(T, ix, iy, n, n + 1)
+    chebyshevpoint(T, ix, iy, n, n + 1)
 end
 
 # This checks whether a point on the chebyshev grid at position (i, j) is also a Padua point
@@ -169,17 +169,17 @@ julia> weight!(ones(4+2, 4+1), 4)
 ```
 """
 function weight!(mat::AbstractMatrix, degree::Integer)
-	mat .*= 2 / ( degree * (degree + 1) )
-	mat[1, :] .*= 0.5
-	mat[end, :] .*= 0.5
-	mat[:, 1] .*= 0.5
-	mat[:, end] .*= 0.5
-	
-	mat
+    mat .*= 2 / ( degree * (degree + 1) )
+    mat[1, :] .*= 0.5
+    mat[end, :] .*= 0.5
+    mat[:, 1] .*= 0.5
+    mat[:, end] .*= 0.5
+    
+    mat
 end
 
 """
-	tovalsmat!(mat::Matrix, vec::AbstractVector, degree::Integer)
+    tovalsmat!(mat::Matrix, vec::AbstractVector, degree::Integer)
 
 write values of function evaluated at Padua points from `vec` to to matrix `mat`.
 
@@ -195,39 +195,39 @@ julia> tovalsmat!(ones(3 + 2, 3 + 1), 1:getpaduanum(3), 3)
 ```
 """
 function tovalsmat!(mat::Matrix{T}, from::AbstractVector, degree::Integer) where T
-	axes(from, 1) == 1:getpaduanum(degree) || error()
-	axes(mat) == (1:(degree + 2), 1:(degree + 1)) || error()
-	
-	fill!(mat, zero(T))
-	
-	if isodd(degree)
-		# x 0
-		# 0 x
-		# x 0
-		
-		mat[1:2:end] .= from
-	else
-		@assert iseven(degree)
-		# x 0 x
-		# 0 x 0
-		# x 0 x
-		# 0 x 0
-		
+    axes(from, 1) == 1:getpaduanum(degree) || error()
+    axes(mat) == (1:(degree + 2), 1:(degree + 1)) || error()
+    
+    fill!(mat, zero(T))
+    
+    if isodd(degree)
+        # x 0
+        # 0 x
+        # x 0
+        
+        mat[1:2:end] .= from
+    else
+        @assert iseven(degree)
+        # x 0 x
+        # 0 x 0
+        # x 0 x
+        # 0 x 0
+        
         # TODO: is there any way to make this easier to understand?
-		valspercol = (degree + 2) ÷ 2
-		@assert size(mat, 1) == valspercol * 2
+        valspercol = (degree + 2) ÷ 2
+        @assert size(mat, 1) == valspercol * 2
 
-		for (i, col) in enumerate(eachcol(mat))
-			@assert 1 ≤ i ≤ degree + 1
-			
-			offset = isodd(i) ? 1 : 0
-			for j in 1:valspercol
-				col[2j - offset, 1] = from[(i - 1) * valspercol + j]
-			end
-		end
-	end
-	
-	mat
+        for (i, col) in enumerate(eachcol(mat))
+            @assert 1 ≤ i ≤ degree + 1
+            
+            offset = isodd(i) ? 1 : 0
+            for j in 1:valspercol
+                col[2j - offset, 1] = from[(i - 1) * valspercol + j]
+            end
+        end
+    end
+    
+    mat
 end
 
 
@@ -272,39 +272,39 @@ julia> fromcoeffsmat!(to2, mat, 2, Val(false))
 
 """
 function fromcoeffsmat!(to::AbstractVector, mat::Matrix, degree, ::Val{false})
-	length(to) == getpaduanum(degree) || error()
-	axes(mat) == (1:(degree + 2), 1:(degree + 1)) || error()
-	
-	n = firstindex(to)
-	for d in 1:degree + 1
-		for ix in 1:d
-			iy = d - ix + 1
-			@assert ix + iy == d + 1 "ix and iy must lie on d-th diagonal"
-			
-			to[n] = mat[iy, ix]
-			n += 1
-		end
-	end
-	
-	to
+    length(to) == getpaduanum(degree) || error()
+    axes(mat) == (1:(degree + 2), 1:(degree + 1)) || error()
+    
+    n = firstindex(to)
+    for d in 1:degree + 1
+        for ix in 1:d
+            iy = d - ix + 1
+            @assert ix + iy == d + 1 "ix and iy must lie on d-th diagonal"
+            
+            to[n] = mat[iy, ix]
+            n += 1
+        end
+    end
+    
+    to
 end
 
 function fromcoeffsmat!(to::AbstractVector, mat::Matrix, degree, ::Val{true})
-	length(to) == getpaduanum(degree) || error()
-	size(mat) == (degree + 2, degree + 1) || error()
-	
-	n = firstindex(to)
-	for d in 1:degree + 1
-		for iy in 1:d
-			ix = d - iy + 1
-			@assert ix + iy == d + 1 "ix and iy must lie on d-th diagonal"
-			
-			to[n] = mat[iy, ix]
-			n += 1
-		end
-	end
-	
-	to
+    length(to) == getpaduanum(degree) || error()
+    size(mat) == (degree + 2, degree + 1) || error()
+    
+    n = firstindex(to)
+    for d in 1:degree + 1
+        for iy in 1:d
+            ix = d - iy + 1
+            @assert ix + iy == d + 1 "ix and iy must lie on d-th diagonal"
+            
+            to[n] = mat[iy, ix]
+            n += 1
+        end
+    end
+    
+    to
 end
 
 """
@@ -333,21 +333,39 @@ julia> paduatransform!(zeros(getpaduanum(3)), plan, vals, Val(true))
 ```
 """
 function paduatransform!(P::PaduaTransformPlan)
-	coeffs = P.dctplan * P.vals
-	weight!(coeffs, P.degree)
-	
-	coeffs
+    coeffs = P.dctplan * P.vals
+    weight!(coeffs, P.degree)
+    
+    coeffs
 end
 
 function paduatransform!(P::PaduaTransformPlan, vals)
-	tovalsmat!(P.vals, vals, P.degree)
-	paduatransform!(P)
+    tovalsmat!(P.vals, vals, P.degree)
+    paduatransform!(P)
 end
 
 function paduatransform!(out, P::PaduaTransformPlan, vals, args...)
-	tovalsmat!(P.vals, vals, P.degree)
-	coeffs = paduatransform!(P)
-	fromcoeffsmat!(out, coeffs, P.degree, args...)
+    tovalsmat!(P.vals, vals, P.degree)
+    coeffs = paduatransform!(P)
+    fromcoeffsmat!(out, coeffs, P.degree, args...)
+end
+
+function paduatransform!(out::AbstractMatrix, P::PaduaTransformPlan, vals::AbstractMatrix, args...)
+    size(out, 2) == size(vals, 2) || error()
+    for (outcol, valcol) in zip(eachcol(out), eachcol(vals))
+        paduatransform!(outcol, P, valcol, args...)
+    end
+
+    out
+end
+
+function paduatransform!(out::AbstractMatrix, P::PaduaTransformPlan, vals::AbstractVector{<:AbstractVector{T}}, args...) where T
+    # Here, each column is a point and each row represents one dimension
+    r = reinterpret(reshape, T, vals)
+    size(out, 2) == size(r, 1) || error()
+    for (outcol, valrow) in zip(eachcol(out), eachrow(r))
+        paduatransform!(outcol, P, valrow, args...)
+    end
 end
 
 end  # Padua
