@@ -96,19 +96,19 @@ function differentiate!(setup::DiffSetup, coeffs::AbstractMatrix)
     return setup.∂xcoeffs, setup.∂ycoeffs
 end
 
+## Conversion from first to second kind Chebyshev ##
+
 struct C12Setup{T, CM}
     C12::CM
     coeffs::Matrix{T}
 end
 
 function C12Setup{T}(D, degree) where T
-    N = getpaduanum(degree)
-
     C12 = sparse(Conversion(CC, UU)[BlockRange(1:degree), BlockRange(1:degree+1)])
 
     # truncate degree so degree of derivative is the same as converted polynomial
-    coeffnum = getcoeffnum(degree - 1)
-    
+    coeffnum = getpaduanum(degree - 1)
+
     coeffs = Matrix{T}(undef, coeffnum, D)
 
     C12Setup{T, typeof(C12)}(C12, coeffs)
@@ -117,7 +117,9 @@ end
 # convert from chebyshev polynomials of first to second kind
 C12convert!(setup::C12Setup, coeffs) = mul!(setup.coeffs, setup.C12, coeffs)
 
-struct ConstΩIntSetup{T, C12T <: C12Setup{T}, ITP, TP}
+# Integration
+
+struct ConstIntSetup{T, C12T <: C12Setup{T}, ITP, TP}
     C12::C12T
     iplan::ITP
     phasevals::Matrix{T}
@@ -129,7 +131,7 @@ struct ConstΩIntSetup{T, C12T <: C12Setup{T}, ITP, TP}
     Integral::Matrix{T}
 end
 
-function ConstΩIntSetup{T}(D, degree) where T
+function ConstIntSetup{T}(D, degree) where T
     coeffnum = getcoeffnum(degree - 1)
     pointnum = getfullpointnum(degree - 1)
 
@@ -154,11 +156,11 @@ function ConstΩIntSetup{T}(D, degree) where T
 end
 
 function integrate!(
-    setup::ConstΩIntSetup, Ω::AbstractMatrix, D::Integer,
+    setup::ConstIntSetup, Ω::AbstractMatrix, D::Integer,
     phasecoeffs, ∂xcoeffs, ∂ycoeffs, t, p
 )
     coeffs = C12convert!(setup.C12, phasecoeffs)
-    
+
     # Convert back to values from coefficients
     @views for i in 1:D
         copyto!(setup.phasevals[:, i], coeffs[:, i])
@@ -202,7 +204,7 @@ end
 function _compute(setup::ChebyshevSetup, Ω, D, phasepoints, t, p)
 	# Convert to basis of Chebyshev polynomials of the first kind
 	coeffs = paduatransform!(setup.padua, phasepoints)
-	
+
 	# Get coefficients of derivatives in basis of Chebyshev polynomials of the second kind
 	∂x, ∂y = differentiate!(setup.diff, coeffs)
 

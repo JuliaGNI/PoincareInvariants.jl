@@ -18,7 +18,7 @@ include("ChebyshevImplementation.jl")
 
 struct SecondPoincareInvariant{
 	T,  # phase space and return type
-	ΩT <: Union{Callable, AbstractMatrix}, 
+	ΩT <: Union{Callable, AbstractMatrix},
 	S
 } <: AbstractPoincareInvariant
 	Ω::ΩT  # symplectic matrix or function returning one
