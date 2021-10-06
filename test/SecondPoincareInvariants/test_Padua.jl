@@ -4,23 +4,26 @@
     for n in [1:10..., 50, 123, 511, 10_000]
         paduanum = getpaduanum(n)
         @test paduanum == (n + 1) * (n + 2) ÷ 2
-        @test isinteger(getdegree(paduanum))
-        @test (checkpaduanum(paduanum); true)
+        @test getdegree(paduanum) == n
 
-        @test_throws ArgumentError checkpaduanum(paduanum + 1)
-        @test_throws ArgumentError checkpaduanum(paduanum - 1)
+        @test_throws ArgumentError getdegree(paduanum + 1)
+        @test_throws ArgumentError getdegree(paduanum - 1)
+
+        @test nextpaduanum(paduanum - 1) == paduanum
+        @test nextpaduanum(paduanum) == paduanum
+        @test nextpaduanum(paduanum + 1) == getpaduanum(n + 1)
     end
 end
 
 @safetestset "chebyshevpoint and paduapoint" begin
     using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.Padua:
         chebyshevpoint, paduapoint
-    
+
     @test chebyshevpoint(Float64, 0, 0, 1, 1) ≈ [ 1,  1]
     @test chebyshevpoint(Float64, 0, 1, 1, 1) ≈ [ 1, -1]
     @test chebyshevpoint(Float64, 1, 0, 1, 1) ≈ [-1,  1]
     @test chebyshevpoint(Float64, 1, 1, 1, 1) ≈ [-1, -1]
-    
+
     @test chebyshevpoint(Float64, 1, 3, 2, 5) ≈ [cos(π * 1 / 2), cos(π * 3 / 5)] atol=3eps()
 
     @test eltype(chebyshevpoint(Float32, 1, 2, 3, 4)) == Float32
@@ -110,10 +113,20 @@ end
 
     Padua.fromcoeffsmat!(to, mat, 2, Val(false))
     @test to == [(0, 0), (0, 1), (1, 0), (0, 2), (1, 1), (2, 0)]
+
+    @test Padua.fromcoeffsmat!(zeros(5, 4), reshape(1:20, 5, 4), 3) == [
+        1  6  11 16;
+        2  7  12  0;
+        3  8   0  0;
+        4  0   0  0;
+        0  0   0  0
+    ]
 end
 
-@safetestset "paduatransform! and PaduaTransformPlan" begin
+@safetestset "paduatransform! and invpaduatransform!" begin
     using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.Padua
+    using Statistics: mean
+    using StaticArrays: SVector
 
     T0(x) = 1
 	T1(x) = x
@@ -121,61 +134,75 @@ end
 	T3(x) = 4x^3 - 3x
 
     function T(v, cfs)
-        cfs[1] * T0(v[1]) * T0(v[2]) +
+        cfs[1, 1] * T0(v[1]) * T0(v[2]) +
 
-        cfs[2] * T1(v[1]) * T0(v[2]) +
-        cfs[3] * T0(v[1]) * T1(v[2]) +
+        cfs[1, 2] * T1(v[1]) * T0(v[2]) +
+        cfs[2, 1] * T0(v[1]) * T1(v[2]) +
 
-        cfs[4] * T2(v[1]) * T0(v[2]) +
-        cfs[5] * T1(v[1]) * T1(v[2]) +
-        cfs[6] * T0(v[1]) * T2(v[2]) +
+        cfs[1, 3] * T2(v[1]) * T0(v[2]) +
+        cfs[2, 2] * T1(v[1]) * T1(v[2]) +
+        cfs[3, 1] * T0(v[1]) * T2(v[2]) +
 
-        cfs[7] * T3(v[1]) * T0(v[2]) +
-        cfs[8] * T2(v[1]) * T1(v[2]) +
-        cfs[9] * T1(v[1]) * T2(v[2]) +
-        cfs[10] * T0(v[1]) * T3(v[2])
+        cfs[1, 4] * T3(v[1]) * T0(v[2]) +
+        cfs[2, 3] * T2(v[1]) * T1(v[2]) +
+        cfs[3, 2] * T1(v[1]) * T2(v[2]) +
+        cfs[4, 1] * T0(v[1]) * T3(v[2])
     end
 
-    for degree in 4:10
+    for degree in [4, 7, 21, 100]
         plan = PaduaTransformPlan{Float64}(degree)
+        iplan = InvPaduaTransformPlan{Float64}(degree)
         points = getpaduapoints(degree)
 
-        coeffs = rand(10)
-        vals = map(v -> T(v, coeffs), points)
+        paduanum = getpaduanum(3)
 
-        out = Vector{Float64}(undef, getpaduanum(degree))
+        cfsmat = Padua.fromcoeffsmat!(zeros(3+2, 3+1), rand(3+2, 3+1), 3)
+        cfsveclexfalse = Padua.fromcoeffsmat!(Vector{Float64}(undef, paduanum), cfsmat, 3, Val(false))
+        cfsveclextrue = Padua.fromcoeffsmat!(Vector{Float64}(undef, paduanum), cfsmat, 3, Val(true))
+        cfsarr = cat(cfsmat, cfsmat, cfsmat, cfsmat; dims=3)
 
-        paduatransform!(out, plan, vals, Val(true))
+        for i in 1:4
+            cfsarr[1, 1, i] += i
+        end
 
-        @test out[1:10] ≈ coeffs atol=10eps()
-        @test out[11:end] ≈ zeros(length(out) - 10) atol=10eps()
+        vals = map(v -> T(v, cfsmat), points)
+        valsmat = hcat(vals .+ 1, vals .+ 2, vals .+ 3, vals .+ 4)
+        valsvecvec = SVector{4, Float64}.(eachrow(valsmat))
+
+        vals2 = similar(vals)
+        valsmat2 = similar(valsmat)
+
+        cfsvec2 = Vector{Float64}(undef, getpaduanum(degree))
+        cfsmat2 = zeros(degree+2, degree+1)
+        cfsarr2 = zeros(degree+2, degree+1, 4)
+
+        paduatransform!(cfsvec2, plan, vals, Val(true))
+        @test mean(abs, cfsvec2[1:10] .- cfsveclextrue) < 5eps()
+        @test mean(abs, cfsvec2[11:end]) < 5eps()
+
+        paduatransform!(cfsvec2, plan, vals, Val(false))
+        @test mean(abs, cfsvec2[1:10] .- cfsveclexfalse) < 5eps()
+        @test mean(abs, cfsvec2[11:end]) < 5eps()
+
+        paduatransform!(cfsmat2, plan, vals)
+        @test mean(abs, cfsmat2[1:5, 1:4] .- cfsmat) < 5eps()
+        @test mean(abs, cfsmat2[6:end, 1:end]) < 5eps()
+        @test mean(abs, cfsmat2[1:end, 5:end]) < 5eps()
+
+        invpaduatransform!(vals2, iplan, cfsmat2)
+        @test mean(abs, vals2 .- vals) < 10eps()
+
+        paduatransform!(cfsarr2, plan, valsmat)
+        @test mean(abs, cfsarr2[1:5, 1:4, :] .- cfsarr) < 5eps()
+        @test mean(abs, cfsarr2[6:end, 1:end, :]) < 5eps()
+        @test mean(abs, cfsarr2[1:end, 5:end, :]) < 5eps()
+
+        invpaduatransform!(valsmat2, iplan, cfsarr2)
+        @test mean(abs, valsmat2 .- valsmat) < 10eps()
+
+        paduatransform!(cfsarr2, plan, valsvecvec)
+        @test mean(abs, cfsarr2[1:5, 1:4, :] .- cfsarr) < 5eps()
+        @test mean(abs, cfsarr2[6:end, 1:end, :]) < 5eps()
+        @test mean(abs, cfsarr2[1:end, 5:end, :]) < 5eps()
     end
-end
-
-@safetestset "multi-dimensional paduatransform!" begin
-    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.Padua
-    using StaticArrays
-
-    degree = 20
-    dims = 5
-    plan = PaduaTransformPlan{Float64}(degree)
-
-    valsmat = rand(getpaduanum(degree), dims)
-    outmat = Matrix{Float64}(undef, getpaduanum(degree), dims)
-
-    paduatransform!(outmat, plan, valsmat, Val(false))
-
-    valsvec = map(SVector{dims, Float64}, eachrow(valsmat))
-    outvec = Matrix{Float64}(undef, getpaduanum(degree), dims)
-
-    paduatransform!(outvec, plan, valsvec, Val(false))
-
-    outcompare = Matrix{Float64}(undef, getpaduanum(degree), dims)
-
-    for i in 1:dims
-        paduatransform!(view(outcompare, :, i), plan, valsmat[:, i], Val(false))
-    end
-
-    @test outcompare == outmat
-    @test outcompare == outvec
 end

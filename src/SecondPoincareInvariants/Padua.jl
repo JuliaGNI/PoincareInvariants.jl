@@ -4,15 +4,18 @@ using StaticArrays: SVector
 using FFTW
 using LinearAlgebra: rmul!
 
-export getpaduanum, getdegree, checkpaduanum
+export getpaduanum, getdegree, nextpaduanum
 export getpaduapoints
 export PaduaTransformPlan, paduatransform!
+export InvPaduaTransformPlan, invpaduatransform!
+
+## Number of Padua Points and Degree ##
 
 """
-    getpaduanum(degree)
+    getpaduanum(n)
 
 calculates number of Padua points needed to approximate a function using Chebyshev polynomials
-up to degree `degree`. This number is equal to the number of coefficeints.
+up to total degree `n`. This number is equal to the number of coefficients.
 
 # Examples
 ```julia-repl
@@ -23,23 +26,41 @@ julia> getpaduanum(13)
 getpaduanum(degree) = (degree + 1) * (degree + 2) ÷ 2
 
 """
-    getdegree(pointnum)
+    getdegree(N)
 
-calculates total degree given the number of coefficients or points used in the Padua transform.
+calculates total degree of corresponding polynomial, given the number of coefficients or
+Padua points `N`.
 
 # Examples
 ```julia-repl
 julia> getdegree(105)
-13.0
+13
 ```
 """
-getdegree(pointnum) = (sqrt(1 + 8pointnum) - 3) / 2
-
-function checkpaduanum(paduanum)
-    check = isinteger(getdegree(paduanum))
-    check || throw(ArgumentError(
-        "number of Padua points or coeffs must be a triangle number 1, 3, 6, 10, 15..."))
+function getdegree(pointnum)
+	d = (sqrt(1 + 8pointnum) - 3) / 2
+	isinteger(d) ? Int(d) : throw(ArgumentError(
+		"number of Padua points or coeffs must be (n + 1) * (n + 2) ÷ 2"))
 end
+
+"""
+    nextpaduanum(N)
+
+get next valid paduanum ≥ `N`.
+
+# Examples
+
+```julia-repl
+julia> nextpaduanum(104)
+105
+```
+"""
+function nextpaduanum(N)
+	d = Int(cld(sqrt(1 + 8N) - 3, 2))
+	getpaduanum(d)
+end
+
+## Padua Points ##
 
 """
     chebyshevpoint(T, ix, iy, nx, ny)
@@ -131,6 +152,7 @@ julia> getpaduapoints(Float64, 1)
 getpaduapoints(::Type{T}, n) where T = [paduapoint(T, x, y, n) for y in 0:n+1, x in 0:n if ispadua(x, y)]
 getpaduapoints(n) = getpaduapoints(Float64, n)
 
+## Padua Transform ##
 
 struct PaduaTransformPlan{T, P}
     degree::Int
@@ -149,11 +171,8 @@ See also: [`paduatransform!`](@ref)
 """
 function PaduaTransformPlan{T}(degree::Integer) where T
     vals = Matrix{T}(undef, degree + 2, degree + 1)
-    plan = FFTW.plan_r2r!(
-        Matrix{T}(undef, degree + 2, degree + 1),
-        FFTW.REDFT00
-    )
-    
+    plan = FFTW.plan_r2r!(vals, FFTW.REDFT00)
+
     PaduaTransformPlan{T, typeof(plan)}(degree, vals, plan)
 end
 
@@ -174,13 +193,13 @@ julia> weight!(ones(4+2, 4+1), 4)
  0.025  0.05  0.05  0.05  0.025
 ```
 """
-function weight!(mat::AbstractMatrix, degree::Integer)
-    mat .*= 2 / ( degree * (degree + 1) )
-    mat[1, :] .*= 0.5
-    mat[end, :] .*= 0.5
-    mat[:, 1] .*= 0.5
-    mat[:, end] .*= 0.5
-    
+function weight!(mat::AbstractMatrix{T}, degree::Integer) where T
+    rmul!(mat, T(2 / ( degree * (degree + 1) )))
+    rmul!(@view(mat[1, :]), T(0.5))
+	rmul!(@view(mat[end, :]), T(0.5))
+	rmul!(@view(mat[:, 1]), T(0.5))
+	rmul!(@view(mat[:, end]), T(0.5))
+
     mat
 end
 
@@ -198,49 +217,57 @@ julia> tovalsmat!(ones(3 + 2, 3 + 1), 1:getpaduanum(3), 3)
  2.0  0.0  7.0   0.0
  0.0  5.0  0.0  10.0
  3.0  0.0  8.0   0.0
+
+julia> tovalsmat!(ones(2 + 2, 2 + 1), 1:getpaduanum(2), 2)
+4×3 Matrix{Float64}:
+ 1.0  0.0  5.0
+ 0.0  3.0  0.0
+ 2.0  0.0  6.0
+ 0.0  4.0  0.0
 ```
 """
 function tovalsmat!(mat::Matrix{T}, from::AbstractVector, degree::Integer) where T
     axes(from, 1) == 1:getpaduanum(degree) || error()
-    axes(mat) == (1:(degree + 2), 1:(degree + 1)) || error()
-    
-    fill!(mat, zero(T))
-    
+    size(mat) == (degree + 2, degree + 1) || error()
+
     if isodd(degree)
         # x 0
         # 0 x
         # x 0
-        
+
         mat[1:2:end] .= from
+		mat[2:2:end] .= zero(T)
     else
         @assert iseven(degree)
         # x 0 x
         # 0 x 0
         # x 0 x
         # 0 x 0
-        
-        # TODO: is there any way to make this easier to understand?
-        valspercol = (degree + 2) ÷ 2
-        @assert size(mat, 1) == valspercol * 2
 
-        for (i, col) in enumerate(eachcol(mat))
-            @assert 1 ≤ i ≤ degree + 1
-            
-            offset = isodd(i) ? 1 : 0
-            for j in 1:valspercol
-                col[2j - offset, 1] = from[(i - 1) * valspercol + j]
-            end
-        end
+		valspercol = (degree + 2) ÷ 2
+
+		# odd columns (j is column index)
+		for j in 1:2:degree + 1, i in 1:valspercol
+			k = (j - 1) * valspercol + i
+			@inbounds mat[2i - 1, j] = from[k]
+			@inbounds mat[2i, j] = zero(T)
+		end
+
+		# even columns
+		for j in 2:2:degree + 1, i in 1:valspercol
+			k = (j - 1) * valspercol + i
+			@inbounds mat[2i - 1, j] = zero(T)
+			@inbounds mat[2i, j] = from[k]
+		end
     end
-    
+
     mat
 end
 
-
 """
-    fromcoeffsmat!(to::AbstractVector, mat::Matrix, degree, ::Val{lex}) where lex
+    fromcoeffsmat!(to::AbstractVector, mat::AbstractMatrix, degree::Integer, ::Val{lex})
 
-write Chebyshev coefficients in `mat` into vector `to`. `lex::Bool` determines whether
+write Chebyshev coefficients from `mat` into vector `to`. `lex::Bool` determines whether
 coefficients should be written in lexigraphical order or not. (See examples)
 
 The lower right triangle does not get written into `to`. These would represent higher
@@ -275,42 +302,71 @@ julia> fromcoeffsmat!(to2, mat, 2, Val(false))
  (1, 1)
  (2, 0)
 ```
-
 """
-function fromcoeffsmat!(to::AbstractVector, mat::Matrix, degree, ::Val{false})
+function fromcoeffsmat!(to::AbstractVector, mat::Matrix, degree::Integer, ::Val{false})
     length(to) == getpaduanum(degree) || error()
     axes(mat) == (1:(degree + 2), 1:(degree + 1)) || error()
-    
+
     n = firstindex(to)
     for d in 1:degree + 1
         for ix in 1:d
             iy = d - ix + 1
             @assert ix + iy == d + 1 "ix and iy must lie on d-th diagonal"
-            
+
             to[n] = mat[iy, ix]
             n += 1
         end
     end
-    
+
     to
 end
 
-function fromcoeffsmat!(to::AbstractVector, mat::Matrix, degree, ::Val{true})
+function fromcoeffsmat!(to::AbstractVector, mat::Matrix, degree::Integer, ::Val{true})
     length(to) == getpaduanum(degree) || error()
     size(mat) == (degree + 2, degree + 1) || error()
-    
+
     n = firstindex(to)
     for d in 1:degree + 1
         for iy in 1:d
             ix = d - iy + 1
             @assert ix + iy == d + 1 "ix and iy must lie on d-th diagonal"
-            
+
             to[n] = mat[iy, ix]
             n += 1
         end
     end
-    
+
     to
+end
+
+"""
+    fromcoeffsmat!(to::AbstractMatrix, mat::AbstractMatrix, degree::Integer)
+
+copy Chebyshev coefficients from `mat` to `to` without copying coefficients coresponding to
+total degree > `degree`.
+
+# Examples
+```
+julia> fromcoeffsmat!(zeros(5, 4), reshape(1:20, 5, 4), 3)
+5×4 Matrix{Float64}:
+ 1.0  6.0  11.0  16.0
+ 2.0  7.0  12.0   0.0
+ 3.0  8.0   0.0   0.0
+ 4.0  0.0   0.0   0.0
+ 0.0  0.0   0.0   0.0
+```
+"""
+function fromcoeffsmat!(to::AbstractMatrix, mat::AbstractMatrix, degree::Integer)
+	axes(to) == axes(mat) || error()
+	size(mat) == (degree + 2, degree + 1) || error()
+
+	for j in 1:degree + 1
+		for i in 1:degree + 2 - j
+			@inbounds to[i, j] = mat[i, j]
+		end
+	end
+
+	to
 end
 
 """
@@ -322,12 +378,12 @@ if `out` is given, written into `out`. `args` are passed to [`fromcoeffsmat!`](@
 
 # Examples
 ```julia-repl
-julia> plan = PaduaTransformPlan{Float32}(3); points = getpaduapoints(3);
+julia> plan = PaduaTransformPlan{Float64}(3); points = getpaduapoints(3);
 
 julia> g(v) = 3 + 4v[1] + 5 * v[2] * (2v[1]^2 - 1); vals = g.(points);
 
 julia> paduatransform!(plan, vals)
-5×4 Matrix{Float32}:
+5×4 Matrix{Float64}:
  3.0  4.0  0.0  0.0
  0.0  0.0  5.0  0.0
  0.0  0.0  0.0  0.0
@@ -336,12 +392,20 @@ julia> paduatransform!(plan, vals)
 
 julia> paduatransform!(zeros(getpaduanum(3)), plan, vals, Val(true))
 [3.0, 4.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0, 0.0, 0.0]
+
+julia> paduatransform!(zeros(5, 4), plan, vals)
+5×4 Matrix{Float64}:
+ 3.0  4.0  0.0  0.0
+ 0.0  0.0  5.0  0.0
+ 0.0  0.0  0.0  0.0
+ 0.0  0.0  0.0  0.0
+ 0.0  0.0  0.0  0.0
 ```
 """
 function paduatransform!(P::PaduaTransformPlan)
     coeffs = P.dctplan * P.vals
     weight!(coeffs, P.degree)
-    
+
     coeffs
 end
 
@@ -351,27 +415,152 @@ function paduatransform!(P::PaduaTransformPlan, vals)
 end
 
 function paduatransform!(out, P::PaduaTransformPlan, vals, args...)
-    tovalsmat!(P.vals, vals, P.degree)
-    coeffs = paduatransform!(P)
-    fromcoeffsmat!(out, coeffs, P.degree, args...)
+	tovalsmat!(P.vals, vals, P.degree)
+	coeffs = paduatransform!(P)
+	fromcoeffsmat!(out, coeffs, P.degree, args...)
 end
 
-function paduatransform!(out::AbstractMatrix, P::PaduaTransformPlan, vals::AbstractMatrix, args...)
-    size(out, 2) == size(vals, 2) || error()
-    for (outcol, valcol) in zip(eachcol(out), eachcol(vals))
-        paduatransform!(outcol, P, valcol, args...)
+"""
+    paduatransform!(out::AbstractArray{<:Any, 3}, P::PaduaTransformPlan, vals::AbstractMatrix, args...)
+
+transforms each column in `vals` and writes the resulting coefficients in a slice of `out`.
+"""
+function paduatransform!(out::AbstractArray{<:Any, 3}, P::PaduaTransformPlan, vals::AbstractMatrix, args...)
+    axes(out, 3) == axes(vals, 2)|| error()
+
+    @views for i in axes(out, 3)
+        paduatransform!(out[:, :, i], P, vals[:, i], args...)
     end
 
     out
 end
 
-function paduatransform!(out::AbstractMatrix, P::PaduaTransformPlan, vals::AbstractVector{<:AbstractVector{T}}, args...) where T
-    # Here, each column is a point and each row represents one dimension
-    r = reinterpret(reshape, T, vals)
-    size(out, 2) == size(r, 1) || error()
-    for (outcol, valrow) in zip(eachcol(out), eachrow(r))
-        paduatransform!(outcol, P, valrow, args...)
+"""
+    paduatransform!(out::Array{<:Any, 3}, P::PaduaTransformPlan, vals::AbstractVector{<:AbstractVector{T}}, args...)
+
+transforms vector of vectors to Chebyshev coefficients and writes the resulting coefficients
+in a slice of `out`. Each vector in the vector of vectors represents a point. Each slice of
+`out` represents a transform of one dimension.
+"""
+function paduatransform!(out::Array{<:Any, 3}, P::PaduaTransformPlan, vals::AbstractVector{<:AbstractVector{T}}, args...) where T
+	# Here, each column is a point and each row represents one dimension
+	r = reinterpret(reshape, T, vals)
+    axes(out, 3) == axes(r, 1) || error()
+
+    @views for i in axes(out, 3)
+        paduatransform!(out[:, :, i], P, r[i, :], args...)
     end
+
+    out
+end
+
+## Inverse Padua Transform ##
+
+struct InvPaduaTransformPlan{T, P}
+    degree::Int
+    coeffs::Matrix{T}
+    dctplan::P
+end
+
+"""
+    InvPaduaTransformPlan{T}(n::Integer)
+
+create plan to compute values on Padua points, given coefficients of Chebyshev polynomials
+up to degree `n`.
+
+See also: [`invpaduatransform!`](@ref)
+"""
+function InvPaduaTransformPlan{T}(degree::Integer) where T
+    coeffs = Matrix{T}(undef, degree + 2, degree + 1)
+    iplan = FFTW.plan_r2r!(coeffs, FFTW.REDFT00)
+
+    InvPaduaTransformPlan{T, typeof(iplan)}(degree, coeffs, iplan)
+end
+
+"""
+    invweight!(coeffs::AbstractMatrix)
+
+weight Chebyshev coefficients before the Fourier transform in the inverse Padua transform.
+
+# Examples
+```julia-repl
+julia> invweight!(ones(5, 5))
+5×5 Matrix{Float64}:
+ 1.0  0.5   0.5   0.5   1.0
+ 0.5  0.25  0.25  0.25  0.5
+ 0.5  0.25  0.25  0.25  0.5
+ 0.5  0.25  0.25  0.25  0.5
+ 1.0  0.5   0.5   0.5   1.0
+```
+"""
+function invweight!(coeffs::AbstractMatrix{T}) where T
+	rmul!(@view(coeffs[:,2:end-1]), T(0.5))
+	rmul!(@view(coeffs[2:end-1, :]), T(0.5))
+
+	coeffs
+end
+
+
+function fromvalsmat!(to::AbstractVector, mat::Matrix, degree::Integer)
+	axes(to, 1) == 1:getpaduanum(degree) || error()
+	size(mat) == (degree + 2, degree + 1) || error()
+
+	if isodd(degree)
+		# x 0
+        # 0 x
+        # x 0
+
+		to .= mat[1:2:end]
+	else
+		@assert iseven(degree)
+		# x 0 x
+        # 0 x 0
+        # x 0 x
+        # 0 x 0
+
+		valspercol = (degree + 2) ÷ 2
+
+		# odd columns (j is column index)
+		for j in 1:2:degree + 1, i in 1:valspercol
+			k = (j - 1) * valspercol + i
+			@inbounds to[k] = mat[2i - 1, j]
+		end
+
+		# even columns
+		for j in 2:2:degree + 1, i in 1:valspercol
+			k = (j - 1) * valspercol + i
+			@inbounds to[k] = mat[2i, j]
+		end
+	end
+
+	to
+end
+
+function invpaduatransform!(IP::InvPaduaTransformPlan)
+	invweight!(IP.coeffs)
+	IP.dctplan * IP.coeffs
+
+	IP.coeffs
+end
+
+function invpaduatransform!(IP::InvPaduaTransformPlan, coeffs::AbstractMatrix)
+	IP.coeffs[:] = coeffs
+	invpaduatransform!(IP)
+end
+
+function invpaduatransform!(vals::AbstractVector, IP::InvPaduaTransformPlan, coeffs::AbstractMatrix)
+	invpaduatransform!(IP, coeffs)
+	fromvalsmat!(vals, IP.coeffs, IP.degree)
+end
+
+function invpaduatransform!(vals::AbstractMatrix, IP::InvPaduaTransformPlan, coeffs::AbstractArray{<:Any, 3})
+	axes(coeffs, 3) == axes(vals, 2) || error()
+
+	@views for i in axes(coeffs, 3)
+        invpaduatransform!(vals[:, i], IP, coeffs[:, :, i])
+    end
+
+	vals
 end
 
 end  # Padua
