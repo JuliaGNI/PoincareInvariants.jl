@@ -132,7 +132,7 @@ struct ConstIntSetup{T, C12T <: C12Setup{T}, ITP, TP}
 end
 
 function ConstIntSetup{T}(D, degree) where T
-    coeffnum = getcoeffnum(degree - 1)
+    coeffnum = getpaduanum(degree - 1)
     pointnum = getfullpointnum(degree - 1)
 
     C12 = C12Setup{T}(D, degree)
@@ -150,7 +150,7 @@ function ConstIntSetup{T}(D, degree) where T
 
     Integral = DefiniteIntegral(UU)[1:1, 1:coeffnum]
 
-    ConstΩIntSetup{T, typeof(C12), typeof(iplan), typeof(plan)}(
+    ConstIntSetup{T, typeof(C12), typeof(iplan), typeof(plan)}(
         C12, iplan, phasevals, ∂xvals, ∂yvals, integrandvals, plan, integrandcoeffs, Integral
     )
 end
@@ -162,15 +162,10 @@ function integrate!(
     coeffs = C12convert!(setup.C12, phasecoeffs)
 
     # Convert back to values from coefficients
-    @views for i in 1:D
-        copyto!(setup.phasevals[:, i], coeffs[:, i])
-        setup.iplan * setup.phasevals[:, i]
-
-        copyto!(setup.∂xvals[:, i], ∂xcoeffs[:, i])
-        setup.iplan * setup.∂xvals[:, i]
-
-        copyto!(setup.∂yvals[:, i], ∂ycoeffs[:, i])
-        setup.iplan * setup.∂yvals[:, i]
+    for i in 1:D
+        setup.phasevals[:, i] = setup.iplan * coeffs[:, i]
+        setup.∂xvals[:, i] = setup.iplan * ∂xcoeffs[:, i]
+        setup.∂yvals[:, i] = setup.iplan * ∂ycoeffs[:, i]
     end
 
     # Calculate integrand on full chebyshev grid
@@ -179,8 +174,7 @@ function integrate!(
     end
 
     # Convert to coefficients and calculate integral
-    copyto!(setup.integrandcoeffs, setup.integrandvals)
-    setup.iplan * setup.integrandcoeffs
+    setup.integrandcoeffs[:] = setup.plan * setup.integrandvals
     dot(setup.Integral, setup.integrandcoeffs)
 end
 
@@ -196,7 +190,7 @@ function ChebyshevSetup{T}(::AbstractMatrix, D::Integer, N::Integer) where T
 
     padua = PaduaSetup{T}(D, degree)
     diff = DiffSetup{T}(D, degree)
-    int = ConstΩIntSetup{T}(D, degree)
+    int = ConstIntSetup{T}(D, degree)
 
     ChebyshevSetup{T, typeof(int)}(degree, padua, diff, int)
 end

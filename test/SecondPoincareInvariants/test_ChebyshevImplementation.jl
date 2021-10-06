@@ -62,3 +62,41 @@ end
     @test setup.coeffs === out == setup.C12 * coeffs
     @test size(setup.coeffs) == (3, 5)
 end
+
+# @safetestset "ContIntSetup and integrate!" begin
+#     using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation:
+#         ConstIntSetup, integrate!, DiffSetup, differentiate!
+
+#     D = 2; degree = 2
+#     setup = ConstIntSetup{Float64}(D, degree)
+
+#     @test setup.Integral == [4 0 0]
+
+#     phasecoeffs = [1 2;
+#                    3 4;
+#                    5 6;
+#                    7 8;
+#                    9 10;
+#                    11 12]
+
+#     diffsetup = DiffSetup{Float64}(D, degree)
+#     ∂x, ∂y = differentiate!(diffsetup, phasecoeffs)
+
+#     @test ∂x ≈ [  5  6;
+#                 4.5  5;
+#                  22 24]
+
+#     @test ∂y ≈ [  3  4;
+#                  14 16;
+#                 4.5  5]
+
+#     Ω = [0  -1;
+#          1  0]
+
+#     out = integrate!(setup, Ω, D, phasecoeffs, ∂x, ∂y, 0, nothing)
+
+#     display(setup.integrandvals)
+#     @test setup.integrandcoeffs[1] ≈ 8
+
+#     @test out ≈ 32 atol=10eps()
+# end
