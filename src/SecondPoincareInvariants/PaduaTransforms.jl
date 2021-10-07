@@ -1,4 +1,4 @@
-module Padua
+module PaduaTransforms
 
 using StaticArrays: SVector
 using FFTW

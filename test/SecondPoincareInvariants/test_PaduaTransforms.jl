@@ -1,5 +1,5 @@
 @safetestset "getpaduanum, getdegree and checkpaduanum" begin
-    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.Padua
+    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms
 
     for n in [1:10..., 50, 123, 511, 10_000]
         paduanum = getpaduanum(n)
@@ -16,7 +16,7 @@
 end
 
 @safetestset "chebyshevpoint and paduapoint" begin
-    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.Padua:
+    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms:
         chebyshevpoint, paduapoint
 
     @test chebyshevpoint(Float64, 0, 0, 1, 1) ≈ [ 1,  1]
@@ -46,14 +46,14 @@ end
 end
 
 @safetestset "ispadua and getpaduapoints" begin
-    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.Padua
+    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms
 
-    @test Padua.ispadua(0, 0) == true
-    @test Padua.ispadua(1, 0) == false
-    @test Padua.ispadua(0, 1) == false
-    @test Padua.ispadua(5, 4) == false
-    @test Padua.ispadua(4, 4) == true
-    @test Padua.ispadua(2, 0) == true
+    @test PaduaTransforms.ispadua(0, 0) == true
+    @test PaduaTransforms.ispadua(1, 0) == false
+    @test PaduaTransforms.ispadua(0, 1) == false
+    @test PaduaTransforms.ispadua(5, 4) == false
+    @test PaduaTransforms.ispadua(4, 4) == true
+    @test PaduaTransforms.ispadua(2, 0) == true
 
     @test getpaduapoints(1) ≈ [
         [1, 1],
@@ -63,15 +63,22 @@ end
 
     for n in 1:20
         pnts = getpaduapoints(n)
-        @test pnts == [Padua.paduapoint(Float64, x, y, n) for y in 0:n+1, x in 0:n if Padua.ispadua(x, y)]
+        @test pnts == [
+            PaduaTransforms.paduapoint(Float64, x, y, n)
+            for y in 0:n+1, x in 0:n if PaduaTransforms.ispadua(x, y)
+        ]
 
         pnts32 = getpaduapoints(Float32, n)
-        @test pnts32 == [Padua.paduapoint(Float32, x, y, n) for y in 0:n+1, x in 0:n if Padua.ispadua(x, y)]
+        @test pnts32 == [
+            PaduaTransforms.paduapoint(Float32, x, y, n)
+            for y in 0:n+1, x in 0:n if PaduaTransforms.ispadua(x, y)
+        ]
     end
 end
 
 @safetestset "weight!" begin
-    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.Padua: weight!
+    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms:
+        weight!, invweight!
 
     @test weight!(ones(4+2, 4+1), 4) == [
         0.025  0.05  0.05  0.05  0.025;
@@ -81,12 +88,21 @@ end
          0.05   0.1   0.1   0.1   0.05;
         0.025  0.05  0.05  0.05  0.025
     ]
+
+    @test invweight!(ones(4+2, 4+1)) == [
+          1    0.5    0.5    0.5    1;
+        0.5   0.25   0.25   0.25  0.5;
+        0.5   0.25   0.25   0.25  0.5;
+        0.5   0.25   0.25   0.25  0.5;
+        0.5   0.25   0.25   0.25  0.5;
+          1    0.5    0.5    0.5    1
+    ]
 end
 
 @safetestset "tovalsmat!" begin
-    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.Padua
+    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms
 
-    @test Padua.tovalsmat!(ones(3 + 2, 3 + 1), 1:getpaduanum(3), 3) == [
+    @test PaduaTransforms.tovalsmat!(ones(3 + 2, 3 + 1), 1:getpaduanum(3), 3) == [
         1 0 6 0 ;
         0 4 0 9 ;
         2 0 7 0 ;
@@ -94,7 +110,7 @@ end
         3 0 8 0
     ]
 
-    @test Padua.tovalsmat!(ones(2 + 2, 2 + 1), 1:getpaduanum(2), 2) == [
+    @test PaduaTransforms.tovalsmat!(ones(2 + 2, 2 + 1), 1:getpaduanum(2), 2) == [
         1 0 5;
         0 3 0;
         2 0 6;
@@ -103,18 +119,18 @@ end
 end
 
 @safetestset "fromcoeffsmat!" begin
-    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.Padua
+    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms
 
     mat = [(x, y) for y in 0:2+1, x in 0:2]
     to = similar(mat, getpaduanum(2))
 
-    Padua.fromcoeffsmat!(to, mat, 2, Val(true))
+    PaduaTransforms.fromcoeffsmat!(to, mat, 2, Val(true))
     @test to == [(0, 0), (1, 0), (0, 1), (2, 0), (1, 1), (0, 2)]
 
-    Padua.fromcoeffsmat!(to, mat, 2, Val(false))
+    PaduaTransforms.fromcoeffsmat!(to, mat, 2, Val(false))
     @test to == [(0, 0), (0, 1), (1, 0), (0, 2), (1, 1), (2, 0)]
 
-    @test Padua.fromcoeffsmat!(zeros(5, 4), reshape(1:20, 5, 4), 3) == [
+    @test PaduaTransforms.fromcoeffsmat!(zeros(5, 4), reshape(1:20, 5, 4), 3) == [
         1  6  11 16;
         2  7  12  0;
         3  8   0  0;
@@ -124,7 +140,7 @@ end
 end
 
 @safetestset "paduatransform! and invpaduatransform!" begin
-    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.Padua
+    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms
     using Statistics: mean
     using StaticArrays: SVector
 
@@ -156,9 +172,9 @@ end
 
         paduanum = getpaduanum(3)
 
-        cfsmat = Padua.fromcoeffsmat!(zeros(3+2, 3+1), rand(3+2, 3+1), 3)
-        cfsveclexfalse = Padua.fromcoeffsmat!(Vector{Float64}(undef, paduanum), cfsmat, 3, Val(false))
-        cfsveclextrue = Padua.fromcoeffsmat!(Vector{Float64}(undef, paduanum), cfsmat, 3, Val(true))
+        cfsmat = PaduaTransforms.fromcoeffsmat!(zeros(3+2, 3+1), rand(3+2, 3+1), 3)
+        cfsveclexfalse = PaduaTransforms.fromcoeffsmat!(Vector{Float64}(undef, paduanum), cfsmat, 3, Val(false))
+        cfsveclextrue = PaduaTransforms.fromcoeffsmat!(Vector{Float64}(undef, paduanum), cfsmat, 3, Val(true))
         cfsarr = cat(cfsmat, cfsmat, cfsmat, cfsmat; dims=3)
 
         for i in 1:4

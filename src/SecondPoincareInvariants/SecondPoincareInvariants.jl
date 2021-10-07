@@ -19,11 +19,11 @@ include("ChebyshevImplementation.jl")
 struct SecondPoincareInvariant{
 	T,  # phase space and return type
 	ΩT <: Union{Callable, AbstractMatrix},
-	S
+	P
 } <: AbstractPoincareInvariant
 	Ω::ΩT  # symplectic matrix or function returning one
 	D::Int
-	setup::S  # setup object for preallocating operators, transform plans, etc.
+	plan::P  # plan for chebyshev transform, differentiation, etc...
 end
 
 function SecondPoincareInvariant{T}(Ω::ΩT, D::Integer, N::Integer) where {T, ΩT <: AbstractMatrix}
@@ -35,8 +35,8 @@ end
 function SecondPoincareInvariant{T}(
 	Ω::ΩT, D::Integer, N::Integer, ::Val{inplace}
 ) where {T, ΩT <: Callable, inplace}
-	setup = ChebyshevImplementation.ChebyshevSetup{T}(Ω, D, N, Val(inplace))
-	SecondPoincareInvariant{T, ΩT, typeof(setup)}(Ω, D, setup)
+	plan = ChebyshevImplementation.ChebyshevPlan{T}(Ω, D, N, Val(inplace))
+	SecondPoincareInvariant{T, ΩT, typeof(plan)}(Ω, D, setup)
 end
 
 # Unexported convenience alias
@@ -45,7 +45,7 @@ const PI2 = SecondPoincareInvariant
 getdim(pinv::SecondPoincareInvariant) = pinv.D
 
 ## Internal interface to implementation ##
-compute!(pinv::SecondPoincareInvariant, args...) = _compute(pinv.setup, pinv.Ω, pinv.D, args...)
+compute!(pinv::SecondPoincareInvariant, args...) = _compute!(pinv.setup, pinv.Ω, pinv.D, args...)
 getpoints(pinv::SecondPoincareInvariant) = getpoints(pinv.setup)
 getpointnum(pinv::SecondPoincareInvariant) = getpointnum(pinv.setup)
 
