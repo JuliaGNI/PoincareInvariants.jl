@@ -47,6 +47,13 @@ function differentiate!(∂x, ∂y, P, coeffs)
 	∂x, ∂y
 end
 
+## Integration ##
+
+getintegrator(::Type{T}, n) where T = T[isodd(i) ? 0 : T(2) / T(1 - i^2) for i in 0:n]
+getintegrator(n) = getintegrator(Float64, n)
+
+integrate(coeffs, integrator) = dot(integrator, coeffs, integrator)
+
 # struct ChebyshevPlan{T, I, P<:PaduaTransformPlan, DO, IO}
 #     degree::Int
 #     paduaplan::PP
