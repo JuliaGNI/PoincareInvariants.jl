@@ -96,9 +96,26 @@ end
 
     intcoeffs = zeros(degree+1, degree+1)
 
-    getintegrand!(intcoeffs, plan, Ω, phasepoints, 0, nothing, phasecoeffs, ∂xcoeffs, ∂ycoeffs)
+    getintegrand!(intcoeffs, plan, Ω, phasepoints, 0, nothing, ∂xcoeffs, ∂ycoeffs)
 
     @test intcoeffs ≈ [-72   -82  -30;
                        -82  -432    0;
                        -30     0    0] atol=5eps()
+end
+
+@safetestset "_compute with ChebyshevPlan (OOP)" begin
+    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms
+    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation:
+        ChebyshevPlan, _compute!
+
+    Ω(v, t, p) = [0 -1; 1 0]
+    plan = ChebyshevPlan{Float64}(Ω, 2, 11, Val(false))
+
+    points = getpaduapoints(4)
+    phasepoints = Matrix{Float64}(undef, 15, 2)
+    for i in 1:15
+        phasepoints[i, :] = points[i]
+    end
+
+    @test _compute!(plan, Ω, phasepoints, 0, nothing) ≈ 4 atol=10eps()
 end
