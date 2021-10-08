@@ -42,10 +42,11 @@ DiffPlan{T}(degree::Integer) where T = DiffPlan{T}(getdiffmat(T, degree))
 
 # differentiate in the Chebyshev basis
 function differentiate!(∂x::AbstractMatrix, ∂y::AbstractMatrix, P::DiffPlan, coeffs::AbstractMatrix)
-	# mul!(::Matrix, ::Matrix, ::LowerTriangular) is really slow,
-	# so we use the standard method here
-	mul!(∂x, coeffs, P.D')  # apply row by row
-	mul!(∂y, UpperTriangular(P.D), coeffs)  # apply column by column
+	∂x[:, :] = coeffs  # differentiate each row
+	rmul!(∂x, LowerTriangular(P.D'))
+
+	∂y[:, :] = coeffs  # differentiate each column
+	lmul!(UpperTriangular(P.D), ∂y)
 
 	∂x, ∂y
 end
