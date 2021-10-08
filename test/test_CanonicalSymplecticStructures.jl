@@ -11,7 +11,23 @@
                                                 0  1  0  0  0  0;
                                                 0  0  1  0  0  0]
 
-    @testset "CanonicalSymplecticMatrix{$T}($n)" for T in [Int, Float64], n in [2:2:10..., 20:10:100...]
+    function test_canonicalmatrix(mat, n, ::Type{T}) where T
+        mid = n ÷ 2
+
+        for i in 1:n, j in 1:n
+            if i == j - mid
+                mat[i, j] === T(-1) || return false
+            elseif i - mid == j
+                mat[i, j] === T(1) || return false
+            else
+                mat[i, j] === T(0) || return false
+            end
+        end
+
+        return true
+    end
+
+    @testset "CanonicalSymplecticMatrix{$T}($n)" for T in [Int, Float64], n in [10, 100, 1000]
         @test CanonicalSymplecticMatrix(n) === CanonicalSymplecticMatrix{Int}(n)
 
         C = CanonicalSymplecticMatrix{T}(n)
@@ -20,15 +36,7 @@
 
         mid = n ÷ 2
 
-        for i in 1:n, j in 1:n
-            if i == j - mid
-                @test C[i, j] === T(-1)
-            elseif i - mid == j
-                @test C[i, j] === T(1)
-            else
-                @test C[i, j] === T(0)
-            end
-        end
+        @test test_canonicalmatrix(C, n, T)
 
         @test C * collect(1:n) == [(-mid-1:-1:-n)..., 1:mid...]
 
