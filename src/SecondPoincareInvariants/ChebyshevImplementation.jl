@@ -8,10 +8,13 @@ module ChebyshevImplementation
 
 using ...PoincareInvariants: @argcheck
 
+using Base: Callable
 using LinearAlgebra
 
 include("PaduaTransforms.jl")
 using .PaduaTransforms
+
+const AbstractArray3 = AbstractArray{<:Any, 3}
 
 ## Differentiation ##
 
@@ -37,12 +40,22 @@ end
 
 DiffPlan{T}(degree::Integer) where T = DiffPlan{T}(getdiffmat(T, degree))
 
-# Differentiation in the Chebyshev basis
-function differentiate!(∂x, ∂y, P, coeffs)
-	# mul!(out, ::Matrix, ::LowerTriangular) is really slow,
+# differentiate in the Chebyshev basis
+function differentiate!(∂x::AbstractMatrix, ∂y::AbstractMatrix, P::DiffPlan, coeffs::AbstractMatrix)
+	# mul!(::Matrix, ::Matrix, ::LowerTriangular) is really slow,
 	# so we use the standard method here
 	mul!(∂x, coeffs, P.D')  # apply row by row
 	mul!(∂y, UpperTriangular(P.D), coeffs)  # apply column by column
+
+	∂x, ∂y
+end
+
+function differentiate!(∂x::AbstractArray3, ∂y::AbstractArray3, P::DiffPlan, coeffs::AbstractArray3)
+	axes(∂x, 3) == axes(∂y, 3) == axes(coeffs, 3) || error()
+
+	@views for i in axes(coeffs, 3)
+		differentiate!(∂x[:, :, i], ∂y[:, :, i], P, coeffs[:, :, i])
+	end
 
 	∂x, ∂y
 end
@@ -54,6 +67,44 @@ getintegrator(n) = getintegrator(Float64, n)
 
 integrate(coeffs, integrator) = dot(integrator, coeffs, integrator)
 
+## getintegrand for Ω Callable and out-of-place ##
+
+struct OOPIntPlan{T, IP, P}
+	invpaduaplan::IP
+	∂xvals::Matrix{T}
+	∂yvals::Matrix{T}
+	intvals::Vector{T}
+	paduaplan::P
+end
+
+function OOPIntPlan{T}(D, degree) where T
+	invpaduaplan = InvPaduaTransformPlan{T}(degree)
+	∂xvals = Matrix{T}(undef, getpaduanum(degree), D)
+	∂yvals = Matrix{T}(undef, getpaduanum(degree), D)
+	intvals = Vector{T}(undef, getpaduanum(degree))
+	paduaplan = PaduaTransformPlan{T}(degree)
+
+	OOPIntPlan{T, typeof(invpaduaplan), typeof(paduaplan)}(
+		invpaduaplan, ∂xvals, ∂yvals, intvals, paduaplan
+	)
+end
+
+function getintegrand!(
+	intcoeffs::AbstractMatrix, plan::OOPIntPlan, Ω::Callable, phasepoints::AbstractMatrix, t, p,
+	phasecoeffs::AbstractArray, ∂xcoeffs::AbstractArray, ∂ycoeffs::AbstractArray
+)
+	∂xvals = invpaduatransform!(plan.∂xvals, plan.invpaduaplan, ∂xcoeffs)
+	∂yvals = invpaduatransform!(plan.∂yvals, plan.invpaduaplan, ∂ycoeffs)
+
+	@views for i in axes(plan.intvals, 1)
+		plan.intvals[i] = dot(∂yvals[i, :], Ω(phasepoints[i, :], t, p), ∂xvals[i, :])
+	end
+
+	paduatransform!(intcoeffs, plan.paduaplan, plan.intvals)
+
+	intcoeffs
+end
+
 # struct ChebyshevPlan{T, I, P<:PaduaTransformPlan, DO, IO}
 #     degree::Int
 #     paduaplan::PP
@@ -61,16 +112,16 @@ integrate(coeffs, integrator) = dot(integrator, coeffs, integrator)
 #     diffplan::DP
 #     ∂x::Array{T, 3}
 #     ∂y::Array{T, 3}
-#     intcoeffsplan::I  # getting coefficients of integrand to integrate
+#     intplan::IP  # getting coefficients of integrand to integrate
 #     intcoeffs::Matrix{T}
-#     intplan::P  # integration
+#     integrator::Vector{T}
 # end
 
-# function _compute!(s::ChebyshevSetup, Ω, D, phasepoints)
-#     paduatransform!(s.phasecoeffs, s.paduaplan, phasepoints)
-#     differentiate!(s.∂x, s.∂y, s.diffplan, s.phasecoeffs)
-#     getintegrand!(s.intcoeffs, s.intcoeffsplan, Ω, phasepoints, s.phasecoeffs, s.∂x, s.∂y)
-#     integrate(s.intcoeffs, s.intplan)
+# function _compute!(P::ChebyshevPlan, Ω, D, phasepoints)
+#     paduatransform!(P.phasecoeffs, P.paduaplan, phasepoints)
+#     differentiate!(P.∂x, P.∂y, P.diffplan, P.phasecoeffs)
+#     getintegrand!(P.intcoeffs, P.intcoeffsplan, Ω, phasepoints, P.phasecoeffs, P.∂x, P.∂y)
+#     integrate(P.intcoeffs, P.intplan)
 # end
 
 end  # module ChebyshevImplementation

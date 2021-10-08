@@ -347,18 +347,17 @@ total degree > `degree`.
 
 # Examples
 ```
-julia> fromcoeffsmat!(zeros(5, 4), reshape(1:20, 5, 4), 3)
+julia> fromcoeffsmat!(zeros(4, 4), reshape(1:20, 5, 4), 3)
 5×4 Matrix{Float64}:
  1.0  6.0  11.0  16.0
  2.0  7.0  12.0   0.0
  3.0  8.0   0.0   0.0
  4.0  0.0   0.0   0.0
- 0.0  0.0   0.0   0.0
 ```
 """
 function fromcoeffsmat!(to::AbstractMatrix, mat::AbstractMatrix, degree::Integer)
-	axes(to) == axes(mat) || error()
-	size(mat) == (degree + 2, degree + 1) || error()
+	axes(to) == (1:degree + 1, 1:degree + 1) || error()
+	axes(mat) == (1:degree + 2, 1:degree + 1) || error()
 
 	for j in 1:degree + 1
 		for i in 1:degree + 2 - j
@@ -544,7 +543,8 @@ function invpaduatransform!(IP::InvPaduaTransformPlan)
 end
 
 function invpaduatransform!(IP::InvPaduaTransformPlan, coeffs::AbstractMatrix)
-	IP.coeffs[:] = coeffs
+	IP.coeffs[1:end-1, :]  = coeffs
+    IP.coeffs[    end, :] .= 0
 	invpaduatransform!(IP)
 end
 

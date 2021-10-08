@@ -130,12 +130,11 @@ end
     PaduaTransforms.fromcoeffsmat!(to, mat, 2, Val(false))
     @test to == [(0, 0), (0, 1), (1, 0), (0, 2), (1, 1), (2, 0)]
 
-    @test PaduaTransforms.fromcoeffsmat!(zeros(5, 4), reshape(1:20, 5, 4), 3) == [
+    @test PaduaTransforms.fromcoeffsmat!(zeros(4, 4), reshape(1:20, 5, 4), 3) == [
         1  6  11 16;
         2  7  12  0;
         3  8   0  0;
-        4  0   0  0;
-        0  0   0  0
+        4  0   0  0
     ]
 end
 
@@ -172,9 +171,11 @@ end
 
         paduanum = getpaduanum(3)
 
-        cfsmat = PaduaTransforms.fromcoeffsmat!(zeros(3+2, 3+1), rand(3+2, 3+1), 3)
-        cfsveclexfalse = PaduaTransforms.fromcoeffsmat!(Vector{Float64}(undef, paduanum), cfsmat, 3, Val(false))
-        cfsveclextrue = PaduaTransforms.fromcoeffsmat!(Vector{Float64}(undef, paduanum), cfsmat, 3, Val(true))
+        randcfs = rand(3+2, 3+1)
+
+        cfsmat = PaduaTransforms.fromcoeffsmat!(zeros(3+1, 3+1), randcfs, 3)
+        cfsveclexfalse = PaduaTransforms.fromcoeffsmat!(Vector{Float64}(undef, paduanum), randcfs, 3, Val(false))
+        cfsveclextrue = PaduaTransforms.fromcoeffsmat!(Vector{Float64}(undef, paduanum), randcfs, 3, Val(true))
         cfsarr = cat(cfsmat, cfsmat, cfsmat, cfsmat; dims=3)
 
         for i in 1:4
@@ -189,8 +190,8 @@ end
         valsmat2 = similar(valsmat)
 
         cfsvec2 = Vector{Float64}(undef, getpaduanum(degree))
-        cfsmat2 = zeros(degree+2, degree+1)
-        cfsarr2 = zeros(degree+2, degree+1, 4)
+        cfsmat2 = zeros(degree+1, degree+1)
+        cfsarr2 = zeros(degree+1, degree+1, 4)
 
         paduatransform!(cfsvec2, plan, vals, Val(true))
         @test mean(abs, cfsvec2[1:10] .- cfsveclextrue) < 5eps()
@@ -201,24 +202,24 @@ end
         @test mean(abs, cfsvec2[11:end]) < 5eps()
 
         paduatransform!(cfsmat2, plan, vals)
-        @test mean(abs, cfsmat2[1:5, 1:4] .- cfsmat) < 5eps()
-        @test mean(abs, cfsmat2[6:end, 1:end]) < 5eps()
+        @test mean(abs, cfsmat2[1:4, 1:4] .- cfsmat) < 5eps()
+        @test mean(abs, cfsmat2[5:end, 1:end]) < 5eps()
         @test mean(abs, cfsmat2[1:end, 5:end]) < 5eps()
 
         invpaduatransform!(vals2, iplan, cfsmat2)
         @test mean(abs, vals2 .- vals) < 10eps()
 
         paduatransform!(cfsarr2, plan, valsmat)
-        @test mean(abs, cfsarr2[1:5, 1:4, :] .- cfsarr) < 5eps()
-        @test mean(abs, cfsarr2[6:end, 1:end, :]) < 5eps()
+        @test mean(abs, cfsarr2[1:4, 1:4, :] .- cfsarr) < 5eps()
+        @test mean(abs, cfsarr2[5:end, 1:end, :]) < 5eps()
         @test mean(abs, cfsarr2[1:end, 5:end, :]) < 5eps()
 
         invpaduatransform!(valsmat2, iplan, cfsarr2)
         @test mean(abs, valsmat2 .- valsmat) < 10eps()
 
         paduatransform!(cfsarr2, plan, valsvecvec)
-        @test mean(abs, cfsarr2[1:5, 1:4, :] .- cfsarr) < 5eps()
-        @test mean(abs, cfsarr2[6:end, 1:end, :]) < 5eps()
+        @test mean(abs, cfsarr2[1:4, 1:4, :] .- cfsarr) < 5eps()
+        @test mean(abs, cfsarr2[5:end, 1:end, :]) < 5eps()
         @test mean(abs, cfsarr2[1:end, 5:end, :]) < 5eps()
     end
 end
