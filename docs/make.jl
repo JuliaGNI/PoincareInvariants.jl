@@ -3,12 +3,13 @@ using Documenter, PoincareInvariants
 makedocs(
     sitename = "PoincareInvariants.jl",
     format = Documenter.HTML(prettyurls = get(ENV, "CI", nothing) == "true"),
-    pages = ["Home" => "index.md",
-             "Poincaré Integral Invariants" => "poincare_invariants.md",
-             "1st Poincaré Invariant" => "poincare_invariant_1st.md",
-             "2nd Poincaré Invariant" => "poincare_invariant_2nd.md",
-             "Example" => "example.md",
-             ]
+    pages = [
+        "Home" => "index.md",
+        "First Poincaré Invariants" => "first_poincare_invariants.md",
+        "Second Poincaré Invariants" => "second_poincare_invariants.md",
+        "Canonical Symplectic Structures" => "canonical_symplectic_structures.md",
+        "Reference" => "reference.md"
+    ]
 )
 
 deploydocs(
