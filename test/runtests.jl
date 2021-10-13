@@ -1,11 +1,13 @@
+using SafeTestsets, Test
 
-using GeometricIntegrators
-using SafeTestsets
+@safetestset "CanonicalSymplecticStructures" begin
+    include("test_CanonicalSymplecticStructures.jl")
+end
 
-set_config(:verbosity, 2)
+@safetestset "FirstPoincareInvariants" begin
+    include("FirstPoincareInvariants/test_FirstPoincareInvariants.jl")
+end
 
-
-@safetestset "1st Poincaré Invariant Unit Tests                                               " begin include("poincare_invariant_1st_unittests.jl") end
-@safetestset "1st Poincaré Invariant Function Tests                                           " begin include("poincare_invariant_1st_tests.jl") end
-@safetestset "2nd Poincaré Invariant Unit Tests                                               " begin include("poincare_invariant_2nd_unittests.jl") end
-@safetestset "2nd Poincaré Invariant Function Tests                                           " begin include("poincare_invariant_2nd_tests.jl") end
+@safetestset "SecondPoincareInvariants" begin
+    include("SecondPoincareInvariants/test_SecondPoincareInvariants.jl")
+end
