@@ -11,6 +11,7 @@ jobs:
       matrix:
         version:
           - '1.6'
+          - '^1.7.0-0'
           - 'nightly'
         os:
           - ubuntu-latest
@@ -18,6 +19,20 @@ jobs:
           - windows-latest
         arch:
           - x64
+        experimental: [false]
+        include:
+          - version: 'nightly'
+            os: ubuntu-latest
+            arch: x64
+            experimental: true
+          - version: 'nightly'
+            os: macOS-latest
+            arch: x64
+            experimental: true
+          - version: 'nightly'
+            os: windows-latest
+            arch: x64
+            experimental: true
     steps:
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
@@ -39,3 +54,8 @@ jobs:
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-uploadcodecov@latest
+      - uses: codecov/codecov-action@v1
+        with:
+          file: lcov.info
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
