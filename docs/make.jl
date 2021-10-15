@@ -1,17 +1,30 @@
 using Documenter, PoincareInvariants
 
+DocMeta.setdocmeta!(
+    PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms,
+    :DocTestSetup,
+    quote
+        using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms
+    end
+)
+
 makedocs(
     sitename = "PoincareInvariants.jl",
-    format = Documenter.HTML(prettyurls = get(ENV, "CI", nothing) == "true"),
+    modules=[PoincareInvariants],
     pages = [
         "Home" => "index.md",
         "First Poincaré Invariants" => "first_poincare_invariants.md",
-        "Second Poincaré Invariants" => "second_poincare_invariants.md",
+        "Second Poincaré Invariants" => [
+            "Guide" => "second_poincare_invariants.md",
+            "Chebyshev Implementation" => "chebyshev_implementation.md",
+            "Padua Transforms" => "padua_transforms.md"
+        ],
         "Canonical Symplectic Structures" => "canonical_symplectic_structures.md",
         "Reference" => "reference.md"
-    ]
+    ],
+    format = Documenter.HTML(prettyurls = get(ENV, "CI", nothing) == "true")
 )
 
-deploydocs(
-    repo   = "github.com/JuliaGNI/PoincareInvariants.jl"
-)
+# deploydocs(
+#     repo   = "github.com/JuliaGNI/PoincareInvariants.jl"
+# )

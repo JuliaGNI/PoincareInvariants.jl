@@ -1,5 +1,7 @@
-@safetestset "getpaduanum, getdegree and checkpaduanum" begin
-    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms
+using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms
+
+@safetestset "getpaduanum, getdegree and nextpaduanum" begin
+    using ..PaduaTransforms
 
     for n in [1:10..., 50, 123, 511, 10_000]
         paduanum = getpaduanum(n)
@@ -15,39 +17,32 @@
     end
 end
 
-@safetestset "chebyshevpoint and paduapoint" begin
-    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms:
-        chebyshevpoint, paduapoint
+@safetestset "paduapoint, ispadua and getpaduapoints" begin
+    using ..PaduaTransforms: ispadua, paduapoint
+    using ..PaduaTransforms
 
-    @test collect(chebyshevpoint(Float64, 0, 0, 1, 1)) ≈ [ 1,  1]
-    @test collect(chebyshevpoint(Float64, 0, 1, 1, 1)) ≈ [ 1, -1]
-    @test collect(chebyshevpoint(Float64, 1, 0, 1, 1)) ≈ [-1,  1]
-    @test collect(chebyshevpoint(Float64, 1, 1, 1, 1)) ≈ [-1, -1]
+    @test paduapoint(Float64, 1, 3, 5)[1] ≈ cos(π * 1 / 5) atol=3eps()
+    @test paduapoint(Float64, 1, 3, 5)[2] ≈ cos(π * 3 / 6) atol=3eps()
 
-    @test collect(chebyshevpoint(Float64, 1, 3, 2, 5)) ≈ [cos(π * 1 / 2), cos(π * 3 / 5)] atol=3eps()
+    @test paduapoint(Float64, 23, 42, 100)[1] ≈ cos(π * 23 / 100) atol=3eps()
+    @test paduapoint(Float64, 23, 42, 100)[2] ≈ cos(π * 42 / 101) atol=3eps()
 
-    @test eltype(chebyshevpoint(Float32, 1, 2, 3, 4)) == Float32
-    @test eltype(chebyshevpoint(Float64, 5, 6, 7, 8)) == Float64
+    @test eltype(paduapoint(Float32, 1, 2, 4)) == Float32
+    @test eltype(paduapoint(Float64, 5, 6, 7)) == Float64
 
-    @test paduapoint(Float64, 1, 2, 3) === chebyshevpoint(Float64, 1, 2, 3, 3+1)
-    @test paduapoint(Float32, 12, 73, 150) === chebyshevpoint(Float32, 12, 73, 150, 150+1)
-
+    # collect tuple to vector, so ≈ works
     @test [collect(paduapoint(Float32, x, y, 1)) for y in 0:1+1, x in 0:0] ≈ [
         [1,  1],
         [1,  0],
         [1, -1]
     ]
-end
 
-@safetestset "ispadua and getpaduapoints" begin
-    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms
-
-    @test PaduaTransforms.ispadua(0, 0) == true
-    @test PaduaTransforms.ispadua(1, 0) == false
-    @test PaduaTransforms.ispadua(0, 1) == false
-    @test PaduaTransforms.ispadua(5, 4) == false
-    @test PaduaTransforms.ispadua(4, 4) == true
-    @test PaduaTransforms.ispadua(2, 0) == true
+    @test ispadua(0, 0) == true
+    @test ispadua(1, 0) == false
+    @test ispadua(0, 1) == false
+    @test ispadua(5, 4) == false
+    @test ispadua(4, 4) == true
+    @test ispadua(2, 0) == true
 
     @test getpaduapoints(1) ≈ [
          1  1;
@@ -55,15 +50,36 @@ end
         -1  0
     ]
 
-    for n in 1:20
+    @test getpaduapoints(4) ≈ [
+        cospi(0/4) cospi(0/5);
+        cospi(0/4) cospi(2/5);
+        cospi(0/4) cospi(4/5);
+        cospi(1/4) cospi(1/5);
+        cospi(1/4) cospi(3/5);
+        cospi(1/4) cospi(5/5);
+        cospi(2/4) cospi(0/5);
+        cospi(2/4) cospi(2/5);
+        cospi(2/4) cospi(4/5);
+        cospi(3/4) cospi(1/5);
+        cospi(3/4) cospi(3/5);
+        cospi(3/4) cospi(5/5);
+        cospi(4/4) cospi(0/5);
+        cospi(4/4) cospi(2/5);
+        cospi(4/4) cospi(4/5)
+    ]
+
+    torowvec(t) = [t[1] t[2]]
+    for n in [21, 22, 23, 100]
         pnts = getpaduapoints(n)
 
         @test size(pnts) == (getpaduanum(n), 2)
 
-        @test all(eachrow(pnts) .== collect.([
-            PaduaTransforms.paduapoint(Float64, x, y, n)
-            for y in 0:n+1, x in 0:n if PaduaTransforms.ispadua(x, y)
-        ]))
+        testpnts = reduce(vcat, [
+            paduapoint(Float64, x, y, n) |> torowvec
+            for y in 0:n+1, x in 0:n if ispadua(x, y)
+        ])
+
+        @test pnts == testpnts
     end
 
     dopoints = getpaduapoints(5) do x, y

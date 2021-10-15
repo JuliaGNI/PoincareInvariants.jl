@@ -1,3 +1,8 @@
+"""
+    PaduaTransforms
+
+an implementation of the Padua transform and its inverse via the fast Fourier transform.
+"""
 module PaduaTransforms
 
 using StaticArrays: SVector
@@ -15,10 +20,14 @@ export InvPaduaTransformPlan, invpaduatransform!
     getpaduanum(n)
 
 calculates number of Padua points needed to approximate a function using Chebyshev polynomials
-up to total degree `n`. This number is equal to the number of coefficients.
+up to total degree `n`. This number is equal to the number of coefficients. The formula is
+
+```math
+N = (n + 1) ⋅ (n + 2) ÷ 2
+```
 
 # Examples
-```julia-repl
+```jldoctest
 julia> getpaduanum(13)
 105
 ```
@@ -28,17 +37,25 @@ getpaduanum(degree) = (degree + 1) * (degree + 2) ÷ 2
 """
     getdegree(N)
 
-calculates total degree of corresponding polynomial, given the number of coefficients or
-Padua points `N`.
+calculates total degree, given the number of coefficients or Padua points `N`.
+Throws an error if `N` is not a possible number of Padua points. The formula is
+
+```math
+n = \\frac{\\sqrt{1 + 8N} - 3}{2}
+```
 
 # Examples
-```julia-repl
+```jldoctest
 julia> getdegree(105)
 13
+
+julia> getdegree(104)
+ERROR: ArgumentError: number of Padua points or coeffs must be (n + 1) * (n + 2) ÷ 2
+[...]
 ```
 """
-function getdegree(pointnum)
-    d = (sqrt(1 + 8pointnum) - 3) / 2
+function getdegree(N)
+    d = (sqrt(1 + 8N) - 3) / 2
     isinteger(d) ? Int(d) : throw(ArgumentError(
         "number of Padua points or coeffs must be (n + 1) * (n + 2) ÷ 2"))
 end
@@ -46,11 +63,11 @@ end
 """
     nextpaduanum(N)
 
-get next valid paduanum ≥ `N`.
+get next valid number of Padua points ≥ `N`.
 
 # Examples
 
-```julia-repl
+```jldoctest
 julia> nextpaduanum(104)
 105
 ```
@@ -63,60 +80,45 @@ end
 ## Padua Points ##
 
 """
-    chebyshevpoint(T, ix, iy, nx, ny)
+    paduapoint(T::Type, j::Integer, i::Integer, n::Integer)
 
-return Chebyshev point at grid position `(ix, iy)` on an `nx × ny` grid as an `SVector{2, T}`.
+returns the Padua point ``z_{ij}``, where
 
-`z = (cos(π * ix / nx), cos(π * iy / ny))`
-
-# Examples
-```julia-repl
-julia> [chebyshevpoint(Float64, x, y, 2, 3) for y in 0:3, x in 0:2]
-4×3 Matrix{NTuple{2, Float64}}:
- (1.0, 1.0)   (0.0, 1.0)   (-1.0, 1.0)
- (1.0, 0.5)   (0.0, 0.5)   (-1.0, 0.5)
- (1.0, -0.5)  (0.0, -0.5)  (-1.0, -0.5)
- (1.0, -1.0)  (0.0, -1.0)  (-1.0, -1.0)
+```math
+z_{ij} = (\\cos{\\frac{jπ}{n}}, \\cos{\\frac{iπ}{n+1}})
 ```
-"""
-function chebyshevpoint(::Type{T}, ix, iy, nx, ny) where T
-    x = cospi(T(ix) / T(nx))
-    y = cospi(T(iy) / T(ny))
-    return (x, y)
-end
 
-"""
-    paduapoint(T, ix, iy, n)
-
-returns [`chebyshevpoint`](@ref) at position `(ix, iy)` on an `n × (n + 1)` grid.
-
-Only every second point is actually a Padua point, though. Check with [`ispadua`](@ref).
-
-`z = (cos(π * ix / n), cos(π * iy / (n + 1)))`
+Note, that only points with ``i-j`` even are actually Padua points.
+Check with [`ispadua`](@ref).
 
 # Examples
-```julia-repl
-julia> [paduapoint(Float32, x, y, 1) for y in 0:1+1, x in 0:1]
-3×2 Matrix{SVector{2, Float32}}:
+```jldoctest
+julia> [PaduaTransforms.paduapoint(Float32, x, y, 1) for y in 0:1+1, x in 0:1]
+3×2 Matrix{Tuple{Float32, Float32}}:
  (1.0, 1.0)   (-1.0, 1.0)
  (1.0, 0.0)   (-1.0, 0.0)
  (1.0, -1.0)  (-1.0, -1.0)
 ```
 
 """
-function paduapoint(::Type{T}, ix, iy, n) where T
-    chebyshevpoint(T, ix, iy, n, n + 1)
+function paduapoint(::Type{T}, j, i, n) where T
+    x = cospi(T(j) / T(n))
+    y = cospi(T(i) / T(n + 1))
+    return x, y
 end
 
 """
-    ispadua(ix, iy)
+    ispadua(i, j)
 
-checks whether [`chebyshevpoint`](@ref) at position `(ix, iy)` is a Padua point.
+returns if [`paduapoint`](@ref) at position `(i, j)` is a Padua point.
 
 # Examples
-```julia-repl
-julia> [ispadua(x, y) ? chebyshevpoint(Float64, x, y, 2, 3) : nothing for y in 0:3, x in 0:2]
-4×3 Matrix{Union{Nothing, SVector{2, Float64}}}:
+```jldoctest
+julia> pointornothing(i, j, n) = PaduaTransforms.ispadua(i, j) ? PaduaTransforms.paduapoint(Float64, j, i, n) : nothing
+pointornothing (generic function with 1 method)
+
+julia> [pointornothing(y, x, 2) for y in 0:3, x in 0:2]
+4×3 Matrix{Union{Nothing, Tuple{Float64, Float64}}}:
  (1.0, 1.0)   nothing      (-1.0, 1.0)
  nothing      (0.0, 0.5)   nothing
  (1.0, -0.5)  nothing      (-1.0, -0.5)
@@ -127,18 +129,25 @@ julia> [ispadua(x, y) ? chebyshevpoint(Float64, x, y, 2, 3) : nothing for y in 0
 ispadua(i, j) = iseven(i - j)
 
 """
-    getpaduapoints([T=Float64, ]n)
+    getpaduapoints([T=Float64,] n)
 
-returns the `(n + 1)(n + 2) / 2` Padua points.
+returns the Padua points
+
+```math
+\\textrm{Pad}_n = \\{(\\cos{\\frac{jπ}{n}}, \\cos{\\frac{iπ}{n + 1}}) \\; | \\;
+    0 ≤ j ≤ n, \\; 0 ≤ i ≤ n + 1, \\; i - j \\; \\textrm{even} \\}
+```
+
+where each row is a point
 
 # Examples
 
-```julia-repl
-julia> getpaduapoints(Float64, 1)
-3×2 Matrix{Float64}:
- 1.0  1.0
- 1.0 -1.0
- -1.0  0.0
+```jldoctest
+julia> getpaduapoints(Float32, 1)
+3×2 Matrix{Float32}:
+  1.0   1.0
+  1.0  -1.0
+ -1.0   0.0
 ```
 """
 function getpaduapoints(::Type{T}, n) where T
@@ -159,8 +168,27 @@ end
 
 getpaduapoints(n) = getpaduapoints(Float64, n)
 
-function getpaduapoints(f::Function, T, n)
-    D = length(f(zero(0), zero(0)))
+"""
+    getpaduapoints(f::Function, [T=Float64,] n)
+
+evaluates the function `f` on the Padua points for degree `n`. If `f` returns a single value,
+`getpaduapoints` returns a `Vector{T}`, else if `f` returns a tuple or other iterable
+`getpaduapoints` returns a `Matrix{T}` where each row represents `f` applied to a Padua point.
+
+# Examples
+```jldoctest
+julia> getpaduapoints(Float64, 2) do x, y; 3x - y, y^2; end
+6×2 Matrix{Float64}:
+  2.0  1.0
+  3.5  0.25
+ -0.5  0.25
+  1.0  1.0
+ -4.0  1.0
+ -2.5  0.25
+```
+"""
+function getpaduapoints(f::Function, ::Type{T}, n) where T
+    D = length(f(zero(T), zero(T)))
     if D == 1
         out = Vector{T}(undef, getpaduanum(n))
     else
@@ -172,6 +200,8 @@ function getpaduapoints(f::Function, T, n)
 
     return out
 end
+
+getpaduapoints(f::Function, n) = getpaduapoints(f, Float64, n)
 
 function _fillpoints!(out::AbstractMatrix, f, ::Type{T}, n) where T
     i = 1
@@ -203,8 +233,6 @@ function _fillpoints!(out::AbstractVector, f, ::Type{T}, n) where T
     out
 end
 
-getpaduapoints(f::Function, n) = getpaduapoints(f, Float64, n)
-
 ## Padua Transform ##
 
 struct PaduaTransformPlan{T, P}
@@ -214,13 +242,11 @@ struct PaduaTransformPlan{T, P}
 end
 
 """
-    PaduaTransformPlan{T}(degree::Integer)
+    PaduaTransformPlan{T}(n::Integer)
 
-create plan to compute coefficients of Chebyshev polynomials in 2D up to degree `degree`
-using the Padua transform, as implemented in [this](https://link.springer.com/article/10.1007/s11075-010-9373-1)
-paper.
+create plan to compute coefficients of Chebyshev polynomials in 2D up to total degree `n`
+using the Padua transform.
 
-See also: [`paduatransform!`](@ref)
 """
 function PaduaTransformPlan{T}(degree::Integer) where T
     vals = Matrix{T}(undef, degree + 2, degree + 1)
@@ -257,13 +283,13 @@ function weight!(mat::AbstractMatrix{T}, degree::Integer) where T
 end
 
 """
-    tovalsmat!(mat::Matrix, vec::AbstractVector, degree::Integer)
+    tovalsmat!(mat::Matrix{T}, from::AbstractVector, degree::Integer)
 
-write values of function evaluated at Padua points from `vec` to to matrix `mat`.
+write values of function evaluated at Padua points from `from` to matrix `mat`.
 
 # Examples
-```julia-repl
-julia> tovalsmat!(ones(3 + 2, 3 + 1), 1:getpaduanum(3), 3)
+```jldoctest
+julia> PaduaTransforms.tovalsmat!(ones(3 + 2, 3 + 1), 1:getpaduanum(3), 3)
 5×4 Matrix{Float64}:
  1.0  0.0  6.0   0.0
  0.0  4.0  0.0   9.0
@@ -271,7 +297,7 @@ julia> tovalsmat!(ones(3 + 2, 3 + 1), 1:getpaduanum(3), 3)
  0.0  5.0  0.0  10.0
  3.0  0.0  8.0   0.0
 
-julia> tovalsmat!(ones(2 + 2, 2 + 1), 1:getpaduanum(2), 2)
+julia> PaduaTransforms.tovalsmat!(ones(2 + 2, 2 + 1), 1:getpaduanum(2), 2)
 4×3 Matrix{Float64}:
  1.0  0.0  5.0
  0.0  3.0  0.0
@@ -424,35 +450,80 @@ function fromcoeffsmat!(to::AbstractMatrix, mat::AbstractMatrix, degree::Integer
 end
 
 """
-    paduatransform!([out, ]P::PaduaTransformPlan, vals, args...)
+    paduatransform!([out,] P::PaduaTransformPlan, vals[, lex])
 
 obtain coefficients of Chebyshev polynomials on 2D via the Padua transform, given values
-`vals` evaluated at the Padua points. Coefficients will either be returned as a matrix, or,
-if `out` is given, written into `out`. `args` are passed to [`fromcoeffsmat!`](@ref).
+`vals` evaluated at the Padua points. Coefficients will written into `out`, which should
+either be a matrix or a vector.
+
+if `out` is a matrix, make sure that all entries in the lower right diagonal are zero as
+these will not get overwritten.
+
+`lex` determines the order in which coefficeints are written into `out` if `out` is a vector.
+If `lex` is `Val(true)` the coefficients correspond to the following basis polynomials
+
+```math
+T_0(x) T_0(y), T_1(x) T_0(y), T_0(x) T_1(y), T_2(x) T_0(y), T_1(x) T_1(y), T_0(x) T_2(y), ...
+```
+
+else if `lex` is `Val(false)` they correspond to
+
+```math
+T_0(x) T_0(y), T_0(x) T_1(y), T_1(x) T_0(y), T_0(x) T_2(y), T_1(x) T_1(y), T_2(x) T_0(y), ...
+```
 
 # Examples
-```julia-repl
-julia> plan = PaduaTransformPlan{Float64}(3); points = getpaduapoints(3);
+```jldoctest
+julia> plan = PaduaTransformPlan{Float64}(3);
 
-julia> g(v) = 3 + 4v[1] + 5 * v[2] * (2v[1]^2 - 1); vals = g.(points);
+julia> f(x, y) = 3 + 4x + 5 * y * (2x^2 - 1)
+f (generic function with 1 method)
 
-julia> paduatransform!(plan, vals)
-5×4 Matrix{Float64}:
- 3.0  4.0  0.0  0.0
- 0.0  0.0  5.0  0.0
- 0.0  0.0  0.0  0.0
- 0.0  5.0  0.0  0.0
- 0.0  0.0  4.0  3.0
-
-julia> paduatransform!(zeros(getpaduanum(3)), plan, vals, Val(true))
-[3.0, 4.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0, 0.0, 0.0]
+julia> vals = getpaduapoints(f, 3)
+10-element Vector{Float64}:
+ 12.0
+  7.0
+  2.0
+  3.232233047033631
+  6.767766952966369
+ -1.5000000000000004
+  1.0000000000000004
+  3.5000000000000013
+  2.5355339059327378
+ -4.535533905932738
 
 julia> paduatransform!(zeros(4, 4), plan, vals)
-5×4 Matrix{Float64}:
- 3.0  4.0  0.0  0.0
- 0.0  0.0  5.0  0.0
- 0.0  0.0  0.0  0.0
- 0.0  0.0  0.0  0.0
+4×4 Matrix{Float64}:
+  3.0           4.0         0.0  1.4803e-16
+ -5.92119e-16  -1.4803e-16  5.0  0.0
+  0.0           0.0         0.0  0.0
+ -2.96059e-16   0.0         0.0  0.0
+
+julia> paduatransform!(zeros(getpaduanum(3)), plan, vals, Val(true))
+10-element Vector{Float64}:
+  3.0
+  4.0
+ -5.921189464667501e-16
+  0.0
+ -1.4802973661668753e-16
+  0.0
+  1.4802973661668753e-16
+  5.0
+  0.0
+ -2.9605947323337506e-16
+
+julia> paduatransform!(zeros(getpaduanum(3)), plan, vals, Val(false))
+10-element Vector{Float64}:
+  3.0
+ -5.921189464667501e-16
+  4.0
+  0.0
+ -1.4802973661668753e-16
+  0.0
+ -2.9605947323337506e-16
+  0.0
+  5.0
+  1.4802973661668753e-16
 ```
 """
 function paduatransform!(P::PaduaTransformPlan)
@@ -460,11 +531,6 @@ function paduatransform!(P::PaduaTransformPlan)
     weight!(coeffs, P.degree)
 
     coeffs
-end
-
-function paduatransform!(P::PaduaTransformPlan, vals)
-    tovalsmat!(P.vals, vals, P.degree)
-    paduatransform!(P)
 end
 
 function paduatransform!(out, P::PaduaTransformPlan, vals, args...)
@@ -519,15 +585,20 @@ end
     InvPaduaTransformPlan{T}(n::Integer)
 
 create plan to compute values on Padua points, given coefficients of Chebyshev polynomials
-up to degree `n`.
-
-See also: [`invpaduatransform!`](@ref)
+up to total degree `n`.
 """
 function InvPaduaTransformPlan{T}(degree::Integer) where T
     coeffs = Matrix{T}(undef, degree + 2, degree + 1)
     iplan = FFTW.plan_r2r!(coeffs, FFTW.REDFT00)
 
     InvPaduaTransformPlan{T, typeof(iplan)}(degree, coeffs, iplan)
+end
+
+function tocoeffsmat!(out, coeffs)
+    out[1:end-1, :]  = coeffs
+    out[    end, :] .= 0
+
+    out
 end
 
 """
@@ -598,14 +669,15 @@ function invpaduatransform!(IP::InvPaduaTransformPlan)
     IP.coeffs
 end
 
-function invpaduatransform!(IP::InvPaduaTransformPlan, coeffs::AbstractMatrix)
-    IP.coeffs[1:end-1, :]  = coeffs
-    IP.coeffs[    end, :] .= 0
-    invpaduatransform!(IP)
-end
+"""
+    invpaduatransform!(vals::AbstractVector, IP::InvPaduaTransformPlan, coeffs::AbstractMatrix)
 
+evaluates the polynomial defined by the coefficients of Chebyshev polynomials `coeffs` on the
+Padua points using the inverse transform plan `IP` and writes the resulting values into `vals`.
+"""
 function invpaduatransform!(vals::AbstractVector, IP::InvPaduaTransformPlan, coeffs::AbstractMatrix)
-    invpaduatransform!(IP, coeffs)
+    tocoeffsmat!(IP.coeffs, coeffs)
+    invpaduatransform!(IP)
     fromvalsmat!(vals, IP.coeffs, IP.degree)
 end
 
