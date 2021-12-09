@@ -366,3 +366,31 @@ end
         @test maximum(abs, vals .- testvals) / eps() < 100 * 5^(n / 10)
     end
 end
+
+@safetestset "ND paduatransform! and invpaduatransform!" begin
+    using ..PaduaTransforms
+
+    n = 500
+    D = 6
+    plan = PaduaTransformPlan{Float64}(n)
+    invplan = InvPaduaTransformPlan{Float64}(n)
+
+    ndtestvals = rand(getpaduanum(n), D)
+    ndcoeffs = zeros(n+1, n+1, D)
+    paduatransform!(ndcoeffs, plan, ndtestvals)
+
+    ndvals = Matrix{Float64}(undef, getpaduanum(n), D)
+    invpaduatransform!(ndvals, invplan, ndcoeffs)
+
+    @test maximum(abs, ndvals .- ndtestvals) / eps() < 100
+
+    for i in 1:D
+        coeffs = zeros(n+1, n+1)
+        @test ndcoeffs[:, :, i] == paduatransform!(coeffs, plan, ndtestvals[:, i])
+    end
+
+    for i in 1:D
+        vals = Vector{Float64}(undef, getpaduanum(n))
+        @test ndvals[:, i] == invpaduatransform!(vals, invplan, ndcoeffs[:, :, i])
+    end
+end
