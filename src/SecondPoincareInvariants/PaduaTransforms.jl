@@ -258,7 +258,16 @@ end
 """
     weight!(mat::AbstractMatrix, degree::Integer)
 
-weight fourier coefficients to obtain Chebyshev coefficients.
+weight fourier coefficients to obtain Chebyshev coefficients as part of a [`paduatransform!`](@ref).
+The weighting factor applied to the coefficients is
+
+```math
+w = \\frac{1}{n(n+1)} ⋅ \\begin{cases}
+    \\frac{1}{2} & \\textrm{if on vertex}   \\\\
+    1           & \\textrm{if on edge}    \\\\
+    2           & \\textrm{if in interior} \\\\
+\\end{cases}
+```
 
 # Examples
 ```julia-repl
@@ -283,7 +292,7 @@ function weight!(mat::AbstractMatrix{T}, degree::Integer) where T
 end
 
 """
-    tovalsmat!(mat::Matrix{T}, from::AbstractVector, degree::Integer)
+    tovalsmat!(mat::Matrix, from::AbstractVector, degree::Integer)
 
 write values of function evaluated at Padua points from `from` to matrix `mat`.
 
@@ -346,13 +355,23 @@ function tovalsmat!(mat::Matrix{T}, from::AbstractVector, degree::Integer) where
 end
 
 """
-    fromcoeffsmat!(to::AbstractVector, mat::AbstractMatrix, degree::Integer, ::Val{lex})
+    fromcoeffsmat!(to::AbstractVector, mat::Matrix, degree::Integer, ::Val{lex})
 
 write Chebyshev coefficients from `mat` into vector `to`. `lex::Bool` determines whether
-coefficients should be written in lexigraphical order or not. (See examples)
+coefficients should be written in lexigraphical order or not. The lower right triangle does
+not get written into `to`. These would represent greater polynomial degrees than `degree`.
 
-The lower right triangle does not get written into `to`. These would represent higher
-polynomial degrees than `degree`.
+If `lex` is `Val(true)` the coefficients correspond to the following basis polynomials
+
+```math
+T_0(x) T_0(y), T_1(x) T_0(y), T_0(x) T_1(y), T_2(x) T_0(y), T_1(x) T_1(y), T_0(x) T_2(y), ...
+```
+
+else if `lex` is `Val(false)` they correspond to
+
+```math
+T_0(x) T_0(y), T_0(x) T_1(y), T_1(x) T_0(y), T_0(x) T_2(y), T_1(x) T_1(y), T_2(x) T_0(y), ...
+```
 
 # Examples
 ```julia-repl
@@ -421,15 +440,15 @@ function fromcoeffsmat!(to::AbstractVector, mat::Matrix, degree::Integer, ::Val{
 end
 
 """
-    fromcoeffsmat!(to::AbstractMatrix, mat::AbstractMatrix, degree::Integer)
+    fromcoeffsmat!(to::AbstractMatrix, mat::Matrix, degree::Integer)
 
 copy Chebyshev coefficients from `mat` to `to` without copying coefficients coresponding to
-total degree > `degree`.
+total degree greater than `degree`.
 
 # Examples
-```
-julia> fromcoeffsmat!(zeros(4, 4), reshape(1:20, 5, 4), 3)
-5×4 Matrix{Float64}:
+```jldoctest
+julia> PaduaTransforms.fromcoeffsmat!(zeros(4, 4), reshape(1:20, 5, 4), 3)
+4×4 Matrix{Float64}:
  1.0  6.0  11.0  16.0
  2.0  7.0  12.0   0.0
  3.0  8.0   0.0   0.0
@@ -450,27 +469,17 @@ function fromcoeffsmat!(to::AbstractMatrix, mat::AbstractMatrix, degree::Integer
 end
 
 """
-    paduatransform!([out,] P::PaduaTransformPlan, vals[, lex])
+    paduatransform!(out, P::PaduaTransformPlan, vals[, lex])
 
 obtain coefficients of Chebyshev polynomials on 2D via the Padua transform, given values
-`vals` evaluated at the Padua points. Coefficients will written into `out`, which should
+`vals` evaluated at the Padua points. Coefficients will be written into `out`, which should
 either be a matrix or a vector.
 
 if `out` is a matrix, make sure that all entries in the lower right diagonal are zero as
 these will not get overwritten.
 
 `lex` determines the order in which coefficeints are written into `out` if `out` is a vector.
-If `lex` is `Val(true)` the coefficients correspond to the following basis polynomials
-
-```math
-T_0(x) T_0(y), T_1(x) T_0(y), T_0(x) T_1(y), T_2(x) T_0(y), T_1(x) T_1(y), T_0(x) T_2(y), ...
-```
-
-else if `lex` is `Val(false)` they correspond to
-
-```math
-T_0(x) T_0(y), T_0(x) T_1(y), T_1(x) T_0(y), T_0(x) T_2(y), T_1(x) T_1(y), T_2(x) T_0(y), ...
-```
+See [`fromcoeffsmat!`](@ref) for details.
 
 # Examples
 ```jldoctest
@@ -594,21 +603,46 @@ function InvPaduaTransformPlan{T}(degree::Integer) where T
     InvPaduaTransformPlan{T, typeof(iplan)}(degree, coeffs, iplan)
 end
 
-function tocoeffsmat!(out, coeffs)
-    out[1:end-1, :]  = coeffs
-    out[    end, :] .= 0
+"""
+    tocoeffsmat!(mat::AbstractMatrix, coeffs::AbstractMatrix)
 
-    out
+writes coefficients in `coeffs` into matrix `mat` for the [`invpaduatransform!`](@ref).
+
+# Examples
+```jldoctest
+julia> PaduaTransforms.tocoeffsmat!(zeros(5, 4), reshape(1:16, 4, 4))
+5×4 Matrix{Float64}:
+ 1.0  5.0   9.0  13.0
+ 2.0  6.0  10.0  14.0
+ 3.0  7.0  11.0  15.0
+ 4.0  8.0  12.0  16.0
+ 0.0  0.0   0.0   0.0
+```
+"""
+function tocoeffsmat!(mat::AbstractMatrix{T}, coeffs::AbstractMatrix) where T
+    mat[1:end-1, :]  = coeffs
+    mat[    end, :] .= zero(T)
+
+    mat
 end
 
 """
     invweight!(coeffs::AbstractMatrix)
 
-weight Chebyshev coefficients before the Fourier transform in the inverse Padua transform.
+weight Chebyshev coefficients before the Fourier transform for the [`invpaduatransform!`](@ref).
+using the weighting
+
+```math
+w = \\begin{cases}
+    1            & \\textrm{if on vertex}   \\\\
+    \\frac{1}{2} & \\textrm{if on edge}     \\\\
+    \\frac{1}{4} & \\textrm{if in interior} \\\\
+\\end{cases}
+```
 
 # Examples
-```julia-repl
-julia> invweight!(ones(5, 5))
+```jldoctest
+julia> PaduaTransforms.invweight!(ones(5, 5))
 5×5 Matrix{Float64}:
  1.0  0.5   0.5   0.5   1.0
  0.5  0.25  0.25  0.25  0.5
@@ -624,10 +658,15 @@ function invweight!(coeffs::AbstractMatrix{T}) where T
     coeffs
 end
 
+"""
+    fromvalsmat!(to::AbstractVector, mat::AbstractMatrix, n::Integer)
 
-function fromvalsmat!(to::AbstractVector, mat::Matrix, degree::Integer)
+write values from `mat` into the vector `to` after an [`invpaduatransform!`](@ref) of total
+degree `n`.
+"""
+function fromvalsmat!(to::AbstractVector, mat::AbstractMatrix, degree::Integer)
     axes(to, 1) == 1:getpaduanum(degree) || error()
-    size(mat) == (degree + 2, degree + 1) || error()
+    axes(mat) == (1:degree + 2, 1:degree + 1) || error()
 
     if isodd(degree)
         # x 0

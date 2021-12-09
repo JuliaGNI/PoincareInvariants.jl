@@ -1,5 +1,63 @@
 using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms
 
+module ChebyshevTestUtils
+    using LinearAlgebra: UpperTriangular
+
+    export T0, T1, T2, T3, T6, T11
+    export evalT, remove_lower_right
+
+    T0(x) = evalpoly(x, (1,))
+    T1(x) = evalpoly(x, (0, 1))
+    T2(x) = evalpoly(x, (-1, 0, 2))
+    T3(x) = evalpoly(x, (0, -3, 0, 4))
+    T6(x) = evalpoly(x, (-1, 0, 18, 0, -48, 0, 32))
+    T11(x) = evalpoly(x, (0, -11, 0, 220, 0, -1232, 0, 2816, 0, -2816, 0, 1024))
+
+    function evalT(x::T, n::Integer) where T
+        if n == 0
+            return one(T)
+        elseif n == 1
+            return x
+        elseif n > 1
+            a = one(T)
+            b = x
+            for _ in 2:n
+                b, a = 2x * b - a, b
+            end
+            return b
+        else
+            throw(ArgumentError("n must be greater than 0"))
+        end
+    end
+
+    function evalT(x::T, y::T, coeffs::AbstractMatrix) where T
+        axes(coeffs, 1) == axes(coeffs, 2) || error()
+        s = zero(T)
+        fi = firstindex(coeffs, 1)
+
+        for i in axes(coeffs, 1)
+            for j in axes(coeffs, 2)
+                s += coeffs[i, j] * evalT(y, i - fi) * evalT(x, j - fi)
+            end
+        end
+
+        s
+    end
+
+    remove_lower_right(A) = reverse(Matrix(UpperTriangular(A)); dims=2)
+end  # ChebyshevTestUtils
+
+@safetestset "ChebyshevTestUtils" begin
+    using ..ChebyshevTestUtils
+
+    @test evalT(0.225, 0) == 1.0
+    @test evalT(0.225, 1) == 0.225
+    @test evalT(0.225, 6) ≈ T6(0.225) atol=5eps()
+    @test evalT(0.225, 11) == let x = 0.225
+        1024x^11 - 2816x^9 + 2816x^7 - 1232x^5 + 220x^3 - 11x
+    end
+end
+
 @safetestset "getpaduanum, getdegree and nextpaduanum" begin
     using ..PaduaTransforms
 
@@ -95,7 +153,7 @@ end
 end
 
 @safetestset "weight! and invweight!" begin
-    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms:
+    using ..PaduaTransforms:
         weight!, invweight!
 
     @test weight!(ones(4+2, 4+1), 4) == [
@@ -118,7 +176,7 @@ end
 end
 
 @safetestset "tovalsmat!" begin
-    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms
+    using ..PaduaTransforms
 
     @test PaduaTransforms.tovalsmat!(ones(3 + 2, 3 + 1), 1:getpaduanum(3), 3) == [
         1 0 6 0 ;
@@ -137,7 +195,7 @@ end
 end
 
 @safetestset "fromcoeffsmat!" begin
-    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms
+    using ..PaduaTransforms
 
     mat = [(x, y) for y in 0:2+1, x in 0:2]
     to = similar(mat, getpaduanum(2))
@@ -156,87 +214,155 @@ end
     ]
 end
 
-@safetestset "paduatransform! and invpaduatransform!" begin
-    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms
-    using Statistics: mean
-    using StaticArrays: SVector
+@safetestset "tocoeffsmat!" begin
+    using ..PaduaTransforms
 
-    T0(x) = 1
-	T1(x) = x
-	T2(x) = 2x^2 - 1
-	T3(x) = 4x^3 - 3x
+    mat = PaduaTransforms.tocoeffsmat!(zeros(5, 4), reshape(1:16, 4, 4))
 
-    for degree in [4, 7, 21, 100]
-        plan = PaduaTransformPlan{Float64}(degree)
-        iplan = InvPaduaTransformPlan{Float64}(degree)
-        points = getpaduapoints(degree)
+    @test mat == [
+        1.0  5.0   9.0  13.0
+        2.0  6.0  10.0  14.0
+        3.0  7.0  11.0  15.0
+        4.0  8.0  12.0  16.0
+        0.0  0.0   0.0   0.0
+    ]
+end
 
-        paduanum = getpaduanum(3)
+@safetestset "fromvalsmat!" begin
+    using ..PaduaTransforms
 
-        randcfs = rand(3+2, 3+1)
+    mat1 = reshape(1:20, 5, 4)
+    out1 = zeros(10)
 
-        cfsmat = PaduaTransforms.fromcoeffsmat!(zeros(3+1, 3+1), randcfs, 3)
-        cfsveclexfalse = PaduaTransforms.fromcoeffsmat!(Vector{Float64}(undef, paduanum), randcfs, 3, Val(false))
-        cfsveclextrue = PaduaTransforms.fromcoeffsmat!(Vector{Float64}(undef, paduanum), randcfs, 3, Val(true))
-        cfsarr = cat(cfsmat, cfsmat, cfsmat, cfsmat; dims=3)
+    PaduaTransforms.fromvalsmat!(out1, mat1, 3)
 
-        for i in 1:4
-            cfsarr[1, 1, i] += i
+    @test out1 == [1, 3, 5,  7, 9,  11, 13, 15,  17, 19]
+
+    mat2 = reshape(1:12, 4, 3)
+    out2 = zeros(6)
+
+    PaduaTransforms.fromvalsmat!(out2, mat2, 2)
+
+    @test out2 == [1, 3,  6, 8,  9, 11]
+end
+
+@safetestset "1D paduatransform!" begin
+    using ..PaduaTransforms
+    using ..ChebyshevTestUtils
+
+    @testset "Low degree tests" begin
+        let n = 3; vals = getpaduapoints(n) do x, y
+                1.5 * T0(x) * T1(y) + 2 * T3(x) * T0(y) + 100 * T2(x) * T1(y)
+            end
+
+            plan = PaduaTransformPlan{Float64}(n)
+
+            out = paduatransform!(zeros(n+1, n+1), plan, vals)
+
+            @test maximum(abs, out .- [
+                  0 0   0 2
+                1.5 0 100 0
+                  0 0   0 0
+                  0 0   0 0
+            ]) / eps() < 100
         end
 
-        vals = getpaduapoints(degree) do x, y
-            cfsmat[1, 1] * T0(x) * T0(y) +
+        let n = 6; vals = getpaduapoints(n) do x, y
+                15 * T0(x) * T0(y) + 2.5 * T0(x) * T6(y) + 0.1 * T3(x) * T3(y)
+            end
 
-            cfsmat[1, 2] * T1(x) * T0(y) +
-            cfsmat[2, 1] * T0(x) * T1(y) +
+            plan = PaduaTransformPlan{Float64}(n)
 
-            cfsmat[1, 3] * T2(x) * T0(y) +
-            cfsmat[2, 2] * T1(x) * T1(y) +
-            cfsmat[3, 1] * T0(x) * T2(y) +
+            out = paduatransform!(zeros(n+1, n+1), plan, vals)
 
-            cfsmat[1, 4] * T3(x) * T0(y) +
-            cfsmat[2, 3] * T2(x) * T1(y) +
-            cfsmat[3, 2] * T1(x) * T2(y) +
-            cfsmat[4, 1] * T0(x) * T3(y)
+            @test maximum(abs, out .- [
+                 15 0 0   0 0 0 0
+                  0 0 0   0 0 0 0
+                  0 0 0   0 0 0 0
+                  0 0 0 0.1 0 0 0
+                  0 0 0   0 0 0 0
+                  0 0 0   0 0 0 0
+                2.5 0 0   0 0 0 0
+            ]) / eps() < 100
+        end
+    end
+
+    @testset "Degree $n tests" for n in [11, 20, 29, 40, 51]
+        plan = PaduaTransformPlan{Float64}(n)
+
+        testcoeffs = remove_lower_right(PaduaTransforms.rand(n+1, n+1))
+
+        vals = getpaduapoints(n) do x, y
+            evalT(x, y, testcoeffs)
         end
 
-        valsmat = hcat(vals .+ 1, vals .+ 2, vals .+ 3, vals .+ 4)
-        valsvecvec = SVector{4, Float64}.(eachrow(valsmat))
+        out = paduatransform!(zeros(n+1, n+1), plan, vals)
 
-        vals2 = similar(vals)
-        valsmat2 = similar(valsmat)
+        @test maximum(abs, out .- testcoeffs) / eps() < 100
+    end
+end
 
-        cfsvec2 = Vector{Float64}(undef, getpaduanum(degree))
-        cfsmat2 = zeros(degree+1, degree+1)
-        cfsarr2 = zeros(degree+1, degree+1, 4)
+@safetestset "1D invpaduatransform!" begin
+    using ..PaduaTransforms
+    using ..ChebyshevTestUtils
 
-        paduatransform!(cfsvec2, plan, vals, Val(true))
-        @test mean(abs, cfsvec2[1:10] .- cfsveclextrue) < 5eps()
-        @test mean(abs, cfsvec2[11:end]) < 5eps()
+    @testset "Low degree tests" begin
+        let n = 3; testvals = getpaduapoints(n) do x, y
+                1.5 * T0(x) * T1(y) + 2 * T3(x) * T0(y) + 100 * T2(x) * T1(y)
+            end
 
-        paduatransform!(cfsvec2, plan, vals, Val(false))
-        @test mean(abs, cfsvec2[1:10] .- cfsveclexfalse) < 5eps()
-        @test mean(abs, cfsvec2[11:end]) < 5eps()
+            invplan = InvPaduaTransformPlan{Float64}(n)
 
-        paduatransform!(cfsmat2, plan, vals)
-        @test mean(abs, cfsmat2[1:4, 1:4] .- cfsmat) < 5eps()
-        @test mean(abs, cfsmat2[5:end, 1:end]) < 5eps()
-        @test mean(abs, cfsmat2[1:end, 5:end]) < 5eps()
+            coeffs = [
+                  0 0   0 2;
+                1.5 0 100 0;
+                  0 0   0 0;
+                  0 0   0 0
+            ]
 
-        invpaduatransform!(vals2, iplan, cfsmat2)
-        @test mean(abs, vals2 .- vals) < 10eps()
+            vals = Vector{Float64}(undef, getpaduanum(n))
+            invpaduatransform!(vals, invplan, coeffs)
 
-        paduatransform!(cfsarr2, plan, valsmat)
-        @test mean(abs, cfsarr2[1:4, 1:4, :] .- cfsarr) < 5eps()
-        @test mean(abs, cfsarr2[5:end, 1:end, :]) < 5eps()
-        @test mean(abs, cfsarr2[1:end, 5:end, :]) < 5eps()
+            @test maximum(abs, vals .- testvals) / eps() < 100
+        end
 
-        invpaduatransform!(valsmat2, iplan, cfsarr2)
-        @test mean(abs, valsmat2 .- valsmat) < 10eps()
+        let n = 6; testvals = getpaduapoints(n) do x, y
+                15 * T0(x) * T0(y) + 2.5 * T0(x) * T6(y) + 0.1 * T3(x) * T3(y)
+            end
 
-        paduatransform!(cfsarr2, plan, valsvecvec)
-        @test mean(abs, cfsarr2[1:4, 1:4, :] .- cfsarr) < 5eps()
-        @test mean(abs, cfsarr2[5:end, 1:end, :]) < 5eps()
-        @test mean(abs, cfsarr2[1:end, 5:end, :]) < 5eps()
+            invplan = InvPaduaTransformPlan{Float64}(n)
+
+            coeffs = [
+                 15 0 0   0 0 0 0
+                  0 0 0   0 0 0 0
+                  0 0 0   0 0 0 0
+                  0 0 0 0.1 0 0 0
+                  0 0 0   0 0 0 0
+                  0 0 0   0 0 0 0
+                2.5 0 0   0 0 0 0
+            ]
+
+            vals = Vector{Float64}(undef, getpaduanum(n))
+            invpaduatransform!(vals, invplan, coeffs)
+
+            @test maximum(abs, vals .- testvals) / eps() < 100
+        end
+    end
+
+    @testset "Degree $n tests" for n in [11, 20, 29, 40, 51]
+        invplan = InvPaduaTransformPlan{Float64}(n)
+
+        coeffs = remove_lower_right(rand(n+1, n+1))
+
+        testvals = getpaduapoints(n) do x, y
+            evalT(x, y, coeffs)
+        end
+
+        vals = Vector{Float64}(undef, getpaduanum(n))
+        invpaduatransform!(vals, invplan, coeffs)
+
+        # These errors get pretty damn big
+        # max abs error is about 14_000 for degree 50
+        @test maximum(abs, vals .- testvals) / eps() < 100 * 5^(n / 10)
     end
 end
