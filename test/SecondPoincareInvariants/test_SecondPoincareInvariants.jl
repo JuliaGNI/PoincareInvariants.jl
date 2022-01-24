@@ -78,4 +78,32 @@ end
         free_particle!.(eachrow(phasepoints), 1000)
         @test abs(π/4 - compute!(pinv, phasepoints, 0, nothing)) / eps() < 2_000
     end
+
+    @testset "$N Points on Half Sphere in 4D" for N in [345, 2345]
+        D = 4
+        Ω(z, t, p) = CanonicalSymplecticMatrix(D)
+        pinv = SecondPoincareInvariant{Float64}(Ω, D, N, Val(false))
+
+        parampoints = getpoints(pinv)
+
+        phasepoints = getpoints(pinv) do θ, ϕ
+            sinθ, cosθ = sincospi(θ)
+            sinϕ, cosϕ = sincospi(ϕ)
+            return (sinθ * cosϕ, sinθ * sinϕ, cosθ, -1)
+        end
+
+        # invariant is -π
+        # TODO: do the calculation by hand and double check it
+
+        @test abs(-π - compute!(pinv, phasepoints, 0, nothing)) / eps() < 15
+
+        free_particle!.(eachrow(phasepoints), 10)
+        @test abs(-π - compute!(pinv, phasepoints, 0, nothing)) / eps() < 15
+
+        free_particle!.(eachrow(phasepoints), 100)
+        @test abs(-π - compute!(pinv, phasepoints, 0, nothing)) / eps() < 150
+
+        free_particle!.(eachrow(phasepoints), 1000)
+        @test abs(-π - compute!(pinv, phasepoints, 0, nothing)) / eps() < 1_500
+    end
 end
