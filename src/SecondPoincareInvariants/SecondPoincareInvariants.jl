@@ -4,11 +4,11 @@
 using Base: Callable
 
 using ..PoincareInvariants: AbstractPoincareInvariant, @argcheck
-import ..PoincareInvariants: compute!, getpoints, getpointnum, getdim
+import ..PoincareInvariants: compute!, getpoints, getpointnum, getdim, getform
 
 export SecondPoincareInvariant
 
-## Implementations
+## Implementation(s)
 
 include("ChebyshevImplementation.jl")
 
@@ -40,11 +40,14 @@ function SecondPoincareInvariant{T}(
 end
 
 # Unexported convenience alias
+# TODO: move or export these aliases to top level module?
 const PI2 = SecondPoincareInvariant
 
 getdim(pinv::SecondPoincareInvariant) = pinv.D
+getform(pinv::SecondPoincareInvariant) = pinv.Ω
 
 ## Internal interface to implementation ##
+
 compute!(pinv::SecondPoincareInvariant, phasepoints::AbstractMatrix, t, p) =
     compute!(pinv.plan, pinv.Ω, phasepoints, t, p)
 compute!(pinv::SecondPoincareInvariant, phasepoints::AbstractMatrix) =

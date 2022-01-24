@@ -7,7 +7,7 @@ module PoincareInvariants
 
 using Reexport
 
-export AbstractPoincareInvariant, compute!, getdim, getpoints, getpointnum
+export AbstractPoincareInvariant, compute!, getdim, getform, getpoints, getpointnum
 
 """
     AbstractPoincareInvariant
@@ -44,6 +44,13 @@ function getpointnum end
 returns dimension of phase space to `compute!` `pinv` in.
 """
 function getdim end
+
+"""
+    getform(pinv::AbstractPoincareInvariant)
+
+get invariant one- or two-form.
+"""
+function getform end
 
 include("utils.jl")
 
