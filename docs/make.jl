@@ -1,10 +1,26 @@
 using Documenter, PoincareInvariants
 
 DocMeta.setdocmeta!(
+    PoincareInvariants.SecondPoincareInvariants,
+    :DocTestSetup,
+    quote
+        using PoincareInvariants
+    end
+)
+
+DocMeta.setdocmeta!(
     PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms,
     :DocTestSetup,
     quote
         using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms
+    end
+)
+
+DocMeta.setdocmeta!(
+    PoincareInvariants.CanonicalSymplecticStructures,
+    :DocTestSetup,
+    quote
+        using PoincareInvariants.CanonicalSymplecticStructures
     end
 )
 
