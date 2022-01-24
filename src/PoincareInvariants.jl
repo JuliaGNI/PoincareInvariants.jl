@@ -55,7 +55,7 @@ function getform end
 include("utils.jl")
 
 include("CanonicalSymplecticStructures.jl")
-include("FirstPoincareInvariants.jl")
+include("FirstPoincareInvariants/FirstPoincareInvariants.jl")
 include("SecondPoincareInvariants/SecondPoincareInvariants.jl")
 
 end  # module
