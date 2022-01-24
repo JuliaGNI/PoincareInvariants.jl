@@ -71,8 +71,8 @@ julia> (p - π/2) < 5eps()
 true
 ```
 
-We can see that the answer is accurate within a few machine epsilon.
-If we now evolve each point forward in time, we should see that the invariant is indeed conserved.
+We can see that the answer is accurate within five times machine epsilon.
+If we now evolve each point forward in time, we should see that the invariant is conserved.
 
 ```jldoctest usage
 julia> function free_particle!(state, δt)
