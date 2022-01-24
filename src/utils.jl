@@ -2,6 +2,8 @@
     @argcheck cond text
 
 Throw an `ArgumentError` if `cond` is `false`.
+
+adapted from base Julia's @assert macro.
 """
 macro argcheck(ex, msgs...)
     msg = isempty(msgs) ? ex : msgs[1]
