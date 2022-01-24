@@ -27,7 +27,7 @@
         return true
     end
 
-    @testset "CanonicalSymplecticMatrix{$T}($n)" for T in [Int, Float64], n in [10, 100, 1000]
+    @testset "CanonicalSymplecticMatrix{$T}($n)" for T in [Int, Float64], n in [10, 64, 1002]
         @test CanonicalSymplecticMatrix(n) === CanonicalSymplecticMatrix{Int}(n)
 
         C = CanonicalSymplecticMatrix{T}(n)
