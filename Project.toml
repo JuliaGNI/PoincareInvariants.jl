@@ -14,5 +14,6 @@ StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 [compat]
 FFTW = "1"
 OffsetArrays = "1"
+GeometricIntegrators = "0.9"
 Reexport = "1"
 StaticArrays = "1"
