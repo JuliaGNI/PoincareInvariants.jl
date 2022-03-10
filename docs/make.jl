@@ -1,14 +1,44 @@
 using Documenter, PoincareInvariants
 
+DocMeta.setdocmeta!(
+    PoincareInvariants.SecondPoincareInvariants,
+    :DocTestSetup,
+    quote
+        using PoincareInvariants
+    end
+)
+
+DocMeta.setdocmeta!(
+    PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms,
+    :DocTestSetup,
+    quote
+        using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms
+    end
+)
+
+DocMeta.setdocmeta!(
+    PoincareInvariants.CanonicalSymplecticStructures,
+    :DocTestSetup,
+    quote
+        using PoincareInvariants.CanonicalSymplecticStructures
+    end
+)
+
 makedocs(
     sitename = "PoincareInvariants.jl",
-    format = Documenter.HTML(prettyurls = get(ENV, "CI", nothing) == "true"),
-    pages = ["Home" => "index.md",
-             "Poincaré Integral Invariants" => "poincare_invariants.md",
-             "1st Poincaré Invariant" => "poincare_invariant_1st.md",
-             "2nd Poincaré Invariant" => "poincare_invariant_2nd.md",
-             "Example" => "example.md",
-             ]
+    modules=[PoincareInvariants],
+    pages = [
+        "Home" => "index.md",
+        "First Poincaré Invariants" => "first_poincare_invariants.md",
+        "Second Poincaré Invariants" => [
+            "Guide" => "second_poincare_invariants.md",
+            "Chebyshev Implementation" => "chebyshev_implementation.md",
+            "Padua Transforms" => "padua_transforms.md"
+        ],
+        "Canonical Symplectic Structures" => "canonical_symplectic_structures.md",
+        "Reference" => "reference.md"
+    ],
+    format = Documenter.HTML(prettyurls = get(ENV, "CI", nothing) == "true")
 )
 
 deploydocs(
