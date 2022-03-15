@@ -132,7 +132,7 @@ end
         testcoeffs = zeros(degree+1, degree+1)
         testcoeffs[1, 1] = 0.25
 
-        @test intcoeffs ≈ intcoeffs atol=1eps()
+        @test testcoeffs ≈ intcoeffs atol=1eps()
     end
 end
 
