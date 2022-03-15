@@ -315,8 +315,10 @@ julia> PaduaTransforms.tovalsmat!(ones(2 + 2, 2 + 1), 1:getpaduanum(2), 2)
 ```
 """
 function tovalsmat!(mat::Matrix{T}, from::AbstractVector, degree::Integer) where T
-    axes(from, 1) == 1:getpaduanum(degree) || error()
-    size(mat) == (degree + 2, degree + 1) || error()
+    axes(from, 1) == 1:getpaduanum(degree) || throw(ArgumentError(
+        "axes of from must be (1:getpaduanum(degree),)"))
+    size(mat) == (degree + 2, degree + 1) || throw(ArgumentError(
+        "axes of vals mat must be (degree + 2, degree + 1)"))
 
     if isodd(degree)
         # x 0
@@ -404,8 +406,10 @@ julia> fromcoeffsmat!(to2, mat, 2, Val(false))
 ```
 """
 function fromcoeffsmat!(to::AbstractVector, mat::Matrix, degree::Integer, ::Val{false})
-    length(to) == getpaduanum(degree) || error()
-    axes(mat) == (1:(degree + 2), 1:(degree + 1)) || error()
+    length(to) == getpaduanum(degree) || throw(ArgumentError(
+        "length of output vector must equal paduanum(degree)"))
+    axes(mat) == (1:(degree + 2), 1:(degree + 1)) || throw(ArgumentError(
+        "axes of coeffs mat must be (1:(degree + 2), 1:(degree + 1))"))
 
     n = firstindex(to)
     for d in 1:degree + 1
@@ -422,8 +426,10 @@ function fromcoeffsmat!(to::AbstractVector, mat::Matrix, degree::Integer, ::Val{
 end
 
 function fromcoeffsmat!(to::AbstractVector, mat::Matrix, degree::Integer, ::Val{true})
-    length(to) == getpaduanum(degree) || error()
-    size(mat) == (degree + 2, degree + 1) || error()
+    length(to) == getpaduanum(degree) || throw(ArgumentError(
+        "length of output must equal paduanum(degree)"))
+    size(mat) == (degree + 2, degree + 1) || throw(ArgumentError(
+        "axes of coeffs mat must be (1:(degree + 2), 1:(degree + 1))"))
 
     n = firstindex(to)
     for d in 1:degree + 1
@@ -456,8 +462,10 @@ julia> PaduaTransforms.fromcoeffsmat!(zeros(4, 4), reshape(1:20, 5, 4), 3)
 ```
 """
 function fromcoeffsmat!(to::AbstractMatrix, mat::AbstractMatrix, degree::Integer)
-    axes(to) == (1:degree + 1, 1:degree + 1) || error()
-    axes(mat) == (1:degree + 2, 1:degree + 1) || error()
+    axes(to) == (1:degree + 1, 1:degree + 1) || throw(ArgumentError(
+        "axes of output must be (1:(degree + 2), 1:(degree + 1))"))
+    axes(mat) == (1:degree + 2, 1:degree + 1) || throw(ArgumentError(
+        "axes of coeffs mat must be (1:(degree + 2), 1:(degree + 1))"))
 
     for j in 1:degree + 1
         for i in 1:degree + 2 - j
@@ -554,7 +562,8 @@ end
 transforms each column in `vals` and writes the resulting coefficients in a slice of `out`.
 """
 function paduatransform!(out::AbstractArray{<:Any, 3}, P::PaduaTransformPlan, vals::AbstractMatrix, args...)
-    axes(out, 3) == axes(vals, 2)|| error()
+    axes(out, 3) == axes(vals, 2)|| throw(ArgumentError(
+        "the dimension associated with coefficients and values must match"))
 
     @views for i in axes(out, 3)
         paduatransform!(out[:, :, i], P, vals[:, i], args...)
@@ -573,7 +582,8 @@ in a slice of `out`. Each vector in the vector of vectors represents a point. Ea
 function paduatransform!(out::Array{<:Any, 3}, P::PaduaTransformPlan, vals::AbstractVector{<:AbstractVector{T}}, args...) where T
     # Here, each column is a point and each row represents one dimension
     r = reinterpret(reshape, T, vals)
-    axes(out, 3) == axes(r, 1) || error()
+    axes(out, 3) == axes(r, 1) || throw(ArgumentError(
+        "the dimension associated with coefficients and values must match"))
 
     @views for i in axes(out, 3)
         paduatransform!(out[:, :, i], P, r[i, :], args...)
@@ -665,8 +675,10 @@ write values from `mat` into the vector `to` after an [`invpaduatransform!`](@re
 degree `n`.
 """
 function fromvalsmat!(to::AbstractVector, mat::AbstractMatrix, degree::Integer)
-    axes(to, 1) == 1:getpaduanum(degree) || error()
-    axes(mat) == (1:degree + 2, 1:degree + 1) || error()
+    axes(to, 1) == 1:getpaduanum(degree) || throw(Argumenterror(
+        "axes of output must be (1:getpaduanum(degree),)"))
+    axes(mat) == (1:degree + 2, 1:degree + 1) || throw(Argumenterror(
+        "axes of vals mat must be (1:degree + 2, 1:degree + 1)"))
 
     if isodd(degree)
         # x 0
@@ -721,7 +733,8 @@ function invpaduatransform!(vals::AbstractVector, IP::InvPaduaTransformPlan, coe
 end
 
 function invpaduatransform!(vals::AbstractMatrix, IP::InvPaduaTransformPlan, coeffs::AbstractArray{<:Any, 3})
-    axes(coeffs, 3) == axes(vals, 2) || error()
+    axes(coeffs, 3) == axes(vals, 2) || throw(ArgumentError(
+        "the dimension associated with coefficients and values must match"))
 
     @views for i in axes(coeffs, 3)
         invpaduatransform!(vals[:, i], IP, coeffs[:, :, i])
