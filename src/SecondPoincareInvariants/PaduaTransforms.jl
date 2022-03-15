@@ -486,7 +486,7 @@ either be a matrix or a vector.
 if `out` is a matrix, make sure that all entries in the lower right diagonal are zero as
 these will not get overwritten.
 
-`lex` determines the order in which coefficeints are written into `out` if `out` is a vector.
+`lex` determines the order in which coefficients are written into `out` if `out` is a vector.
 See [`fromcoeffsmat!`](@ref) for details.
 
 # Examples
