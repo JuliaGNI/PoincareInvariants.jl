@@ -1,6 +1,7 @@
 @safetestset "CanonicalSymplecticMatrix" begin
     using PoincareInvariants: CanonicalSymplecticMatrix
     using LinearAlgebra: dot
+    using Random: rand
 
     @test CanonicalSymplecticMatrix{Int}(2) == [0 -1; 1 0]
     @test CanonicalSymplecticMatrix{Int}(4) == [0 0 -1 0; 0 0 0 -1; 1 0 0 0; 0 1 0 0]
@@ -41,6 +42,12 @@
         @test C * collect(1:n) == [(-mid-1:-1:-n)..., 1:mid...]
 
         @test dot(ones(n), C, ones(n)) == 0
+
+        v = rand(n); w = rand(n)
+        vCw = dot(v, C, w)
+
+        @test vCw ≈ dot(v[mid+1:end], w[1:mid]) - dot(v[1:mid], w[mid+1:end])
+        @test vCw ≈ dot(v, C * w)
 
         @test_throws ArgumentError CanonicalSymplecticMatrix{T}(n + 1)
     end
