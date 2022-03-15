@@ -352,7 +352,7 @@ end
     @testset "Degree $n tests" for n in [11, 20, 29, 40, 51]
         invplan = InvPaduaTransformPlan{Float64}(n)
 
-        coeffs = remove_lower_right(rand(n+1, n+1))
+        coeffs = rand(n+1, n+1)
 
         testvals = getpaduapoints(n) do x, y
             evalT(x, y, coeffs)
@@ -361,9 +361,7 @@ end
         vals = Vector{Float64}(undef, getpaduanum(n))
         invpaduatransform!(vals, invplan, coeffs)
 
-        # These errors get pretty damn big
-        # max abs error is about 14_000 for degree 50
-        @test maximum(abs, vals .- testvals) / eps() < 100 * 5^(n / 10)
+        @test maximum(abs, vals .- testvals) / eps() < 0.1 * n^3.3
     end
 end
 
