@@ -491,7 +491,7 @@ function paduatransform!(P::PaduaTransformPlan)
     coeffs
 end
 
-function paduatransform!(out, P::PaduaTransformPlan, vals, args...)
+function paduatransform!(out, P::PaduaTransformPlan, vals::AbstractVector{<: Number}, args...)
     tovalsmat!(P.vals, vals, P.degree)
     coeffs = paduatransform!(P)
     fromcoeffsmat!(out, coeffs, P.degree, args...)
@@ -502,35 +502,17 @@ end
 
 transforms each column in `vals` and writes the resulting coefficients in a slice of `out`.
 """
-function paduatransform!(out::AbstractArray{<:Any, 3}, P::PaduaTransformPlan, vals::AbstractMatrix, args...)
-    axes(out, 3) == axes(vals, 2)|| throw(ArgumentError(
-        "the dimension associated with coefficients and values must match"))
+function paduatransform!(coeffs, P::PaduaTransformPlan, vals, args...)
+    length(coeffs) == length(vals)|| throw(ArgumentError(
+        "the length of coeffs and vals iterables must match"))
 
-    @views for i in axes(out, 3)
-        paduatransform!(out[:, :, i], P, vals[:, i], args...)
+    # can't use eltype to check eltype beforehand because eachcol/eachrow are type unstable
+    # and I want eachcol/eachrow to be usable as an iterable of vectors
+    for (c, v::AbstractVector{<:Number}) in zip(coeffs, vals)
+        paduatransform!(c, P, v, args...)
     end
 
-    out
-end
-
-"""
-    paduatransform!(out::Array{<:Any, 3}, P::PaduaTransformPlan, vals::AbstractVector{<:AbstractVector{T}}, args...)
-
-transforms vector of vectors to Chebyshev coefficients and writes the resulting coefficients
-in a slice of `out`. Each vector in the vector of vectors represents a point. Each slice of
-`out` represents a transform of one dimension.
-"""
-function paduatransform!(out::Array{<:Any, 3}, P::PaduaTransformPlan, vals::AbstractVector{<:AbstractVector{T}}, args...) where T
-    # Here, each column is a point and each row represents one dimension
-    r = reinterpret(reshape, T, vals)
-    axes(out, 3) == axes(r, 1) || throw(ArgumentError(
-        "the dimension associated with coefficients and values must match"))
-
-    @views for i in axes(out, 3)
-        paduatransform!(out[:, :, i], P, r[i, :], args...)
-    end
-
-    out
+    coeffs
 end
 
 ## Inverse Padua Transform ##
@@ -667,18 +649,18 @@ end
 evaluates the polynomial defined by the coefficients of Chebyshev polynomials `coeffs` on the
 Padua points using the inverse transform plan `IP` and writes the resulting values into `vals`.
 """
-function invpaduatransform!(vals::AbstractVector, IP::InvPaduaTransformPlan, coeffs::AbstractMatrix)
+function invpaduatransform!(vals::AbstractVector{<:Number}, IP::InvPaduaTransformPlan, coeffs)
     tocoeffsmat!(IP.coeffs, coeffs)
     invpaduatransform!(IP)
     fromvalsmat!(vals, IP.coeffs, IP.degree)
 end
 
-function invpaduatransform!(vals::AbstractMatrix, IP::InvPaduaTransformPlan, coeffs::AbstractArray{<:Any, 3})
-    axes(coeffs, 3) == axes(vals, 2) || throw(ArgumentError(
-        "the dimension associated with coefficients and values must match"))
+function invpaduatransform!(vals, IP::InvPaduaTransformPlan, coeffs)
+    length(coeffs) == length(vals)|| throw(ArgumentError(
+        "the length of coeffs and vals iterables must match"))
 
-    @views for i in axes(coeffs, 3)
-        invpaduatransform!(vals[:, i], IP, coeffs[:, :, i])
+    for (v::AbstractVector{<:Number}, c) in zip(vals, coeffs)
+        invpaduatransform!(v, IP, c)
     end
 
     vals

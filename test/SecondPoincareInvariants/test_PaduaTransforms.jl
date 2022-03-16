@@ -391,22 +391,20 @@ end
     plan = PaduaTransformPlan{Float64}(n)
     invplan = InvPaduaTransformPlan{Float64}(n)
 
-    ndtestvals = rand(getpaduanum(n), D)
-    ndcoeffs = zeros(n+1, n+1, D)
+    ndtestvals = ntuple(_ -> rand(getpaduanum(n)), D)
+    ndcoeffs = [zeros(n+1, n+1) for _ in 1:D]
     paduatransform!(ndcoeffs, plan, ndtestvals)
 
-    ndvals = Matrix{Float64}(undef, getpaduanum(n), D)
+    ndvals = ntuple(_ -> Vector{Float64}(undef, getpaduanum(n)), D)
     invpaduatransform!(ndvals, invplan, ndcoeffs)
 
-    @test maximum(abs, ndvals .- ndtestvals) / eps() < 100
+    for d in 1:D
+        @test maximum(abs, ndvals[d] .- ndtestvals[d]) / eps() < 100
 
-    for i in 1:D
         coeffs = zeros(n+1, n+1)
-        @test ndcoeffs[:, :, i] == paduatransform!(coeffs, plan, ndtestvals[:, i])
-    end
+        @test ndcoeffs[d] == paduatransform!(coeffs, plan, ndtestvals[d])
 
-    for i in 1:D
         vals = Vector{Float64}(undef, getpaduanum(n))
-        @test ndvals[:, i] == invpaduatransform!(vals, invplan, ndcoeffs[:, :, i])
+        @test ndvals[d] == invpaduatransform!(vals, invplan, ndcoeffs[d])
     end
 end
