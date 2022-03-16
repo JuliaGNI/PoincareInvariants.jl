@@ -77,6 +77,7 @@ integrate(coeffs, integrator) = dot(integrator, coeffs, integrator)
 
 struct OOPIntPlan{T, IP, P}
     invpaduaplan::IP
+    phasevals::Matrix{T}
     ∂xvals::Matrix{T}
     ∂yvals::Matrix{T}
     intvals::Vector{T}
@@ -85,25 +86,34 @@ end
 
 function OOPIntPlan{T}(D, degree) where T
     invpaduaplan = InvPaduaTransformPlan{T}(degree)
-    ∂xvals = Matrix{T}(undef, getpaduanum(degree), D)
-    ∂yvals = Matrix{T}(undef, getpaduanum(degree), D)
+    phasevals = Matrix{T}(undef, D, getpaduanum(degree))
+    ∂xvals = Matrix{T}(undef, D, getpaduanum(degree))
+    ∂yvals = Matrix{T}(undef, D, getpaduanum(degree))
     intvals = Vector{T}(undef, getpaduanum(degree))
     paduaplan = PaduaTransformPlan{T}(degree)
 
     OOPIntPlan{T, typeof(invpaduaplan), typeof(paduaplan)}(
-        invpaduaplan, ∂xvals, ∂yvals, intvals, paduaplan
+        invpaduaplan, phasevals, ∂xvals, ∂yvals, intvals, paduaplan
     )
 end
 
 function getintegrand!(
-    intcoeffs::AbstractMatrix, plan::OOPIntPlan, Ω::Callable, phasepoints::AbstractMatrix, t, p,
-    ∂xcoeffs::AbstractArray3, ∂ycoeffs::AbstractArray3
-)
-    ∂xvals = invpaduatransform!(plan.∂xvals, plan.invpaduaplan, ∂xcoeffs)
-    ∂yvals = invpaduatransform!(plan.∂yvals, plan.invpaduaplan, ∂ycoeffs)
+    intcoeffs::AbstractMatrix, plan::OOPIntPlan{T}, Ω::Callable,
+    phasepoints, t, p, ∂xcoeffs, ∂ycoeffs
+) where T
+    invpaduatransform!(eachrow(plan.∂xvals), plan.invpaduaplan, ∂xcoeffs)
+    invpaduatransform!(eachrow(plan.∂yvals), plan.invpaduaplan, ∂ycoeffs)
 
-    @views for i in axes(plan.intvals, 1)
-        plan.intvals[i] = dot(∂yvals[i, :], Ω(phasepoints[i, :], t, p), ∂xvals[i, :])
+    D = length(phasepoints)
+    for d in 1:D
+        plan.phasevals[d, :] .= phasepoints[d]
+    end
+
+    for i in axes(plan.intvals, 1)
+        pnti = view(plan.phasevals, :, i)
+        ∂xi = view(plan.∂xvals, :, i)
+        ∂yi = view(plan.∂yvals, :, i)
+        plan.intvals[i] = dot(∂yi, Ω(pnti, t, p), ∂xi)
     end
 
     paduatransform!(intcoeffs, plan.paduaplan, plan.intvals)
@@ -111,7 +121,7 @@ function getintegrand!(
     intcoeffs
 end
 
-## ChebyshevPlan and _compute! ##
+## ChebyshevPlan and compute! ##
 
 getintplan(::Type{T}, ::Callable, D, degree, ::Val{false}) where T = OOPIntPlan{T}(D, degree)
 # getintplan(::Type{T}, ::Callable, D, degree, ::Val{true}) where T = IPIntPlan{T}(D, degree)
@@ -120,10 +130,10 @@ getintplan(::Type{T}, ::Callable, D, degree, ::Val{false}) where T = OOPIntPlan{
 struct ChebyshevPlan{T, IP, PP<:PaduaTransformPlan}
     degree::Int
     paduaplan::PP
-    phasecoeffs::Array{T, 3}
+    phasecoeffs::Vector{Matrix{T}}
     diffplan::DiffPlan{T}
-    ∂x::Array{T, 3}
-    ∂y::Array{T, 3}
+    ∂x::Vector{Matrix{T}}
+    ∂y::Vector{Matrix{T}}
     intplan::IP  # getting coefficients of integrand to integrate
     intcoeffs::Matrix{T}
     integrator::Vector{T}
@@ -133,10 +143,10 @@ function ChebyshevPlan{T}(Ω::Callable, D::Integer, N::Integer, ::Val{inplace}) 
     degree = getdegree(nextpaduanum(N))
 
     paduaplan = PaduaTransformPlan{T}(degree)
-    phasecoeffs = zeros(T, degree+1, degree+1, D)
+    phasecoeffs = [zeros(T, degree+1, degree+1) for _ in 1:D]
     diffplan = DiffPlan{T}(degree)
-    ∂x = Array{T, 3}(undef, degree+1, degree+1, D)
-    ∂y = Array{T, 3}(undef, degree+1, degree+1, D)
+    ∂x = [Matrix{T}(undef, degree+1, degree+1) for _ in 1:D]
+    ∂y = [Matrix{T}(undef, degree+1, degree+1) for _ in 1:D]
     intplan = getintplan(T, Ω, D, degree, Val(inplace))
     intcoeffs = zeros(T, degree+1, degree+1)
     integrator = getintegrator(T, degree)
@@ -146,7 +156,7 @@ function ChebyshevPlan{T}(Ω::Callable, D::Integer, N::Integer, ::Val{inplace}) 
     )
 end
 
-function compute!(plan::ChebyshevPlan, Ω::Callable, phasepoints::AbstractMatrix, t, p)
+function compute!(plan::ChebyshevPlan, Ω::Callable, phasepoints, t, p)
     paduatransform!(plan.phasecoeffs, plan.paduaplan, phasepoints)
     differentiate!(plan.∂x, plan.∂y, plan.diffplan, plan.phasecoeffs)
     getintegrand!(plan.intcoeffs, plan.intplan, Ω, phasepoints, t, p, plan.∂x, plan.∂y)
