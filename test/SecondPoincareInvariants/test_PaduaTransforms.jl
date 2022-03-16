@@ -75,9 +75,8 @@ end
     end
 end
 
-@safetestset "paduapoint, ispadua and getpaduapoints" begin
-    using ..PaduaTransforms: ispadua, paduapoint
-    using ..PaduaTransforms
+@safetestset "paduapoint and ispadua" begin
+    using ..PaduaTransforms: paduapoint, ispadua
 
     @test paduapoint(Float64, 1, 3, 5)[1] ≈ cos(π * 1 / 5) atol=3eps()
     @test paduapoint(Float64, 1, 3, 5)[2] ≈ cos(π * 3 / 6) atol=3eps()
@@ -88,68 +87,87 @@ end
     @test eltype(paduapoint(Float32, 1, 2, 4)) == Float32
     @test eltype(paduapoint(Float64, 5, 6, 7)) == Float64
 
-    # collect tuple to vector, so ≈ works
-    @test [collect(paduapoint(Float32, x, y, 1)) for y in 0:1+1, x in 0:0] ≈ [
-        [1,  1],
-        [1,  0],
-        [1, -1]
-    ]
-
     @test ispadua(0, 0) == true
     @test ispadua(1, 0) == false
     @test ispadua(0, 1) == false
     @test ispadua(5, 4) == false
     @test ispadua(4, 4) == true
     @test ispadua(2, 0) == true
+end
 
-    @test getpaduapoints(1) ≈ [
-         1  1;
-         1 -1;
-        -1  0
+@safetestset "getpaduapoints" begin
+    using ..PaduaTransforms
+
+    @test getpaduapoints(1) isa NTuple{2, Vector{Float64}}
+    @test getpaduapoints(Float32, 2) isa NTuple{2, Vector{Float32}}
+    @test getpaduapoints(Float64, 3) isa NTuple{2, Vector{Float64}}
+
+    @test getpaduapoints(1)[1] ≈ [1, 1, -1]
+    @test getpaduapoints(1)[2] ≈ [1, -1, 0]
+
+    @test getpaduapoints(Float32, 2)[1] ≈
+        [cospi(0/2), cospi(0/2), cospi(1/2), cospi(1/2), cospi(2/2), cospi(2/2)]
+    @test getpaduapoints(Float32, 2)[2] ≈
+        [cospi(0/3), cospi(2/3), cospi(1/3), cospi(3/3), cospi(0/3), cospi(2/3)]
+
+
+    @test getpaduapoints(Float32, 4)[1] ≈ [
+        cospi(0/4), cospi(0/4), cospi(0/4),
+        cospi(1/4), cospi(1/4), cospi(1/4),
+        cospi(2/4), cospi(2/4), cospi(2/4),
+        cospi(3/4), cospi(3/4), cospi(3/4),
+        cospi(4/4), cospi(4/4), cospi(4/4),
+    ]
+    @test getpaduapoints(Float32, 4)[2] ≈ [
+        cospi(0/5), cospi(2/5), cospi(4/5),
+        cospi(1/5), cospi(3/5), cospi(5/5),
+        cospi(0/5), cospi(2/5), cospi(4/5),
+        cospi(1/5), cospi(3/5), cospi(5/5),
+        cospi(0/5), cospi(2/5), cospi(4/5),
     ]
 
-    @test getpaduapoints(4) ≈ [
-        cospi(0/4) cospi(0/5);
-        cospi(0/4) cospi(2/5);
-        cospi(0/4) cospi(4/5);
-        cospi(1/4) cospi(1/5);
-        cospi(1/4) cospi(3/5);
-        cospi(1/4) cospi(5/5);
-        cospi(2/4) cospi(0/5);
-        cospi(2/4) cospi(2/5);
-        cospi(2/4) cospi(4/5);
-        cospi(3/4) cospi(1/5);
-        cospi(3/4) cospi(3/5);
-        cospi(3/4) cospi(5/5);
-        cospi(4/4) cospi(0/5);
-        cospi(4/4) cospi(2/5);
-        cospi(4/4) cospi(4/5)
+    @test getpaduapoints(Float32, 5)[1] ≈ [
+        cospi(0/5), cospi(0/5), cospi(0/5), cospi(0/5),
+        cospi(1/5), cospi(1/5), cospi(1/5),
+        cospi(2/5), cospi(2/5), cospi(2/5), cospi(2/5),
+        cospi(3/5), cospi(3/5), cospi(3/5),
+        cospi(4/5), cospi(4/5), cospi(4/5), cospi(4/5),
+        cospi(5/5), cospi(5/5), cospi(5/5),
+    ]
+    @test getpaduapoints(Float32, 5)[2] ≈ [
+        cospi(0/6), cospi(2/6), cospi(4/6), cospi(6/6),
+        cospi(1/6), cospi(3/6), cospi(5/6),
+        cospi(0/6), cospi(2/6), cospi(4/6), cospi(6/6),
+        cospi(1/6), cospi(3/6), cospi(5/6),
+        cospi(0/6), cospi(2/6), cospi(4/6), cospi(6/6),
+        cospi(1/6), cospi(3/6), cospi(5/6),
     ]
 
-    torowvec(t) = [t[1] t[2]]
-    for n in [21, 22, 23, 100]
-        pnts = getpaduapoints(n)
+    @inferred getpaduapoints(3)
+    @inferred getpaduapoints((x, y) -> x + y, 4)
+    @inferred getpaduapoints((x, y) -> (x, y, x * x + y), 5)
 
-        @test size(pnts) == (getpaduanum(n), 2)
-
-        testpnts = reduce(vcat, [
-            paduapoint(Float64, x, y, n) |> torowvec
-            for y in 0:n+1, x in 0:n if ispadua(x, y)
-        ])
-
-        @test pnts == testpnts
+    dopoints1 = getpaduapoints(11) do x, y
+        x * y
     end
 
-    dopoints = getpaduapoints(5) do x, y
+    @test dopoints1 isa Vector{Float64}
+    @test length(dopoints1) == getpaduanum(11)
+    @test dopoints1 ≈ getpaduapoints(11)[1] .* getpaduapoints(11)[2]
+
+    dopoints4 = getpaduapoints(Float32, 5) do x, y
         x, y, x * y, x + y
     end
 
-    @test size(dopoints) == (getpaduanum(5), 4)
+    @test dopoints4 isa NTuple{4, Vector{Float32}}
+    @test all(dopoints4) do v
+        length(v) == getpaduanum(5)
+    end
 
-    @test dopoints[:, 1] ≈ getpaduapoints(5)[:, 1]
-    @test dopoints[:, 2] ≈ getpaduapoints(5)[:, 2]
-    @test dopoints[:, 3] ≈ getpaduapoints(5)[:, 1] .* getpaduapoints(5)[:, 2]
-    @test dopoints[:, 4] ≈ getpaduapoints(5)[:, 1] .+ getpaduapoints(5)[:, 2]
+    @test dopoints4[1] ≈ getpaduapoints(5)[1]
+    @test dopoints4[2] ≈ getpaduapoints(5)[2]
+    @test dopoints4[3] ≈ getpaduapoints(5)[1] .* getpaduapoints(5)[2]
+    @test dopoints4[4] ≈ getpaduapoints(5)[1] .+ getpaduapoints(5)[2]
 end
 
 @safetestset "weight! and invweight!" begin

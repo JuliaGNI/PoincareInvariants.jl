@@ -127,45 +127,7 @@ julia> [pointornothing(y, x, 2) for y in 0:3, x in 0:2]
 """
 ispadua(i, j) = iseven(i - j)
 
-"""
-    getpaduapoints([T=Float64,] n)
 
-returns the Padua points
-
-```math
-\\textrm{Pad}_n = \\{(\\cos{\\frac{jπ}{n}}, \\cos{\\frac{iπ}{n + 1}}) \\; | \\;
-    0 ≤ j ≤ n, \\; 0 ≤ i ≤ n + 1, \\; i - j \\; \\textrm{even} \\}
-```
-
-where each row is a point
-
-# Examples
-
-```jldoctest
-julia> getpaduapoints(Float32, 1)
-3×2 Matrix{Float32}:
-  1.0   1.0
-  1.0  -1.0
- -1.0   0.0
-```
-"""
-function getpaduapoints(::Type{T}, n) where T
-    out = Matrix{T}(undef, getpaduanum(n), 2)
-
-    i = 1
-    for x in 0:n
-        for y in 0:n+1
-            if ispadua(x, y)
-                out[i, 1:2] .= paduapoint(T, x, y, n)
-                i += 1
-            end
-        end
-    end
-
-    return out
-end
-
-getpaduapoints(n) = getpaduapoints(Float64, n)
 
 """
     getpaduapoints(f::Function, [T=Float64,] n)
@@ -188,49 +150,29 @@ julia> getpaduapoints(Float64, 2) do x, y; 3x - y, y^2; end
 """
 function getpaduapoints(f::Function, ::Type{T}, n) where T
     D = length(f(zero(T), zero(T)))
-    if D == 1
-        out = Vector{T}(undef, getpaduanum(n))
-    else
-        out = Matrix{T}(undef, getpaduanum(n), D)
+    out = ntuple(_ -> Vector{T}(undef, getpaduanum(n)), D)
+
+    i = 1
+    for x in 0:n
+        for y in 0:n+1
+            if ispadua(x, y)
+                px, py = paduapoint(T, x, y, n)
+                fpnt = f(px, py)
+                for d in 1:D
+                    out[d][i] = fpnt[d]
+                end
+                i += 1
+            end
+        end
     end
 
-    # Function barrier to alleviate issues from type instability
-    _fillpoints!(out, f, T, n)
-
-    return out
+    # Should return vector [...] instead of ([...],) in 1D case
+    return D == 1 ? out[1] : out
 end
 
 getpaduapoints(f::Function, n) = getpaduapoints(f, Float64, n)
-
-function _fillpoints!(out::AbstractMatrix, f, ::Type{T}, n) where T
-    i = 1
-    for x in 0:n
-        for y in 0:n+1
-            if ispadua(x, y)
-                v = paduapoint(T, x, y, n)
-                out[i, :] .= f(v[1], v[2])
-                i += 1
-            end
-        end
-    end
-
-    out
-end
-
-function _fillpoints!(out::AbstractVector, f, ::Type{T}, n) where T
-    i = 1
-    for x in 0:n
-        for y in 0:n+1
-            if ispadua(x, y)
-                v = paduapoint(T, x, y, n)
-                out[i] = f(v[1], v[2])
-                i += 1
-            end
-        end
-    end
-
-    out
-end
+getpaduapoints(T, n) = getpaduapoints((x, y) -> (x, y), T, n)
+getpaduapoints(n) = getpaduapoints(Float64, n)
 
 ## Padua Transform ##
 
