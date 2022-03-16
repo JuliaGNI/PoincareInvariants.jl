@@ -39,16 +39,16 @@
                   0  0  0  0;
                   0  0  0  0]
 
-    coeffsarr = rand(4, 4, 6)
-    ∂xarr = zeros(4, 4, 6)
-    ∂yarr = zeros(4, 4, 6)
+    ndcoeffs = ntuple(_ -> rand(4, 4), 6)
+    nd∂x = ntuple(_ -> zeros(4, 4), 6)
+    nd∂y = ntuple(_ -> zeros(4, 4), 6)
 
-    differentiate!(∂xarr, ∂yarr, P, coeffsarr)
+    differentiate!(nd∂x, nd∂y, P, ndcoeffs)
 
     for i in 1:6
-        differentiate!(∂x, ∂y, P, coeffsarr[:, :, i])
-        @test ∂xarr[:, :, i] == ∂x
-        @test ∂yarr[:, :, i] == ∂y
+        differentiate!(∂x, ∂y, P, ndcoeffs[i])
+        @test nd∂x[i] == ∂x
+        @test nd∂y[i] == ∂y
     end
 end
 

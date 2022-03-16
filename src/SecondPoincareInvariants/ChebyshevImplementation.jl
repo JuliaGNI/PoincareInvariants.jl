@@ -52,11 +52,15 @@ function differentiate!(∂x::AbstractMatrix, ∂y::AbstractMatrix, P::DiffPlan,
     ∂x, ∂y
 end
 
-function differentiate!(∂x::AbstractArray3, ∂y::AbstractArray3, P::DiffPlan, coeffs::AbstractArray3)
-    axes(∂x, 3) == axes(∂y, 3) == axes(coeffs, 3) || error()
+function differentiate!(∂x, ∂y, P::DiffPlan, coeffs)
+    eltype(∂x) <: AbstractMatrix && eltype(∂y) <: AbstractMatrix &&
+        eltype(coeffs) <: AbstractMatrix || throw(ArgumentError(
+            "coefficients must be AbstractMatrix or iterable thereof"))
+    length(∂x) == length(∂y) == length(coeffs) || throw(ArgumentError(
+        "number of coefficient matrices must match number of derivative matrices to write to"))
 
-    @views for i in axes(coeffs, 3)
-        differentiate!(∂x[:, :, i], ∂y[:, :, i], P, coeffs[:, :, i])
+    for (∂xi, ∂yi, coeffsi) in zip(∂x, ∂y, coeffs)
+        differentiate!(∂xi, ∂yi, P, coeffsi)
     end
 
     ∂x, ∂y
