@@ -273,27 +273,30 @@ end
                 1.5 * T0(x) * T1(y) + 2 * T3(x) * T0(y) + 100 * T2(x) * T1(y)
             end
 
-            plan = PaduaTransformPlan{Float64}(n)
-
-            out = paduatransform!(zeros(n+1, n+1), plan, vals)
-
-            @test maximum(abs, out .- [
+            testcoeffs = [
                   0 0   0 2
                 1.5 0 100 0
                   0 0   0 0
                   0 0   0 0
-            ]) / eps() < 100
+            ]
+
+            plan = PaduaTransformPlan{Float64}(n)
+
+            out = paduatransform!(zeros(n+1, n+1), plan, vals)
+            @test maximum(abs, out .- testcoeffs) / eps() < 100
+
+            outvec = zeros(getpaduanum(n))
+            paduatransform!(outvec, plan, vals, Val(true))
+
+            testvec = zeros(getpaduanum(n))
+            @test outvec == PaduaTransforms.fromcoeffsmat!(testvec, plan.vals, n, Val(true))
         end
 
         let n = 6; vals = getpaduapoints(n) do x, y
                 15 * T0(x) * T0(y) + 2.5 * T0(x) * T6(y) + 0.1 * T3(x) * T3(y)
             end
 
-            plan = PaduaTransformPlan{Float64}(n)
-
-            out = paduatransform!(zeros(n+1, n+1), plan, vals)
-
-            @test maximum(abs, out .- [
+            testcoeffs = [
                  15 0 0   0 0 0 0
                   0 0 0   0 0 0 0
                   0 0 0   0 0 0 0
@@ -301,7 +304,18 @@ end
                   0 0 0   0 0 0 0
                   0 0 0   0 0 0 0
                 2.5 0 0   0 0 0 0
-            ]) / eps() < 100
+            ]
+
+            plan = PaduaTransformPlan{Float64}(n)
+
+            out = paduatransform!(zeros(n+1, n+1), plan, vals)
+            @test maximum(abs, out .- testcoeffs) / eps() < 100
+
+            outvec = zeros(getpaduanum(n))
+            paduatransform!(outvec, plan, vals, Val(false))
+
+            testvec = zeros(getpaduanum(n))
+            @test outvec == PaduaTransforms.fromcoeffsmat!(testvec, plan.vals, n, Val(false))
         end
     end
 
