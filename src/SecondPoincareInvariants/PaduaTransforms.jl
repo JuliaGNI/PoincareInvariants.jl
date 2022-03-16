@@ -223,7 +223,7 @@ julia> weight!(ones(4+2, 4+1), 4)
 ```
 """
 function weight!(mat::AbstractMatrix{T}, degree::Integer) where T
-    rmul!(mat, T(2 / ( degree * (degree + 1) )))
+    rmul!(mat, T(2) / T(degree * (degree + 1)))
     rmul!(@view(mat[1, :]), T(0.5))
     rmul!(@view(mat[end, :]), T(0.5))
     rmul!(@view(mat[:, 1]), T(0.5))
@@ -684,4 +684,4 @@ function invpaduatransform!(vals::AbstractMatrix, IP::InvPaduaTransformPlan, coe
     vals
 end
 
-end  # Padua
+end  # PaduaTransforms
