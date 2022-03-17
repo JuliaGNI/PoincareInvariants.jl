@@ -39,7 +39,7 @@ function PoincareInvariant1stCanonical(f_equ::Function, f_loop_q::Function, f_lo
 end
 
 
-function evaluate_poincare_invariant(pinv::PoincareInvariant1stCanonical, sol::SolutionPODE)
+function evaluate_poincare_invariant(pinv::PoincareInvariant1stCanonical, sol)
     v = zeros(size(sol.q[begin],1), size(sol.q,2))
 
     for i in axes(sol.q,1)
@@ -51,7 +51,7 @@ function evaluate_poincare_invariant(pinv::PoincareInvariant1stCanonical, sol::S
 end
 
 
-function write_to_hdf5(pinv::PoincareInvariant1stCanonical, sol::Solution, output_file::String)
+function write_to_hdf5(pinv::PoincareInvariant1stCanonical, sol, output_file::String)
     # h5open(output_file, isfile(output_file) ? "r+" : "w") do h5
     h5open(output_file, "w") do h5
         write(h5, "t", sol.t)

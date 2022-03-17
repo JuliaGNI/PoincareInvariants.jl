@@ -43,7 +43,7 @@ function PoincareInvariant1st(f_equ::Function, f_loop::Function, Θ::ΘT, Δt::T
 end
 
 
-function evaluate_poincare_invariant(pinv::PoincareInvariant1st, sol::Solution)
+function evaluate_poincare_invariant(pinv::PoincareInvariant1st, sol)
     p = zeros(size(sol.q[begin],1), size(sol.q,1), size(sol.q,2))
     g = zeros(size(sol.q[begin],1), size(sol.q,1), size(sol.q,2))
     v = zeros(size(sol.q[begin],1), size(sol.q,2))
@@ -73,7 +73,7 @@ function evaluate_poincare_invariant(pinv::PoincareInvariant1st, sol::Solution)
 end
 
 
-function write_to_hdf5(pinv::PoincareInvariant1st, sol::Solution, output_file::String)
+function write_to_hdf5(pinv::PoincareInvariant1st, sol, output_file::String)
     # h5open(output_file, isfile(output_file) ? "r+" : "w") do h5
     h5open(output_file, "w") do h5
 
