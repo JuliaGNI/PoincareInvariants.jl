@@ -170,7 +170,7 @@ end
         end
     end
 
-    @test compute!(plan, Ω, phasepoints, 0, nothing) ≈ 4 atol=10eps()
+    @test compute!(plan, Ω, phasepoints, 0, nothing) ≈ 4 atol=20eps()
 
     testphasecoeffs[1][1, 2] = 1  # 1 x
     testphasecoeffs[D ÷ 2 + 1][2, 1] = 1 # 1 y
