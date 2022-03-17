@@ -195,8 +195,9 @@ end
     using ..Chebyshev.PaduaTransforms
     using ..Chebyshev: ChebyshevPlan, getpoints, getpointnum
 
-    for N in [10, 4321, 862178], T in [Float32, Float64]
+    for N in [10, 4321, 162178], T in [Float32, Float64]
         @test getpointnum(N, ChebyshevPlan) == nextpaduanum(N)
+        @test getpointnum((7, N), ChebyshevPlan) == nextpaduanum(7 * N)
 
         f(x, y) = 5 * x, cos(x*y), x+y
         rescale(x, y) = ((x, y) .+ 1) ./ 2

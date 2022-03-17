@@ -13,19 +13,20 @@ export SecondPoincareInvariant
 struct SecondPoincareInvariant{
     T,  # phase space and return type
     ΩT <: Union{Callable, AbstractMatrix},
+    NT,
     P
 } <: AbstractPoincareInvariant
     Ω::ΩT  # symplectic matrix or function returning one
     D::Int  # dimension of phase space
-    N::Int  # approximate number of points to use
+    N::NT  # specifies how many points
     plan::P  # plan for chebyshev transform, differentiation, etc...
 end
 
 function SecondPoincareInvariant{T}(
-    Ω::ΩT, D::Integer, N::Integer, P::Type=DEFAULT_PLAN_TYPE
-) where {T, ΩT}
+    Ω::ΩT, D::Integer, N::NT, P::Type=DEFAULT_PLAN_TYPE
+) where {T, ΩT, NT}
     plan = P{T}(Ω, D, N)
-    SecondPoincareInvariant{T, ΩT, typeof(plan)}(Ω, D, N, plan)
+    SecondPoincareInvariant{T, ΩT, NT, typeof(plan)}(Ω, D, N, plan)
 end
 
 # Unexported convenience alias
@@ -43,11 +44,12 @@ compute!(pinv::SecondPoincareInvariant, phasepoints) =
     compute!(pinv.plan, pinv.Ω, phasepoints)
 
 # Interface should define getpoints(f, T, N, P) method
-getpoints(f::Function, pinv::SecondPoincareInvariant{T, Ω, P}) where {T, Ω, P} =
+getpoints(f::Function, pinv::SecondPoincareInvariant{T, Ω, NT, P}) where {T, Ω, NT, P} =
     getpoints(f, T, pinv.N, P)
 getpoints(pinv::SecondPoincareInvariant) = getpoints((x, y) -> (x, y), pinv)
 
-getpointnum(pinv::SecondPoincareInvariant{T, Ω, P}) where {T, Ω, P} = getpointnum(pinv.N, P)
+getpointnum(pinv::SecondPoincareInvariant{T, Ω, P}) where {T, Ω, NT, P} =
+    getpointnum(pinv.N, P)
 
 ## Implementation(s)
 
