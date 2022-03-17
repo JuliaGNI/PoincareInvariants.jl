@@ -75,15 +75,18 @@ We can see that the answer is accurate within five times machine epsilon.
 If we now evolve each point forward in time, we should see that the invariant is conserved.
 
 ```jldoctest usage
-julia> function free_particle!(state, δt)
-           mid = length(state) ÷ 2
-           state[1:mid] += state[mid+1:end] .* δt
-       end;
+julia> function free_particle!(points, t)
+           mid = length(points) ÷ 2
+           for i in 1:mid
+               points[i] .+= points[mid+i] .* t
+           end
+       end
+free_particle! (generic function with 1 method)
 
-julia> free_particle!.(eachrow(phasepoints), 100);
+julia> free_particle!(phasepoints, 100);
 
 julia> abs(compute!(pinv, phasepoints, 0, nothing) - π/2) < 50eps()
 true
 ```
 
-We find that up to some numerical error the invariant is indeed invariant.
+We find that up to some numerical error the invariant is indeed conserved.

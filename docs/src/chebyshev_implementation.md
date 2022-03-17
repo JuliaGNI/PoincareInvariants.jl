@@ -4,7 +4,7 @@ Here, I describe how the second Poincaré invariant is calculated using the `Che
 The code for the `compute!` function in this implementation looks something like:
 
 ```Julia
-function compute!(plan::ChebyshevPlan, Ω::Callable, phasepoints::AbstractMatrix, t, p)
+function compute!(plan::ChebyshevPlan, Ω::Callable, phasepoints, t, p)
     paduatransform!(plan.phasecoeffs, plan.paduaplan, phasepoints)
     differentiate!(plan.∂x, plan.∂y, plan.diffplan, plan.phasecoeffs)
     getintegrand!(plan.intcoeffs, plan.intplan, Ω, phasepoints, t, p, plan.∂x, plan.∂y)

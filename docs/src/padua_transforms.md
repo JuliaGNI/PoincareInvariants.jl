@@ -132,25 +132,15 @@ To generate the Padua points we can use the function [`getpaduapoints`](@ref) as
 
 ```jldoctest
 julia> getpaduapoints(3)
-10×2 Matrix{Float64}:
-  1.0   1.0
-  1.0   0.0
-  1.0  -1.0
-  0.5   0.707107
-  0.5  -0.707107
- -0.5   1.0
- -0.5   0.0
- -0.5  -1.0
- -1.0   0.707107
- -1.0  -0.707107
+([1.0, 1.0, 1.0, 0.5, 0.5, -0.4999999999999999, -0.4999999999999999, -0.4999999999999999, -1.0, -1.0], [1.0, 0.0, -1.0, 0.7071067811865476, -0.7071067811865476, 1.0, 0.0, -1.0, 0.7071067811865476, -0.7071067811865476])
 ```
 
 Using do block syntax we can evaluate a function on the Padua points.
 
 ```jldoctest step_by_step
 julia> vals = getpaduapoints(3) do x, y
-           y * (2x^2 - 1) + 5 * x * y + 2.5
-       end
+                  y * (2x^2 - 1) + 5 * x * y + 2.5
+              end
 10-element Vector{Float64}:
   8.5
   2.5
