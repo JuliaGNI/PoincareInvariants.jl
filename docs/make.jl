@@ -9,10 +9,10 @@ DocMeta.setdocmeta!(
 )
 
 DocMeta.setdocmeta!(
-    PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms,
+    PoincareInvariants.SecondPoincareInvariants.Chebyshev.PaduaTransforms,
     :DocTestSetup,
     quote
-        using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms
+        using PoincareInvariants.SecondPoincareInvariants.Chebyshev.PaduaTransforms
     end
 )
 

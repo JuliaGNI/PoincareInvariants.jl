@@ -1,10 +1,10 @@
 """
-    ChebyshevImplementation
+    Chebyshev
 
 implementation of computation of second Poincare invariant by approximating surface with
 Chebyshev polynomials
 """
-module ChebyshevImplementation
+module Chebyshev
 
 using ...PoincareInvariants: @argcheck
 import ...PoincareInvariants: compute!, getpoints, getpointnum
@@ -181,4 +181,4 @@ getpoints(f::Function, plan::ChebyshevPlan) = getpaduapoints(plan.degree) do x, 
     f((x + 1) / 2, (y + 1) / 2)
 end
 
-end  # module ChebyshevImplementation
+end  # module Chebyshev

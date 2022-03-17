@@ -1,7 +1,7 @@
 @safetestset "PaduaTransforms" begin include("test_PaduaTransforms.jl") end
 
 @safetestset "Differentiation" begin
-    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation:
+    using PoincareInvariants.SecondPoincareInvariants.Chebyshev:
         DiffPlan, differentiate!
 
     @test DiffPlan{Float64}(5).D == [0  1  0  3  0   5;
@@ -53,7 +53,7 @@
 end
 
 @safetestset "Integration" begin
-    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation:
+    using PoincareInvariants.SecondPoincareInvariants.Chebyshev:
         getintegrator, integrate
 
     # integrating odd polynomials over symmetric boundary conditions gives 0
@@ -69,8 +69,8 @@ end
 end
 
 @safetestset "getintegrand! with OOPIntPlan" begin
-    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms
-    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation:
+    using PoincareInvariants.SecondPoincareInvariants.Chebyshev.PaduaTransforms
+    using PoincareInvariants.SecondPoincareInvariants.Chebyshev:
         DiffPlan, differentiate!, OOPIntPlan, getintegrand!
     using PoincareInvariants.CanonicalSymplecticStructures
 
@@ -143,8 +143,8 @@ end
 end
 
 @safetestset "compute! with ChebyshevPlan (OOP)" begin
-    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms
-    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation:
+    using PoincareInvariants.SecondPoincareInvariants.Chebyshev.PaduaTransforms
+    using PoincareInvariants.SecondPoincareInvariants.Chebyshev:
         ChebyshevPlan, compute!, DiffPlan
     using PoincareInvariants.CanonicalSymplecticStructures
 
@@ -190,8 +190,8 @@ end
 end
 
 @safetestset "getpoints and getpointnum" begin
-    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms
-    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation:
+    using PoincareInvariants.SecondPoincareInvariants.Chebyshev.PaduaTransforms
+    using PoincareInvariants.SecondPoincareInvariants.Chebyshev:
         ChebyshevPlan, getpoints, getpointnum
 
     Ω(v, t, p) = [0 -1; 1 0]
