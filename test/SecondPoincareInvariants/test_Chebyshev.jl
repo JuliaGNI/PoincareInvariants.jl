@@ -68,10 +68,10 @@ end
     @test integrate(coeffs, getintegrator(3)) ≈ 1 * 4 + 3 * -4/3 + 7 * -4/3 + 9 * 4/9 atol=5eps()
 end
 
-@safetestset "getintegrand! with OOPIntPlan" begin
+@safetestset "getintegrand! with CallIntPlan" begin
     using PoincareInvariants.SecondPoincareInvariants.Chebyshev.PaduaTransforms
     using PoincareInvariants.SecondPoincareInvariants.Chebyshev:
-        DiffPlan, differentiate!, OOPIntPlan, getintegrand!
+        DiffPlan, differentiate!, CallIntPlan, getintegrand!
     using PoincareInvariants.CanonicalSymplecticStructures
 
     @testset "6 Points in 2 Dimensions" begin
@@ -96,7 +96,7 @@ end
 
         Ω(v, t, p) = [0 -1; 1  0]
 
-        plan = OOPIntPlan{Float64}(D, degree)
+        plan = CallIntPlan{Float64}(D, degree)
 
         intcoeffs = zeros(degree+1, degree+1)
 
@@ -129,7 +129,7 @@ end
 
         Ω(v, t, p) = CanonicalSymplecticMatrix(D)
 
-        plan = OOPIntPlan{Float64}(D, degree)
+        plan = CallIntPlan{Float64}(D, degree)
 
         intcoeffs = zeros(degree+1, degree+1)
 
@@ -152,7 +152,7 @@ end
     D = 12
     N = 200
     Ω(v, t, p) = CanonicalSymplecticMatrix(D)
-    plan = ChebyshevPlan{Float64}(Ω, D, N, Val(false))
+    plan = ChebyshevPlan{Float64}(Ω, D, N)
 
     pointnum = nextpaduanum(N)
     degree = getdegree(pointnum)
@@ -195,7 +195,7 @@ end
         ChebyshevPlan, getpoints, getpointnum
 
     Ω(v, t, p) = [0 -1; 1 0]
-    plan = ChebyshevPlan{Float64}(Ω, 2, 11, Val(false))
+    plan = ChebyshevPlan{Float64}(Ω, 2, 11)
 
     @test getpointnum(plan) == 15
     @test getpoints(plan) == getpaduapoints(4) do x, y

@@ -13,7 +13,7 @@ for N in [100 * 100, 1000 * 1000], D in [2, 12, 100]
     SUITE["SecondPoincareInvariants"]["canonical"][name] =
         @benchmarkable compute!(pinv, phasepoints, 0, nothing) setup=begin
             Ω(z, t, p) = CanonicalSymplecticMatrix($D)
-            pinv = SecondPoincareInvariant{Float64}(Ω, $D, $N, Val(false))
+            pinv = SecondPoincareInvariant{Float64}(Ω, $D, $N)
             phasepoints = getpoints(pinv) do x, y
                 rand($D)
             end

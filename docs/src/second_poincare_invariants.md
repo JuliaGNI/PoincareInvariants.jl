@@ -27,13 +27,12 @@ In future it will also be possible to use a constant matrix or an in-place funct
 Now, we can initialise the setup object used to calculate the invariant.
 
 ```jldoctest usage
-julia> pinv = SecondPoincareInvariant{Float64}(Ω, D, N, Val(false));
+julia> pinv = SecondPoincareInvariant{Float64}(Ω, D, N);
 ```
 
 The type `Float64` specifies that the final result as well as all intermediate calculations will use the type `Float64`.
 The number `N` specifies the approximate number of points to be used to approximate the surface.
-The exact number depends on implementation details.
-`Val{false}` specifies that `Ω` is not in-place. The type of `Ω` signals it is not a constant matrix.
+The exact number depends on implementation details. The type of `Ω` signals it is not a constant matrix.
 
 The setup object contains the two-form, the dimension of the phase space and the number of points used to approximate the surface.
 These properties can be probed using the functions [`getform`](@ref), [`getdim`](@ref) and [`getpointnum`](@ref).

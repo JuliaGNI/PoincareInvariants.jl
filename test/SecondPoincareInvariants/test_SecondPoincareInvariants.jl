@@ -7,7 +7,7 @@
         D = 10
         N = 500
         Ω(z, t, p) = CanonicalSymplecticMatrix(D)
-        pinv = SecondPoincareInvariant{Float64}(Ω, D, N, Val(false))
+        pinv = SecondPoincareInvariant{Float64}(Ω, D, N)
 
         phasepoints = getpoints(pinv) do x, y
             ntuple(D) do i
@@ -35,7 +35,7 @@ end
         D = 8
         N = 1_000
         Ω(z, t, p) = CanonicalSymplecticMatrix(D)
-        pinv = SecondPoincareInvariant{Float64}(Ω, D, N, Val(false))
+        pinv = SecondPoincareInvariant{Float64}(Ω, D, N)
 
         phasepoints = getpoints(pinv) do x, y
             (x, 0, 0, 0, y, 0, 0, 0)
@@ -54,7 +54,7 @@ end
         D = 4
         N = 2_000
         Ω(z, t, p) = CanonicalSymplecticMatrix(D)
-        pinv = SecondPoincareInvariant{Float64}(Ω, D, N, Val(false))
+        pinv = SecondPoincareInvariant{Float64}(Ω, D, N)
 
         phasepoints = getpoints(pinv) do r, θ
             (0, r * cos(θ * π/2), 0, r * sin(θ * π/2))
@@ -73,7 +73,7 @@ end
         D = 4
         N = 1500
         Ω(z, t, p) = CanonicalSymplecticMatrix(D)
-        pinv = SecondPoincareInvariant{Float64}(Ω, D, N, Val(false))
+        pinv = SecondPoincareInvariant{Float64}(Ω, D, N)
 
         phasepoints = getpoints(pinv) do θ, ϕ
             sinθ, cosθ = sincospi(θ)
