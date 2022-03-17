@@ -1,9 +1,9 @@
 # Padua Transforms
 
 ```@meta
-CurrentModule = PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms
+CurrentModule = PoincareInvariants.SecondPoincareInvariants.Chebyshev.PaduaTransforms
 DocTestSetup = quote
-    using PoincareInvariants.SecondPoincareInvariants.ChebyshevImplementation.PaduaTransforms
+    using PoincareInvariants.SecondPoincareInvariants.Chebyshev.PaduaTransforms
 end
 ```
 

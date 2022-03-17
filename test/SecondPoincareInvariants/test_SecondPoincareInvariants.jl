@@ -1,4 +1,4 @@
-@safetestset "ChebyshevImplementation" begin include("test_ChebyshevImplementation.jl") end
+@safetestset "Chebyshev Implementation" begin include("test_Chebyshev.jl") end
 
 @safetestset "SecondPoincareInvariant OOP" begin
     using PoincareInvariants
