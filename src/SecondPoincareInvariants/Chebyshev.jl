@@ -169,13 +169,12 @@ end
 
 ## getpoints and getpointnum ##
 
-getpointnum(plan::ChebyshevPlan) = getpaduanum(plan.degree)
-getpoints(plan::ChebyshevPlan) = getpaduapoints(plan.degree) do x, y
-    (x + 1) / 2, (y + 1) / 2
-end
-
-getpoints(f::Function, plan::ChebyshevPlan) = getpaduapoints(plan.degree) do x, y
-    f((x + 1) / 2, (y + 1) / 2)
+getpointnum(N, ::Type{<:ChebyshevPlan}) = nextpaduanum(N)
+function getpoints(f, ::Type{T}, N, ::Type{<:ChebyshevPlan}) where T
+    degree = nextdegree(N)
+    return getpaduapoints(T, degree) do x, y
+        f((x + T(1)) / T(2), (y + T(1)) / T(2))
+    end
 end
 
 end  # module Chebyshev

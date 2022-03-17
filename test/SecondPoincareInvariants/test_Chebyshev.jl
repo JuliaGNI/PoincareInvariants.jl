@@ -1,7 +1,9 @@
 @safetestset "PaduaTransforms" begin include("test_PaduaTransforms.jl") end
 
+using PoincareInvariants.SecondPoincareInvariants.Chebyshev
+
 @safetestset "Differentiation" begin
-    using PoincareInvariants.SecondPoincareInvariants.Chebyshev:
+    using ..Chebyshev:
         DiffPlan, differentiate!
 
     @test DiffPlan{Float64}(5).D == [0  1  0  3  0   5;
@@ -53,7 +55,7 @@
 end
 
 @safetestset "Integration" begin
-    using PoincareInvariants.SecondPoincareInvariants.Chebyshev:
+    using ..Chebyshev:
         getintegrator, integrate
 
     # integrating odd polynomials over symmetric boundary conditions gives 0
@@ -69,8 +71,8 @@ end
 end
 
 @safetestset "getintegrand! with CallIntPlan" begin
-    using PoincareInvariants.SecondPoincareInvariants.Chebyshev.PaduaTransforms
-    using PoincareInvariants.SecondPoincareInvariants.Chebyshev:
+    using ..Chebyshev.PaduaTransforms
+    using ..Chebyshev:
         DiffPlan, differentiate!, CallIntPlan, getintegrand!
     using PoincareInvariants.CanonicalSymplecticStructures
 
@@ -143,8 +145,8 @@ end
 end
 
 @safetestset "compute! with ChebyshevPlan (OOP)" begin
-    using PoincareInvariants.SecondPoincareInvariants.Chebyshev.PaduaTransforms
-    using PoincareInvariants.SecondPoincareInvariants.Chebyshev:
+    using ..Chebyshev.PaduaTransforms
+    using ..Chebyshev:
         ChebyshevPlan, compute!, DiffPlan
     using PoincareInvariants.CanonicalSymplecticStructures
 
@@ -190,15 +192,23 @@ end
 end
 
 @safetestset "getpoints and getpointnum" begin
-    using PoincareInvariants.SecondPoincareInvariants.Chebyshev.PaduaTransforms
-    using PoincareInvariants.SecondPoincareInvariants.Chebyshev:
-        ChebyshevPlan, getpoints, getpointnum
+    using ..Chebyshev.PaduaTransforms
+    using ..Chebyshev: ChebyshevPlan, getpoints, getpointnum
 
-    Ω(v, t, p) = [0 -1; 1 0]
-    plan = ChebyshevPlan{Float64}(Ω, 2, 11)
+    for N in [10, 4321, 862178], T in [Float32, Float64]
+        @test getpointnum(N, ChebyshevPlan) == nextpaduanum(N)
 
-    @test getpointnum(plan) == 15
-    @test getpoints(plan) == getpaduapoints(4) do x, y
-        ((x, y) .+ 1) ./ 2
+        f(x, y) = 5 * x, cos(x*y), x+y
+        rescale(x, y) = ((x, y) .+ 1) ./ 2
+
+        pnts = getpoints(f, T, N, ChebyshevPlan)
+        testpnts = getpaduapoints(T, nextdegree(N)) do x, y
+            px, py = rescale(x, y)
+            return f(px, py)
+        end
+
+        for i in 1:3
+            @test pnts[i] ≈ testpnts[i]
+        end
     end
 end
