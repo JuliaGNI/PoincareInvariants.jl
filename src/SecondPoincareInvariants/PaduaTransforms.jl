@@ -5,7 +5,6 @@ an implementation of the Padua transform and its inverse via the fast Fourier tr
 """
 module PaduaTransforms
 
-using StaticArrays: SVector
 using FFTW
 using LinearAlgebra: rmul!
 
