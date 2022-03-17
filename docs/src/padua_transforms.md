@@ -310,6 +310,7 @@ getpaduapoints
 getpaduanum
 getdegree
 nextpaduanum
+nextdegree
 ```
 
 ### Padua Transform
