@@ -48,9 +48,9 @@ getform(pinv::SecondPoincareInvariant) = pinv.Ω
 
 ## Internal interface to implementation ##
 
-compute!(pinv::SecondPoincareInvariant, phasepoints::AbstractMatrix, t, p) =
+compute!(pinv::SecondPoincareInvariant, phasepoints, t, p) =
     compute!(pinv.plan, pinv.Ω, phasepoints, t, p)
-compute!(pinv::SecondPoincareInvariant, phasepoints::AbstractMatrix) =
+compute!(pinv::SecondPoincareInvariant, phasepoints) =
     compute!(pinv.plan, pinv.Ω, phasepoints)
 
 getpoints(pinv::SecondPoincareInvariant) = getpoints(pinv.plan)

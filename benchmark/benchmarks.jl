@@ -14,7 +14,9 @@ for N in [100 * 100, 1000 * 1000], D in [2, 12, 100]
         @benchmarkable compute!(pinv, phasepoints, 0, nothing) setup=begin
             Ω(z, t, p) = CanonicalSymplecticMatrix($D)
             pinv = SecondPoincareInvariant{Float64}(Ω, $D, $N, Val(false))
-            phasepoints = rand(getpointnum(pinv), $D)
+            phasepoints = getpoints(pinv) do x, y
+                rand($D)
+            end
         end
 end
 

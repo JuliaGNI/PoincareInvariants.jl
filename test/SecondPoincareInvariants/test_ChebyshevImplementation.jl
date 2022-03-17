@@ -39,16 +39,16 @@
                   0  0  0  0;
                   0  0  0  0]
 
-    coeffsarr = rand(4, 4, 6)
-    ∂xarr = zeros(4, 4, 6)
-    ∂yarr = zeros(4, 4, 6)
+    ndcoeffs = ntuple(_ -> rand(4, 4), 6)
+    nd∂x = ntuple(_ -> zeros(4, 4), 6)
+    nd∂y = ntuple(_ -> zeros(4, 4), 6)
 
-    differentiate!(∂xarr, ∂yarr, P, coeffsarr)
+    differentiate!(nd∂x, nd∂y, P, ndcoeffs)
 
     for i in 1:6
-        differentiate!(∂x, ∂y, P, coeffsarr[:, :, i])
-        @test ∂xarr[:, :, i] == ∂x
-        @test ∂yarr[:, :, i] == ∂y
+        differentiate!(∂x, ∂y, P, ndcoeffs[i])
+        @test nd∂x[i] == ∂x
+        @test nd∂y[i] == ∂y
     end
 end
 
@@ -77,20 +77,22 @@ end
     @testset "6 Points in 2 Dimensions" begin
         degree = 2
         D = 2
-        phasecoeffs = cat(
+        phasecoeffs = (
             Float64[1 2 3;
                     4 5 0;
                     6 0 0],
             Float64[1 4 6;
                     2 5 0;
                     3 0 0]
-        ; dims=3)
+        )
 
-        ∂xcoeffs, ∂ycoeffs = differentiate!(similar(phasecoeffs), similar(phasecoeffs),
-            DiffPlan{Float64}(degree), phasecoeffs)
+        ∂xcoeffs = ntuple(_ -> zeros(degree+1, degree+1), D)
+        ∂ycoeffs = ntuple(_ -> zeros(degree+1, degree+1), D)
+        differentiate!(∂xcoeffs, ∂ycoeffs, DiffPlan{Float64}(degree), phasecoeffs)
 
-        phasepoints = invpaduatransform!(zeros(getpaduanum(degree), D),
-            InvPaduaTransformPlan{Float64}(degree), phasecoeffs)
+        phasepoints = [Vector{Float64}(undef, getpaduanum(degree)) for _ in 1:D]
+        iplan = InvPaduaTransformPlan{Float64}(degree)
+        invpaduatransform!(phasepoints, iplan, phasecoeffs)
 
         Ω(v, t, p) = [0 -1; 1  0]
 
@@ -105,21 +107,25 @@ end
                            -30     0    0] atol=5eps()
     end
 
-    @testset "$N Points in $D Dimensions" for D in [4, 20], N in [53, 11223]
+    @testset "50 Points in 6 Dimensions" begin
+        D = 6
+        N = 50
         pointnum = nextpaduanum(N)
         degree = getdegree(pointnum)
 
-        phasecoeffs = zeros(degree+1, degree+1, D)
-        phasecoeffs[1, 1, 1] = 0.5  # 0.5
-        phasecoeffs[1, 2, 1] = 0.5  # 0.5 x
-        phasecoeffs[1, 1, D ÷ 2 + 1] = 0.5  # 0.5
-        phasecoeffs[2, 1, D ÷ 2 + 1] = 0.5  # 0.5 y
+        phasecoeffs = ntuple(_ -> zeros(degree+1, degree+1), D)
+        phasecoeffs[1][1, 1] = 0.5  # 0.5
+        phasecoeffs[1][1, 2] = 0.5  # 0.5 x
+        phasecoeffs[D ÷ 2 + 1][1, 1] = 0.5  # 0.5
+        phasecoeffs[D ÷ 2 + 1][2, 1] = 0.5  # 0.5 y
 
-        ∂xcoeffs, ∂ycoeffs = differentiate!(similar(phasecoeffs), similar(phasecoeffs),
-            DiffPlan{Float64}(degree), phasecoeffs)
+        ∂xcoeffs = ntuple(_ -> zeros(degree+1, degree+1), D)
+        ∂ycoeffs = ntuple(_ -> zeros(degree+1, degree+1), D)
+        differentiate!(∂xcoeffs, ∂ycoeffs, DiffPlan{Float64}(degree), phasecoeffs)
 
-        phasepoints = invpaduatransform!(zeros(getpaduanum(degree), D),
-            InvPaduaTransformPlan{Float64}(degree), phasecoeffs)
+        phasepoints = [Vector{Float64}(undef, getpaduanum(degree)) for _ in 1:D]
+        iplan = InvPaduaTransformPlan{Float64}(degree)
+        invpaduatransform!(phasepoints, iplan, phasecoeffs)
 
         Ω(v, t, p) = CanonicalSymplecticMatrix(D)
 
@@ -143,57 +149,44 @@ end
     using PoincareInvariants.CanonicalSymplecticStructures
 
 
-    @testset "$N Points in $D dimensions" for D in [4, 12], N in [20, 1234]
-        Ω(v, t, p) = CanonicalSymplecticMatrix(D)
-        plan = ChebyshevPlan{Float64}(Ω, D, N, Val(false))
+    D = 12
+    N = 200
+    Ω(v, t, p) = CanonicalSymplecticMatrix(D)
+    plan = ChebyshevPlan{Float64}(Ω, D, N, Val(false))
 
-        pointnum = nextpaduanum(N)
-        degree = getdegree(pointnum)
+    pointnum = nextpaduanum(N)
+    degree = getdegree(pointnum)
 
-        @test plan.degree == degree
+    testphasecoeffs = [zeros(degree+1, degree+1) for _ in 1:D]
+    test∂x = [zeros(degree+1, degree+1) for _ in 1:D]
+    test∂y = [zeros(degree+1, degree+1) for _ in 1:D]
+    testintcoeffs = zeros(degree+1, degree+1)
 
-        @test plan.paduaplan isa PaduaTransformPlan
-        @test plan.paduaplan.degree == degree
-
-        testphasecoeffs = zeros(degree+1, degree+1, D)
-        @test plan.phasecoeffs == testphasecoeffs
-
-        @test plan.diffplan isa DiffPlan
-        @test size(plan.diffplan.D) == (degree+1, degree+1)
-
-        test∂x = zeros(degree+1, degree+1, D)
-        @test size(plan.∂x) == size(test∂x)
-
-        test∂y = zeros(degree+1, degree+1, D)
-        @test size(plan.∂y) == size(test∂y)
-
-        testintcoeffs = zeros(degree+1, degree+1)
-        @test size(plan.intcoeffs) == size(testintcoeffs)
-        @test size(plan.integrator) == (degree+1,)
-
-        phasepoints = getpaduapoints(degree) do x, y
-            ntuple(D) do i
-                i == 1 && return x
-                i == D ÷ 2 + 1 && return y
-                return 0
-            end
+    phasepoints = getpaduapoints(degree) do x, y
+        ntuple(D) do i
+            i == 1 && return x
+            i == D ÷ 2 + 1 && return y
+            return 0
         end
-
-        @test compute!(plan, Ω, phasepoints, 0, nothing) ≈ 4 atol=10eps()
-
-        testphasecoeffs[1, 2, 1] = 1  # 1 x
-        testphasecoeffs[2, 1, D ÷ 2 + 1] = 1 # 1 y
-        @test maximum(abs, plan.phasecoeffs .- testphasecoeffs) / eps() < 10
-
-        test∂x[1, 1, 1] = 1
-        @test maximum(abs, plan.∂x .- test∂x) / eps() < 50
-
-        test∂y[1, 1, D ÷ 2 + 1] = 1
-        @test maximum(abs, plan.∂y .- test∂y) / eps() < 50
-
-        testintcoeffs[1, 1] = 1
-        @test maximum(abs, plan.intcoeffs .- testintcoeffs) / eps() < 50
     end
+
+    @test compute!(plan, Ω, phasepoints, 0, nothing) ≈ 4 atol=20eps()
+
+    testphasecoeffs[1][1, 2] = 1  # 1 x
+    testphasecoeffs[D ÷ 2 + 1][2, 1] = 1 # 1 y
+
+    test∂x[1][1, 1] = 1
+    test∂y[D ÷ 2 + 1][1, 1] = 1
+
+
+    for d in 1:D
+        @test maximum(abs, plan.phasecoeffs[d] .- testphasecoeffs[d]) / eps() < 10
+        @test maximum(abs, plan.∂x[d] .- test∂x[d]) / eps() < 50
+        @test maximum(abs, plan.∂y[d] .- test∂y[d]) / eps() < 50
+    end
+
+    testintcoeffs[1, 1] = 1
+    @test maximum(abs, plan.intcoeffs .- testintcoeffs) / eps() < 50
 end
 
 @safetestset "getpoints and getpointnum" begin
@@ -205,7 +198,7 @@ end
     plan = ChebyshevPlan{Float64}(Ω, 2, 11, Val(false))
 
     @test getpointnum(plan) == 15
-    @test getpoints(plan) == map(getpaduapoints(4)) do v
-        (v .+ 1) ./ 2
+    @test getpoints(plan) == getpaduapoints(4) do x, y
+        ((x, y) .+ 1) ./ 2
     end
 end

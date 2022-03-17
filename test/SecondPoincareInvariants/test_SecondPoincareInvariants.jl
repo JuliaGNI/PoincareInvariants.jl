@@ -3,7 +3,9 @@
 @safetestset "SecondPoincareInvariant OOP" begin
     using PoincareInvariants
 
-    @testset "$N Points on Square in $(D)D" for D in [2, 10], N in [10, 123, 4321]
+    @testset "Points on Square" begin
+        D = 10
+        N = 500
         Ω(z, t, p) = CanonicalSymplecticMatrix(D)
         pinv = SecondPoincareInvariant{Float64}(Ω, D, N, Val(false))
 
@@ -22,69 +24,56 @@ end
 @safetestset "Free Particle" begin
     using PoincareInvariants
 
-    function free_particle!(state, δt)
-        mid = length(state) ÷ 2
-        state[1:mid] += state[mid+1:end] .* δt
+    function free_particle!(points, t)
+        mid = length(points) ÷ 2
+        for i in 1:mid
+            points[i] .+= points[mid+i] .* t
+        end
     end
 
-    @testset "$N Points on Square in $(D)D" for D in [2, 6], N in [500, 10_000]
+    @testset "Square" begin
+        D = 8
+        N = 1_000
         Ω(z, t, p) = CanonicalSymplecticMatrix(D)
         pinv = SecondPoincareInvariant{Float64}(Ω, D, N, Val(false))
 
-        parampoints = getpoints(pinv)
-
         phasepoints = getpoints(pinv) do x, y
-            ntuple(D) do i
-                i == 1 && return x
-                i == D ÷ 2 + 1 && return y
-                return 0
-            end
+            (x, 0, 0, 0, y, 0, 0, 0)
         end
 
         @test abs(1 - compute!(pinv, phasepoints, 0, nothing)) / eps() < 10
 
-        free_particle!.(eachrow(phasepoints), 10)
+        free_particle!(phasepoints, 10)
         @test abs(1 - compute!(pinv, phasepoints, 0, nothing)) / eps() < 20
 
-        free_particle!.(eachrow(phasepoints), 100)
+        free_particle!(phasepoints, 100)
         @test abs(1 - compute!(pinv, phasepoints, 0, nothing)) / eps() < 100
-
-        free_particle!.(eachrow(phasepoints), 1000)
-        @test abs(1 - compute!(pinv, phasepoints, 0, nothing)) / eps() < 1_000
     end
 
-    @testset "$N Points on Quarter Circle in $(D)D " for D in [4, 12], N in [234, 5678]
+    @testset "Quarter Circle" begin
+        D = 4
+        N = 2_000
         Ω(z, t, p) = CanonicalSymplecticMatrix(D)
         pinv = SecondPoincareInvariant{Float64}(Ω, D, N, Val(false))
 
-        parampoints = getpoints(pinv)
-
         phasepoints = getpoints(pinv) do r, θ
-            ntuple(D) do i
-                i == 1 && return r * cos(θ * π/2)
-                i == D ÷ 2 + 1 && return r * sin(θ * π/2)
-                return 0
-            end
+            (0, r * cos(θ * π/2), 0, r * sin(θ * π/2))
         end
 
         @test abs(π/4 - compute!(pinv, phasepoints, 0, nothing)) / eps() < 10
 
-        free_particle!.(eachrow(phasepoints), 10)
+        free_particle!(phasepoints, 10)
         @test abs(π/4 - compute!(pinv, phasepoints, 0, nothing)) / eps() < 20
 
-        free_particle!.(eachrow(phasepoints), 100)
+        free_particle!(phasepoints, 100)
         @test abs(π/4 - compute!(pinv, phasepoints, 0, nothing)) / eps() < 200
-
-        free_particle!.(eachrow(phasepoints), 1000)
-        @test abs(π/4 - compute!(pinv, phasepoints, 0, nothing)) / eps() < 2_000
     end
 
-    @testset "$N Points on Half Sphere in 4D" for N in [345, 2345]
+    @testset "Half Sphere in 4D" begin
         D = 4
+        N = 1500
         Ω(z, t, p) = CanonicalSymplecticMatrix(D)
         pinv = SecondPoincareInvariant{Float64}(Ω, D, N, Val(false))
-
-        parampoints = getpoints(pinv)
 
         phasepoints = getpoints(pinv) do θ, ϕ
             sinθ, cosθ = sincospi(θ)
@@ -97,13 +86,10 @@ end
 
         @test abs(-π - compute!(pinv, phasepoints, 0, nothing)) / eps() < 15
 
-        free_particle!.(eachrow(phasepoints), 10)
+        free_particle!(phasepoints, 10)
         @test abs(-π - compute!(pinv, phasepoints, 0, nothing)) / eps() < 15
 
-        free_particle!.(eachrow(phasepoints), 100)
+        free_particle!(phasepoints, 100)
         @test abs(-π - compute!(pinv, phasepoints, 0, nothing)) / eps() < 150
-
-        free_particle!.(eachrow(phasepoints), 1000)
-        @test abs(-π - compute!(pinv, phasepoints, 0, nothing)) / eps() < 1_500
     end
 end
