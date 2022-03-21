@@ -31,6 +31,20 @@ using PoincareInvariants.SecondPoincareInvariants.Trapezoidal
         0  , 0.5, 1.0,
         0  , 0.5, 1.0]
 
+    reshapepnts = getpoints((x, y) -> (3x, 4y), Float64, (4, 5), TrapezoidalPlan)
+    @test reshape(reshapepnts[1], 5, 4) ≈ [
+        0 1 2 3;
+        0 1 2 3;
+        0 1 2 3;
+        0 1 2 3;
+        0 1 2 3]
+    @test reshape(reshapepnts[2], 5, 4) ≈ [
+        0 0 0 0;
+        1 1 1 1;
+        2 2 2 2;
+        3 3 3 3;
+        4 4 4 4]
+
     @test getpoints((x, y) -> y, Float64, 120, TrapezoidalPlan) ≈ Float64[
         0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,
         0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,
