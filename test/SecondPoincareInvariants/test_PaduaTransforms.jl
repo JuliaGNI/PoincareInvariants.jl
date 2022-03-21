@@ -397,7 +397,7 @@ end
         vals = Vector{Float64}(undef, getpaduanum(n))
         invpaduatransform!(vals, invplan, coeffs)
 
-        @test maximum(abs, vals .- testvals) / eps() < 0.1 * n^3.3
+        @test maximum(abs, vals .- testvals) / eps() < 0.2 * n^3.3
     end
 end
 
