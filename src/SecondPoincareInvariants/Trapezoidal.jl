@@ -2,13 +2,15 @@ module Trapezoidal
 
 using ...PoincareInvariants: @argcheck
 import ...PoincareInvariants: compute!, getpoints, getpointnum
+import ..SecondPoincareInvariants: getpointspec
 
 struct TrapezoidalPlan end
 
-_totuple(N::Integer) = (n = ceil(Int, sqrt(Int(N))); (n, n))
+getpointnum(dims::NTuple{2, Integer}, ::Type{<:TrapezoidalPlan}) = dims[1] * dims[2]
+getpointnum(N, ::Type{T}) where T <: TrapezoidalPlan = getpointnum(getpointspec(N, T), T)
 
-getpointnum(N::Integer, ::Type{<:TrapezoidalPlan}) = getpointnum(_totuple(N), TrapezoidalPlan)
-getpointnum(t::NTuple{2, Integer}, ::Type{<:TrapezoidalPlan}) = t[1] * t[2]
+getpointspec(dims::NTuple{2, Integer}, ::Type{<:TrapezoidalPlan}) = dims
+getpointspec(N::Integer, ::Type{<:TrapezoidalPlan}) = (n = ceil(Int, sqrt(Int(N))); (n, n))
 
 function getpoints(f, ::Type{T}, dims::NTuple{2, Integer}, ::Type{<:TrapezoidalPlan}) where T
     D = length(f(zero(T), zero(T)))
@@ -30,9 +32,6 @@ function getpoints(f, ::Type{T}, dims::NTuple{2, Integer}, ::Type{<:TrapezoidalP
     # Should return vector [...] instead of ([...],) in 1D case
     return D == 1 ? out[1] : out
 end
-
-getpoints(f, T, N::Integer, ::Type{<:TrapezoidalPlan}) =
-    getpoints(f, T, _totuple(N), TrapezoidalPlan)
 
 ## Differentiation ##
 

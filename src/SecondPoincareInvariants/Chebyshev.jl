@@ -6,8 +6,11 @@ Chebyshev polynomials
 """
 module Chebyshev
 
-using ...PoincareInvariants: @argcheck
 import ...PoincareInvariants: compute!, getpoints, getpointnum
+import ..SecondPoincareInvariants: getpointspec
+
+using ...PoincareInvariants: @argcheck
+using ..SecondPoincareInvariants: SecondPoincareInvariant
 
 using Base: Callable
 using LinearAlgebra
@@ -153,10 +156,13 @@ function ChebyshevPlan{T}(Ω::Callable, D::Integer, N::Integer) where T
     )
 end
 
-function compute!(plan::ChebyshevPlan, Ω::Callable, phasepoints, t, p)
+function compute!(
+    pinv::SecondPoincareInvariant{T, ΩT, NT, P}, phasepoints, t, p
+) where {T, ΩT <: Callable, NT, P <: ChebyshevPlan}
+    plan = pinv.plan
     paduatransform!(plan.phasecoeffs, plan.paduaplan, phasepoints)
     differentiate!(plan.∂x, plan.∂y, plan.diffplan, plan.phasecoeffs)
-    getintegrand!(plan.intcoeffs, plan.intplan, Ω, phasepoints, t, p, plan.∂x, plan.∂y)
+    getintegrand!(plan.intcoeffs, plan.intplan, pinv.Ω, phasepoints, t, p, plan.∂x, plan.∂y)
     integrate(plan.intcoeffs, plan.integrator)
 end
 
@@ -167,7 +173,7 @@ end
 #     integrate(plan.intcoeffs, plan.intplan)
 # end
 
-## getpoints and getpointnum ##
+## getpoints, getpointspec and getpointnum ##
 
 getpointnum(N::Integer, ::Type{<:ChebyshevPlan}) = nextpaduanum(N)
 getpointnum(dims::NTuple{2, Integer}, ::Type{<:ChebyshevPlan}) = nextpaduanum(dims[1] * dims[2])

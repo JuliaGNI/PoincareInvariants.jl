@@ -3,8 +3,7 @@
 using PoincareInvariants.SecondPoincareInvariants.Chebyshev
 
 @safetestset "Differentiation" begin
-    using ..Chebyshev:
-        DiffPlan, differentiate!
+    using ..Chebyshev: DiffPlan, differentiate!
 
     @test DiffPlan{Float64}(5).D == [0  1  0  3  0   5;
                                      0  0  4  0  8   0;
@@ -146,18 +145,17 @@ end
 
 @safetestset "compute! with ChebyshevPlan (OOP)" begin
     using ..Chebyshev.PaduaTransforms
-    using ..Chebyshev:
-        ChebyshevPlan, compute!, DiffPlan
+    using ..Chebyshev: ChebyshevPlan, compute!, DiffPlan
+    using PoincareInvariants.SecondPoincareInvariants
     using PoincareInvariants.CanonicalSymplecticStructures
 
 
     D = 12
     N = 200
     Ω(v, t, p) = CanonicalSymplecticMatrix(D)
-    plan = ChebyshevPlan{Float64}(Ω, D, N)
-
     pointnum = nextpaduanum(N)
     degree = getdegree(pointnum)
+    plan = ChebyshevPlan{Float64}(Ω, D, pointnum)
 
     testphasecoeffs = [zeros(degree+1, degree+1) for _ in 1:D]
     test∂x = [zeros(degree+1, degree+1) for _ in 1:D]
@@ -172,7 +170,8 @@ end
         end
     end
 
-    @test compute!(plan, Ω, phasepoints, 0, nothing) ≈ 4 atol=20eps()
+    pinv = SecondPoincareInvariant{Float64}(Ω, D, pointnum, plan)
+    @test compute!(pinv, phasepoints, 0, nothing) ≈ 4 atol=20eps()
 
     testphasecoeffs[1][1, 2] = 1  # 1 x
     testphasecoeffs[D ÷ 2 + 1][2, 1] = 1 # 1 y
@@ -191,11 +190,15 @@ end
     @test maximum(abs, plan.intcoeffs .- testintcoeffs) / eps() < 50
 end
 
-@safetestset "getpoints and getpointnum" begin
+@safetestset "getpoints, getpointspec and getpointnum" begin
     using ..Chebyshev.PaduaTransforms
     using ..Chebyshev: ChebyshevPlan, getpoints, getpointnum
+    using PoincareInvariants.SecondPoincareInvariants: getpointspec
 
-    for N in [10, 4321, 162178], T in [Float32, Float64]
+    for N in [10, 321, 2178], T in [Float32, Float64]
+        @test getpointspec(N, ChebyshevPlan) == nextpaduanum(N)
+        @test getpointspec((N, 2N), ChebyshevPlan) == nextpaduanum(N * 2N)
+
         @test getpointnum(N, ChebyshevPlan) == nextpaduanum(N)
         @test getpointnum((7, N), ChebyshevPlan) == nextpaduanum(7 * N)
 

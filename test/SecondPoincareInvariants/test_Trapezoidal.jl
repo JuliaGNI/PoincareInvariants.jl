@@ -1,7 +1,11 @@
 using PoincareInvariants.SecondPoincareInvariants.Trapezoidal
 
-@safetestset "getpoints and getpointnum" begin
-    using ..Trapezoidal: TrapezoidalPlan, getpoints, getpointnum
+@safetestset "getpoints, getpointspec and getpointnum" begin
+    using ..Trapezoidal: TrapezoidalPlan, getpoints, getpointnum, getpointspec
+
+    @test getpointspec(50, TrapezoidalPlan) == (8, 8)
+    @test getpointspec(87, TrapezoidalPlan) == (10, 10)
+    @test getpointspec((53, 42), TrapezoidalPlan) == (53, 42)
 
     @test getpointnum(50, TrapezoidalPlan) == 64
     @test getpointnum(87, TrapezoidalPlan) == 100
@@ -16,7 +20,7 @@ using PoincareInvariants.SecondPoincareInvariants.Trapezoidal
     @test getpointnum((123, 908342), TrapezoidalPlan) == 123 * 908342
 
     @inferred NTuple{3, Vector{Float64}} getpoints((x, y) -> (x, y, x+y), Float64, (7, 4), TrapezoidalPlan)
-    @inferred Vector{Float32} getpoints((x, y) -> sin(x), Float32, 64, TrapezoidalPlan)
+    @inferred Vector{Float32} getpoints((x, y) -> sin(x), Float32, (8, 8), TrapezoidalPlan)
 
     @test getpoints((x, y) -> (x, y), Float64, (5, 3), TrapezoidalPlan)[1] ≈ [
         0   , 0   , 0   ,
@@ -45,7 +49,7 @@ using PoincareInvariants.SecondPoincareInvariants.Trapezoidal
         3 3 3 3;
         4 4 4 4]
 
-    @test getpoints((x, y) -> y, Float64, 120, TrapezoidalPlan) ≈ Float64[
+    @test getpoints((x, y) -> y, Float64, (11, 11), TrapezoidalPlan) ≈ Float64[
         0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,
         0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,
         0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,
@@ -59,13 +63,14 @@ using PoincareInvariants.SecondPoincareInvariants.Trapezoidal
         0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,
     ]
 
-    testpnts = getpoints((x, y) -> (x, y), Float64, 6342, TrapezoidalPlan)
-    pnts4 = getpoints(Float64, 6342, TrapezoidalPlan) do x, y
+    ps = getpointspec(6342, TrapezoidalPlan)
+    testpnts = getpoints((x, y) -> (x, y), Float64, ps, TrapezoidalPlan)
+    pnts4 = getpoints(Float64, ps, TrapezoidalPlan) do x, y
         x, y, x * y, x + y
     end
     @test pnts4 isa NTuple{4, Vector{Float64}}
     @test all(pnts4) do v
-        length(v) == getpointnum(6342, TrapezoidalPlan)
+        length(v) == getpointnum(ps, TrapezoidalPlan)
     end
 
     @test pnts4[1] ≈ testpnts[1]
