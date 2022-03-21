@@ -75,5 +75,50 @@ using PoincareInvariants.SecondPoincareInvariants.Trapezoidal
 end
 
 @safetestset "Differentiation" begin
-    using ..Trapezoidal
+    using ..Trapezoidal: getpoints, TrapezoidalPlan, differentiate!
+
+    let f(x, y) = sinpi(x) * exp(-y^2) + x * y
+        dims = (4, 3)
+        vals = getpoints(f, Float64, dims, TrapezoidalPlan)
+
+        ∂x = zeros(Float64, length(vals))
+        ∂y = zeros(Float64, length(vals))
+
+        differentiate!(∂x, ∂y, vals, dims)
+
+        Δx = 1 / 3
+        @test ∂x ≈ [
+            f(1/3,  0)-f(0,  0)  (f(2/3,  0)-f(0,  0))/2  (f(1,  0)-f(1/3,  0))/2  f(1,  0)-f(2/3,  0);
+            f(1/3,1/2)-f(0,1/2)  (f(2/3,1/2)-f(0,1/2))/2  (f(1,1/2)-f(1/3,1/2))/2  f(1,1/2)-f(2/3,1/2);
+            f(1/3,  1)-f(0,  1)  (f(2/3,  1)-f(0,  1))/2  (f(1,  1)-f(1/3,  1))/2  f(1,  1)-f(2/3,  1);
+        ] ./ Δx |> vec
+
+        Δy = 1 / 2
+        @test ∂y ≈ [
+            f(0,1/2)-f(0,  0)     f(1/3,1/2)-f(1/3,  0)     f(2/3,1/2)-f(2/3,  0)     f(1,1/2)-f(1,  0);
+            (f(0,  1)-f(0,  0))/2 (f(1/3,  1)-f(1/3,  0))/2 (f(2/3,  1)-f(2/3,  0))/2 (f(1,  1)-f(1,  0))/2;
+            f(0,  1)-f(0,1/2)     f(1/3,  1)-f(1/3,1/2)     f(2/3,  1)-f(2/3,1/2)     f(1,  1)-f(1,1/2);
+        ] ./ Δy |> vec
+    end
+
+    let f(x, y) = sinpi(x) * y^2
+        dims = (1000, 1000)
+        vals = getpoints(f, Float64, dims, TrapezoidalPlan)
+
+        ∂x = zeros(Float64, length(vals))
+        ∂y = zeros(Float64, length(vals))
+
+        differentiate!(∂x, ∂y, vals, dims)
+
+        test∂x = getpoints(Float64, dims, TrapezoidalPlan) do x, y
+            π * cospi(x) * y^2
+        end
+
+        test∂y = getpoints(Float64, dims, TrapezoidalPlan) do x, y
+            sinpi(x) * 2 * y
+        end
+
+        @test maximum(abs, test∂y .- ∂y) < 2e-3
+        @test maximum(abs, test∂y .- ∂y) < 2e-3
+    end
 end

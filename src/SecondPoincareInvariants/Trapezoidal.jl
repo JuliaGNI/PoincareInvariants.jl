@@ -1,5 +1,8 @@
 module Trapezoidal
 
+using ...PoincareInvariants: @argcheck
+import ...PoincareInvariants: compute!, getpoints, getpointnum
+
 struct TrapezoidalPlan end
 
 _totuple(N::Integer) = (n = ceil(Int, sqrt(Int(N))); (n, n))
@@ -30,6 +33,55 @@ end
 
 getpoints(f, T, N::Integer, ::Type{<:TrapezoidalPlan}) =
     getpoints(f, T, _totuple(N), TrapezoidalPlan)
+
+## Differentiation ##
+
+function differentiate!(
+    ∂x::AbstractVector, ∂y::AbstractVector, vals::AbstractVector, dims::NTuple{2, Integer}
+)
+    nx, ny = dims
+    ∂xmat = reshape(∂x, ny, nx)
+    ∂ymat = reshape(∂y, ny, nx)
+    valsmat = reshape(vals, ny, nx)
+
+    @argcheck nx >= 2 && ny >= 2 "must have at least 2×2 points to calculate both derivatives"
+    @argcheck axes(∂xmat) == axes(∂ymat) == axes(valsmat) "axes of derivatives and values must match"
+    @argcheck axes(valsmat) == (1:ny, 1:nx) "reshaped derivatives and values must use one-based indexing"
+
+    invΔx = nx - 1
+    invΔy = ny - 1
+
+    # borders
+    @inbounds for iy in 1:ny
+        ∂xmat[iy,  1] = (valsmat[iy,  2] - valsmat[iy,    1]) * invΔx
+        ∂xmat[iy, nx] = (valsmat[iy, nx] - valsmat[iy, nx-1]) * invΔx
+    end
+
+    @inbounds for ix in 1:nx
+        ∂ymat[ 1, ix] = (valsmat[2,  ix] - valsmat[   1, ix]) * invΔy
+        ∂ymat[ny, ix] = (valsmat[ny, ix] - valsmat[ny-1, ix]) * invΔy
+    end
+
+
+    # interior (uses central differences)
+    if nx >= 3
+        @inbounds for ix in 2:nx-1
+            for iy in 1:ny
+                ∂xmat[iy, ix] = (valsmat[iy, ix+1] - valsmat[iy, ix-1]) * invΔx / 2
+            end
+        end
+    end
+
+    if ny >= 3
+        @inbounds for ix in 1:nx
+            for iy in 2:ny-1
+                ∂ymat[iy, ix] = (valsmat[iy+1, ix] - valsmat[iy-1, ix]) * invΔy / 2
+            end
+        end
+    end
+
+    return ∂x, ∂y
+end
 
 #=
 
