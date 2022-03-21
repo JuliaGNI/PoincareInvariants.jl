@@ -40,26 +40,25 @@ function differentiate!(
     ∂x::AbstractVector, ∂y::AbstractVector, vals::AbstractVector, dims::NTuple{2, Integer}
 )
     nx, ny = dims
-    ∂xmat = reshape(∂x, ny, nx)
-    ∂ymat = reshape(∂y, ny, nx)
-    valsmat = reshape(vals, ny, nx)
-
     @argcheck nx >= 2 && ny >= 2 "must have at least 2×2 points to calculate both derivatives"
-    @argcheck axes(∂xmat) == axes(∂ymat) == axes(valsmat) "axes of derivatives and values must match"
-    @argcheck axes(valsmat) == (1:ny, 1:nx) "reshaped derivatives and values must use one-based indexing"
+    @argcheck axes(∂x) == axes(∂y) == axes(vals) "axes of derivatives and values must match"
+    @argcheck length(vals) == nx * ny "length of vals and length implied by dims must match"
 
     invΔx = nx - 1
     invΔy = ny - 1
 
+    # cartesian to linear index
+    _li(iy, ix) = axes(vals, 1)[(ix - 1) * ny + iy]
+
     # borders
     @inbounds for iy in 1:ny
-        ∂xmat[iy,  1] = (valsmat[iy,  2] - valsmat[iy,    1]) * invΔx
-        ∂xmat[iy, nx] = (valsmat[iy, nx] - valsmat[iy, nx-1]) * invΔx
+        ∂x[_li(iy,  1)] = (vals[_li(iy,  2)] - vals[_li(iy,    1)]) * invΔx
+        ∂x[_li(iy, nx)] = (vals[_li(iy, nx)] - vals[_li(iy, nx-1)]) * invΔx
     end
 
     @inbounds for ix in 1:nx
-        ∂ymat[ 1, ix] = (valsmat[2,  ix] - valsmat[   1, ix]) * invΔy
-        ∂ymat[ny, ix] = (valsmat[ny, ix] - valsmat[ny-1, ix]) * invΔy
+        ∂y[_li( 1, ix)] = (vals[_li( 2, ix)] - vals[_li(   1, ix)]) * invΔy
+        ∂y[_li(ny, ix)] = (vals[_li(ny, ix)] - vals[_li(ny-1, ix)]) * invΔy
     end
 
 
@@ -67,7 +66,7 @@ function differentiate!(
     if nx >= 3
         @inbounds for ix in 2:nx-1
             for iy in 1:ny
-                ∂xmat[iy, ix] = (valsmat[iy, ix+1] - valsmat[iy, ix-1]) * invΔx / 2
+                ∂x[_li(iy, ix)] = (vals[_li(iy, ix+1)] - vals[_li(iy, ix-1)]) * invΔx / 2
             end
         end
     end
@@ -75,7 +74,7 @@ function differentiate!(
     if ny >= 3
         @inbounds for ix in 1:nx
             for iy in 2:ny-1
-                ∂ymat[iy, ix] = (valsmat[iy+1, ix] - valsmat[iy-1, ix]) * invΔy / 2
+                ∂y[_li(iy, ix)] = (vals[_li(iy+1, ix)] - vals[_li(iy-1, ix)]) * invΔy / 2
             end
         end
     end
