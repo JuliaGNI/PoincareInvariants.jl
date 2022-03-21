@@ -41,7 +41,8 @@ function differentiate!(
 )
     nx, ny = dims
     @argcheck nx >= 2 && ny >= 2 "must have at least 2×2 points to calculate both derivatives"
-    @argcheck axes(∂x) == axes(∂y) == axes(vals) "axes of derivatives and values must match"
+    @argcheck axes(∂x, 1) == axes(∂y, 1) == axes(vals, 1) "axes of derivatives and " *
+        "values must match"
     @argcheck length(vals) == nx * ny "length of vals and length implied by dims must match"
 
     invΔx = nx - 1
@@ -81,6 +82,19 @@ function differentiate!(
 
     return ∂x, ∂y
 end
+
+function differentiate!(∂x, ∂y, vals, dims::NTuple{2, Integer})
+    @argcheck length(∂x) == length(∂y) == length(vals) "number of derivative and vals " *
+        "vectors must match"
+
+    for (∂xi, ∂yi, valsi) in zip(∂x, ∂y, vals)
+        differentiate!(∂xi, ∂yi, valsi, dims)
+    end
+
+    return ∂x, ∂y
+end
+
+
 
 #=
 

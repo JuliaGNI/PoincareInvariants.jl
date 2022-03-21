@@ -121,4 +121,24 @@ end
         @test maximum(abs, test∂y .- ∂y) < 2e-3
         @test maximum(abs, test∂y .- ∂y) < 2e-3
     end
+
+    let f(x, y) = (x * exp(-x^2 - y^2), x + y, y * sinpi(x), x * y)
+        dims = (75, 125)
+        vals = getpoints(f, Float64, dims, TrapezoidalPlan)
+        N = dims[1] * dims[2]
+
+        ∂x = zeros(Float64, N, 4)
+        ∂y = zeros(Float64, N, 4)
+
+        differentiate!(eachcol(∂x), eachcol(∂y), vals, dims)
+
+        for i in 1:4
+            ∂xi = zeros(Float64, N)
+            ∂yi = zeros(Float64, N)
+            differentiate!(∂xi, ∂yi, vals[i], dims)
+
+            @test ∂x[:, i] == ∂xi
+            @test ∂y[:, i] == ∂yi
+        end
+    end
 end
