@@ -1,13 +1,13 @@
-module FiniteDifferences
+module Trapezoidal
 
-struct FiniteDiffPlan end
+struct TrapezoidalPlan end
 
 _totuple(N::Integer) = (n = ceil(Int, sqrt(Int(N))); (n, n))
 
-getpointnum(N::Integer, ::Type{<:FiniteDiffPlan}) = getpointnum(_totuple(N), FiniteDiffPlan)
-getpointnum(t::NTuple{2, Integer}, ::Type{<:FiniteDiffPlan}) = t[1] * t[2]
+getpointnum(N::Integer, ::Type{<:TrapezoidalPlan}) = getpointnum(_totuple(N), TrapezoidalPlan)
+getpointnum(t::NTuple{2, Integer}, ::Type{<:TrapezoidalPlan}) = t[1] * t[2]
 
-function getpoints(f, ::Type{T}, t::NTuple{2, Integer}, ::Type{<:FiniteDiffPlan}) where T
+function getpoints(f, ::Type{T}, t::NTuple{2, Integer}, ::Type{<:TrapezoidalPlan}) where T
     D = length(f(zero(T), zero(T)))
     nx, ny = t
     N = nx * ny
@@ -28,8 +28,8 @@ function getpoints(f, ::Type{T}, t::NTuple{2, Integer}, ::Type{<:FiniteDiffPlan}
     return D == 1 ? out[1] : out
 end
 
-getpoints(f, T, N::Integer, ::Type{<:FiniteDiffPlan}) =
-    getpoints(f, T, _totuple(N), FiniteDiffPlan)
+getpoints(f, T, N::Integer, ::Type{<:TrapezoidalPlan}) =
+    getpoints(f, T, _totuple(N), TrapezoidalPlan)
 
 #=
 
@@ -270,4 +270,4 @@ end
 
 =#
 
-end  # FiniteDifferences
+end  # Trapezoidal

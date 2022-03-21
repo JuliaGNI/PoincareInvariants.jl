@@ -54,7 +54,7 @@ getpointnum(pinv::SecondPoincareInvariant{T, Ω, P}) where {T, Ω, NT, P} =
 ## Implementation(s)
 
 include("Chebyshev.jl")
-include("FiniteDifferences.jl")
+include("Trapezoidal.jl")
 
 const DEFAULT_PLAN_TYPE = Chebyshev.ChebyshevPlan
 
