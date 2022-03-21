@@ -54,7 +54,7 @@ getpointspec(N, P) = getpointnum(N, P)
 ## Implementation(s)
 
 include("Chebyshev.jl")
-include("Trapezoidal.jl")
+include("FiniteDifferences.jl")
 
 const DEFAULT_PLAN_TYPE = Chebyshev.ChebyshevPlan
 

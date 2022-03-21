@@ -1,7 +1,7 @@
 @safetestset "Chebyshev Implementation" begin include("test_Chebyshev.jl") end
 
-@safetestset "Trapezoidal Implementation" begin
-    include("test_Trapezoidal.jl")
+@safetestset "FiniteDifferences Implementation" begin
+    include("test_FiniteDifferences.jl")
 end
 
 @safetestset "SecondPoincareInvariant OOP" begin

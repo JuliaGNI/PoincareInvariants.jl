@@ -1,18 +1,30 @@
-module Trapezoidal
+module FiniteDifferences
 
 using ...PoincareInvariants: @argcheck
 import ...PoincareInvariants: compute!, getpoints, getpointnum
 import ..SecondPoincareInvariants: getpointspec
 
-struct TrapezoidalPlan end
+struct FiniteDiffPlan end
 
-getpointnum(dims::NTuple{2, Integer}, ::Type{<:TrapezoidalPlan}) = dims[1] * dims[2]
-getpointnum(N, ::Type{T}) where T <: TrapezoidalPlan = getpointnum(getpointspec(N, T), T)
+function getpointnum(dims::NTuple{2, Integer}, ::Type{<:FiniteDiffPlan})
+    nx, ny = getpointspec(dims, FiniteDiffPlan)
+    return nx * ny
+end
 
-getpointspec(dims::NTuple{2, Integer}, ::Type{<:TrapezoidalPlan}) = dims
-getpointspec(N::Integer, ::Type{<:TrapezoidalPlan}) = (n = ceil(Int, sqrt(Int(N))); (n, n))
+getpointnum(N, ::Type{T}) where T <: FiniteDiffPlan = getpointnum(getpointspec(N, T), T)
 
-function getpoints(f, ::Type{T}, dims::NTuple{2, Integer}, ::Type{<:TrapezoidalPlan}) where T
+nextodd(n::Integer)::Int = n <= 3 ? 3 : 2 * fld(n, 2) + 1
+
+function getpointspec(dims::NTuple{2, Integer}, ::Type{<:FiniteDiffPlan})
+    return (nextodd(dims[1]), nextodd(dims[2]))
+end
+
+function getpointspec(N::Integer, ::Type{<:FiniteDiffPlan})
+    n = nextodd(ceil(Int, sqrt(Int(N))))
+    return (n, n)
+end
+
+function getpoints(f, ::Type{T}, dims::NTuple{2, Integer}, ::Type{<:FiniteDiffPlan}) where T
     D = length(f(zero(T), zero(T)))
     nx, ny = dims
     N = nx * ny
@@ -36,48 +48,45 @@ end
 ## Differentiation ##
 
 function differentiate!(
-    ∂x::AbstractVector, ∂y::AbstractVector, vals::AbstractVector, dims::NTuple{2, Integer}
-)
+    ∂x::AbstractVector, ∂y::AbstractVector, vals::AbstractVector{T},
+    dims::NTuple{2, Integer}
+) where T
     nx, ny = dims
-    @argcheck nx >= 2 && ny >= 2 "must have at least 2×2 points to calculate both derivatives"
+    @argcheck nx >= 3 && ny >= 3 "must have at least 3×3 points to calculate both derivatives"
     @argcheck axes(∂x, 1) == axes(∂y, 1) == axes(vals, 1) "axes of derivatives and " *
         "values must match"
     @argcheck length(vals) == nx * ny "length of vals and length implied by dims must match"
 
-    invΔx = nx - 1
-    invΔy = ny - 1
-
     # cartesian to linear index
     _li(iy, ix) = axes(vals, 1)[(ix - 1) * ny + iy]
 
-    # borders
+    # borders (derivatives of quadratic approximation)
     @inbounds for iy in 1:ny
-        ∂x[_li(iy,  1)] = (vals[_li(iy,  2)] - vals[_li(iy,    1)]) * invΔx
-        ∂x[_li(iy, nx)] = (vals[_li(iy, nx)] - vals[_li(iy, nx-1)]) * invΔx
+        ∂x[_li(iy,  1)] = 4 * vals[_li(iy,  2)] - 3 * vals[_li(iy,    1)] - vals[_li(iy,    3)]
+        ∂x[_li(iy, nx)] = 3 * vals[_li(iy, nx)] - 4 * vals[_li(iy, nx-1)] + vals[_li(iy, nx-2)]
     end
 
     @inbounds for ix in 1:nx
-        ∂y[_li( 1, ix)] = (vals[_li( 2, ix)] - vals[_li(   1, ix)]) * invΔy
-        ∂y[_li(ny, ix)] = (vals[_li(ny, ix)] - vals[_li(ny-1, ix)]) * invΔy
+        ∂y[_li( 1, ix)] = 4 * vals[_li( 2, ix)] - 3 * vals[_li(1   , ix)] - vals[_li(   3, ix)]
+        ∂y[_li(ny, ix)] = 3 * vals[_li(ny, ix)] - 4 * vals[_li(ny-1, ix)] + vals[_li(ny-2, ix)]
     end
 
 
     # interior (uses central differences)
-    if nx >= 3
-        @inbounds for ix in 2:nx-1
-            for iy in 1:ny
-                ∂x[_li(iy, ix)] = (vals[_li(iy, ix+1)] - vals[_li(iy, ix-1)]) * invΔx / 2
-            end
+    @inbounds for ix in 2:nx-1
+        for iy in 1:ny
+            ∂x[_li(iy, ix)] = vals[_li(iy, ix+1)] - vals[_li(iy, ix-1)]
         end
     end
 
-    if ny >= 3
-        @inbounds for ix in 1:nx
-            for iy in 2:ny-1
-                ∂y[_li(iy, ix)] = (vals[_li(iy+1, ix)] - vals[_li(iy-1, ix)]) * invΔy / 2
-            end
+    @inbounds for ix in 1:nx
+        for iy in 2:ny-1
+            ∂y[_li(iy, ix)] = vals[_li(iy+1, ix)] - vals[_li(iy-1, ix)]
         end
     end
+
+    ∂x .*= T(nx - 1) / 2
+    ∂y .*= T(ny - 1) / 2
 
     return ∂x, ∂y
 end
@@ -334,4 +343,4 @@ end
 
 =#
 
-end  # Trapezoidal
+end  # FiniteDifferences
