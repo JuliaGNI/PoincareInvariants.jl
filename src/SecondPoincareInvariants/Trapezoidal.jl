@@ -7,9 +7,9 @@ _totuple(N::Integer) = (n = ceil(Int, sqrt(Int(N))); (n, n))
 getpointnum(N::Integer, ::Type{<:TrapezoidalPlan}) = getpointnum(_totuple(N), TrapezoidalPlan)
 getpointnum(t::NTuple{2, Integer}, ::Type{<:TrapezoidalPlan}) = t[1] * t[2]
 
-function getpoints(f, ::Type{T}, t::NTuple{2, Integer}, ::Type{<:TrapezoidalPlan}) where T
+function getpoints(f, ::Type{T}, dims::NTuple{2, Integer}, ::Type{<:TrapezoidalPlan}) where T
     D = length(f(zero(T), zero(T)))
-    nx, ny = t
+    nx, ny = dims
     N = nx * ny
     out = ntuple(_ -> Vector{T}(undef, N), D)
 

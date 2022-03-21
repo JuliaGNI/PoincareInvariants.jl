@@ -170,7 +170,7 @@ end
 ## getpoints and getpointnum ##
 
 getpointnum(N::Integer, ::Type{<:ChebyshevPlan}) = nextpaduanum(N)
-getpointnum(N::NTuple{2, Integer}, ::Type{<:ChebyshevPlan}) = nextpaduanum(N[1] * N[2])
+getpointnum(dims::NTuple{2, Integer}, ::Type{<:ChebyshevPlan}) = nextpaduanum(dims[1] * dims[2])
 
 function getpoints(f, ::Type{T}, N, ::Type{<:ChebyshevPlan}) where T
     degree = nextdegree(N)
