@@ -141,7 +141,7 @@ function _sw(i, n)
     end
 end
 
-function simpsonweights(::Type{T}, nx, ny) where T
+function getsimpweights(::Type{T}, nx, ny) where T
     w = Matrix{T}(undef, ny, nx)
     for x in 1:nx
         wx = _sw(x, nx)
