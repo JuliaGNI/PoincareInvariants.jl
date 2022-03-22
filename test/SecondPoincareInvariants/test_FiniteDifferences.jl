@@ -82,36 +82,59 @@ end
 @safetestset "Differentiation" begin
     using ..FiniteDifferences: getpoints, FiniteDiffPlan, differentiate!
 
-    let f(x, y) = sinpi(x) * exp(-y^2) + x * y
-        dims = (3, 5)
-        vals = getpoints(f, Float64, dims, FiniteDiffPlan)
+    # Finite difference derivatives should be exact for a quadratic
+    let f(x, y)  = 1 + 0.75*x + y - 0.5*x*x - y*y - 1.5*x*y
+        fx(x, y) = 0.75 - x - 1.5*y
+        fy(x, y) = 1 - 2*y - 1.5*x
 
-        ∂x = zeros(Float64, length(vals))
-        ∂y = zeros(Float64, length(vals))
+        # small
+        sdims = (3, 3)
+        svals = getpoints(f, Float64, sdims, FiniteDiffPlan)
 
-        differentiate!(∂x, ∂y, vals, dims)
+        s∂x = zeros(Float64, length(svals))
+        s∂y = zeros(Float64, length(svals))
 
-        Δx = 1 / 2
-        @test ∂x ≈ [
-            4f(0.5,   0)-3f(0,   0)-f(1,   0)  f(1,   0)-f(0,   0)  3f(1,   0)-4f(0.5,   0)+f(0,   0);
-            4f(0.5,0.25)-3f(0,0.25)-f(1,0.25)  f(1,0.25)-f(0,0.25)  3f(1,0.25)-4f(0.5,0.25)+f(0,0.25);
-            4f(0.5, 0.5)-3f(0, 0.5)-f(1, 0.5)  f(1, 0.5)-f(0, 0.5)  3f(1, 0.5)-4f(0.5, 0.5)+f(0, 0.5);
-            4f(0.5,0.75)-3f(0,0.75)-f(1,0.75)  f(1,0.75)-f(0,0.75)  3f(1,0.75)-4f(0.5,0.75)+f(0,0.75);
-            4f(0.5,   1)-3f(0,   1)-f(1,   1)  f(1,   1)-f(0,   1)  3f(1,   1)-4f(0.5,   1)+f(0,   1);
-        ] ./ 2 ./ Δx |> vec
+        differentiate!(s∂x, s∂y, svals, sdims)
 
-        Δy = 1 / 4
-        @test ∂y ≈ [
-            4f(0,0.25)-3f(0,   0)-f(0,0.5)  4f(0.5,0.25)-3f(0.5,   0)-f(0.5,0.5)  4f(1,0.25)-3f(1,   0)-f(1,0.5);
-             f(0, 0.5)- f(0,   0)            f(0.5, 0.5)- f(0.5,   0)              f(1, 0.5)- f(1,   0)         ;
-             f(0,0.75)- f(0,0.25)            f(0.5,0.75)- f(0.5,0.25)              f(1,0.75)- f(1,0.25)         ;
-             f(0,   1)- f(0, 0.5)            f(0.5,   1)- f(0.5, 0.5)              f(1,   1)- f(1, 0.5)         ;
-            3f(0,   1)-4f(0,0.75)+f(0,0.5)  3f(0.5,   1)-4f(0.5,0.75)+f(0.5,0.5)  3f(1,   1)-4f(1,0.75)+f(1,0.5)
-        ] ./ 2 ./ Δy |> vec
+        sfx = getpoints(fx, Float64, sdims, FiniteDiffPlan)
+        @test maximum(abs, s∂x .- sfx) / eps() < 50
+
+        sfy = getpoints(fy, Float64, sdims, FiniteDiffPlan)
+        @test maximum(abs, s∂y .- sfy) / eps() < 50
+
+        # medium
+        mdims = (21, 33)
+        mvals = getpoints(f, Float64, mdims, FiniteDiffPlan)
+
+        m∂x = zeros(Float64, length(mvals))
+        m∂y = zeros(Float64, length(mvals))
+
+        differentiate!(m∂x, m∂y, mvals, mdims)
+
+        mfx = getpoints(fx, Float64, mdims, FiniteDiffPlan)
+        @test maximum(abs, s∂x .- sfx) / eps() < 500
+
+        mfy = getpoints(fy, Float64, mdims, FiniteDiffPlan)
+        @test maximum(abs, s∂y .- sfy) / eps() < 500
+
+        # large
+        ldims = (331, 123)
+        lvals = getpoints(f, Float64, ldims, FiniteDiffPlan)
+
+        l∂x = zeros(Float64, length(lvals))
+        l∂y = zeros(Float64, length(lvals))
+
+        differentiate!(l∂x, l∂y, lvals, ldims)
+
+        lfx = getpoints(fx, Float64, ldims, FiniteDiffPlan)
+        @test maximum(abs, s∂x .- sfx) / eps() < 5000
+
+        lfy = getpoints(fy, Float64, ldims, FiniteDiffPlan)
+        @test maximum(abs, s∂x .- sfx) / eps() < 5000
     end
 
     let f(x, y) = sinpi(x) * exp(y)
-        dims = (999, 1001)
+        dims = (1321, 1235)
         vals = getpoints(f, Float64, dims, FiniteDiffPlan)
 
         ∂x = zeros(Float64, length(vals))
@@ -127,8 +150,8 @@ end
             sinpi(x) * exp(y)
         end
 
-        @test maximum(abs, test∂y .- ∂y) < 1e-6
-        @test maximum(abs, test∂y .- ∂y) < 1e-6
+        @test maximum(abs, test∂x .- ∂x) < 1e-4
+        @test maximum(abs, test∂y .- ∂y) < 1e-4
     end
 
     let f(x, y) = (x * exp(-x^2 - y^2), x + y, y * sinpi(x), x * y)
