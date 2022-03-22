@@ -1,8 +1,9 @@
 @safetestset "PaduaTransforms" begin include("test_PaduaTransforms.jl") end
 
+using PoincareInvariants.SecondPoincareInvariants.Chebyshev
+
 @safetestset "Differentiation" begin
-    using PoincareInvariants.SecondPoincareInvariants.Chebyshev:
-        DiffPlan, differentiate!
+    using ..Chebyshev: DiffPlan, differentiate!
 
     @test DiffPlan{Float64}(5).D == [0  1  0  3  0   5;
                                      0  0  4  0  8   0;
@@ -53,25 +54,25 @@
 end
 
 @safetestset "Integration" begin
-    using PoincareInvariants.SecondPoincareInvariants.Chebyshev:
-        getintegrator, integrate
+    using ..Chebyshev:
+        getintweights, integrate
 
     # integrating odd polynomials over symmetric boundary conditions gives 0
-    @test all(getintegrator(100)[2:2:end] .== 0)
-    @test all(getintegrator(999)[2:2:end] .== 0)
+    @test all(getintweights(100)[2:2:end] .== 0)
+    @test all(getintweights(999)[2:2:end] .== 0)
 
     coeffs = [1 4 7 0;
               2 5 8 0;
               3 6 9 0;
 		      0 0 0 0]
 
-    @test integrate(coeffs, getintegrator(3)) ≈ 1 * 4 + 3 * -4/3 + 7 * -4/3 + 9 * 4/9 atol=5eps()
+    @test integrate(coeffs, getintweights(3)) ≈ 1 * 4 + 3 * -4/3 + 7 * -4/3 + 9 * 4/9 atol=5eps()
 end
 
-@safetestset "getintegrand! with OOPIntPlan" begin
-    using PoincareInvariants.SecondPoincareInvariants.Chebyshev.PaduaTransforms
-    using PoincareInvariants.SecondPoincareInvariants.Chebyshev:
-        DiffPlan, differentiate!, OOPIntPlan, getintegrand!
+@safetestset "getintegrand! with CallIntPlan" begin
+    using ..Chebyshev.PaduaTransforms
+    using ..Chebyshev:
+        DiffPlan, differentiate!, CallIntPlan, getintegrand!
     using PoincareInvariants.CanonicalSymplecticStructures
 
     @testset "6 Points in 2 Dimensions" begin
@@ -96,7 +97,7 @@ end
 
         Ω(v, t, p) = [0 -1; 1  0]
 
-        plan = OOPIntPlan{Float64}(D, degree)
+        plan = CallIntPlan{Float64}(D, degree)
 
         intcoeffs = zeros(degree+1, degree+1)
 
@@ -129,7 +130,7 @@ end
 
         Ω(v, t, p) = CanonicalSymplecticMatrix(D)
 
-        plan = OOPIntPlan{Float64}(D, degree)
+        plan = CallIntPlan{Float64}(D, degree)
 
         intcoeffs = zeros(degree+1, degree+1)
 
@@ -143,19 +144,18 @@ end
 end
 
 @safetestset "compute! with ChebyshevPlan (OOP)" begin
-    using PoincareInvariants.SecondPoincareInvariants.Chebyshev.PaduaTransforms
-    using PoincareInvariants.SecondPoincareInvariants.Chebyshev:
-        ChebyshevPlan, compute!, DiffPlan
+    using ..Chebyshev.PaduaTransforms
+    using ..Chebyshev: ChebyshevPlan, compute!, DiffPlan
+    using PoincareInvariants.SecondPoincareInvariants
     using PoincareInvariants.CanonicalSymplecticStructures
 
 
     D = 12
     N = 200
     Ω(v, t, p) = CanonicalSymplecticMatrix(D)
-    plan = ChebyshevPlan{Float64}(Ω, D, N, Val(false))
-
     pointnum = nextpaduanum(N)
     degree = getdegree(pointnum)
+    plan = ChebyshevPlan{Float64}(Ω, D, pointnum)
 
     testphasecoeffs = [zeros(degree+1, degree+1) for _ in 1:D]
     test∂x = [zeros(degree+1, degree+1) for _ in 1:D]
@@ -170,7 +170,8 @@ end
         end
     end
 
-    @test compute!(plan, Ω, phasepoints, 0, nothing) ≈ 4 atol=20eps()
+    pinv = SecondPoincareInvariant{Float64}(Ω, D, pointnum, plan)
+    @test compute!(pinv, phasepoints, 0, nothing) ≈ 4 atol=20eps()
 
     testphasecoeffs[1][1, 2] = 1  # 1 x
     testphasecoeffs[D ÷ 2 + 1][2, 1] = 1 # 1 y
@@ -189,16 +190,29 @@ end
     @test maximum(abs, plan.intcoeffs .- testintcoeffs) / eps() < 50
 end
 
-@safetestset "getpoints and getpointnum" begin
-    using PoincareInvariants.SecondPoincareInvariants.Chebyshev.PaduaTransforms
-    using PoincareInvariants.SecondPoincareInvariants.Chebyshev:
-        ChebyshevPlan, getpoints, getpointnum
+@safetestset "getpoints, getpointspec and getpointnum" begin
+    using ..Chebyshev.PaduaTransforms
+    using ..Chebyshev: ChebyshevPlan, getpoints, getpointnum
+    using PoincareInvariants.SecondPoincareInvariants: getpointspec
 
-    Ω(v, t, p) = [0 -1; 1 0]
-    plan = ChebyshevPlan{Float64}(Ω, 2, 11, Val(false))
+    for N in [10, 321, 2178], T in [Float32, Float64]
+        @test getpointspec(N, ChebyshevPlan) == nextpaduanum(N)
+        @test getpointspec((N, 2N), ChebyshevPlan) == nextpaduanum(N * 2N)
 
-    @test getpointnum(plan) == 15
-    @test getpoints(plan) == getpaduapoints(4) do x, y
-        ((x, y) .+ 1) ./ 2
+        @test getpointnum(N, ChebyshevPlan) == nextpaduanum(N)
+        @test getpointnum((7, N), ChebyshevPlan) == nextpaduanum(7 * N)
+
+        f(x, y) = 5 * x, cos(x*y), x+y
+        rescale(x, y) = ((x, y) .+ 1) ./ 2
+
+        pnts = getpoints(f, T, N, ChebyshevPlan)
+        testpnts = getpaduapoints(T, nextdegree(N)) do x, y
+            px, py = rescale(x, y)
+            return f(px, py)
+        end
+
+        for i in 1:3
+            @test pnts[i] ≈ testpnts[i]
+        end
     end
 end

@@ -58,7 +58,7 @@ end  # ChebyshevTestUtils
     end
 end
 
-@safetestset "getpaduanum, getdegree and nextpaduanum" begin
+@safetestset "getpaduanum, getdegree, nextdegree and nextpaduanum" begin
     using ..PaduaTransforms
 
     for n in [1:10..., 50, 123, 511, 10_000]
@@ -68,6 +68,10 @@ end
 
         @test_throws ArgumentError getdegree(paduanum + 1)
         @test_throws ArgumentError getdegree(paduanum - 1)
+
+        @test nextdegree(paduanum - 1) == n
+        @test nextdegree(paduanum) == n
+        @test nextdegree(paduanum + 1) == n + 1
 
         @test nextpaduanum(paduanum - 1) == paduanum
         @test nextpaduanum(paduanum) == paduanum
@@ -393,7 +397,7 @@ end
         vals = Vector{Float64}(undef, getpaduanum(n))
         invpaduatransform!(vals, invplan, coeffs)
 
-        @test maximum(abs, vals .- testvals) / eps() < 0.1 * n^3.3
+        @test maximum(abs, vals .- testvals) / eps() < 0.2 * n^3.3
     end
 end
 

@@ -8,7 +8,7 @@ module PaduaTransforms
 using FFTW
 using LinearAlgebra: rmul!
 
-export getpaduanum, getdegree, nextpaduanum
+export getpaduanum, getdegree, nextdegree, nextpaduanum
 export getpaduapoints
 export PaduaTransformPlan, paduatransform!
 export InvPaduaTransformPlan, invpaduatransform!
@@ -61,6 +61,20 @@ function getdegree(N)
 end
 
 """
+    nextdegree(N)
+
+get degree of `nextpaduanum(N)`.
+
+# Examples
+
+```jldoctest
+julia> nextdegree(104)
+13
+```
+"""
+nextdegree(N) = Int(cld(sqrt(1 + 8N) - 3, 2))
+
+"""
     nextpaduanum(N)
 
 get next valid number of Padua points ≥ `N`.
@@ -72,10 +86,7 @@ julia> nextpaduanum(104)
 105
 ```
 """
-function nextpaduanum(N)
-    d = Int(cld(sqrt(1 + 8N) - 3, 2))
-    getpaduanum(d)
-end
+nextpaduanum(N) = getpaduanum(nextdegree(N))
 
 ## Padua Points ##
 

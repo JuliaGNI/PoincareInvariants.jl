@@ -8,35 +8,30 @@ import ..PoincareInvariants: compute!, getpoints, getpointnum, getdim, getform
 
 export SecondPoincareInvariant
 
-## Implementation(s)
-
-include("Chebyshev.jl")
-
 ## SecondPoincareInvariant ##
-
-# TODO: add isinplace check
 
 struct SecondPoincareInvariant{
     T,  # phase space and return type
     ΩT <: Union{Callable, AbstractMatrix},
+    PS,
     P
 } <: AbstractPoincareInvariant
     Ω::ΩT  # symplectic matrix or function returning one
-    D::Int
+    D::Int  # dimension of phase space
+    pointspec::PS  # specifies how many points
     plan::P  # plan for chebyshev transform, differentiation, etc...
 end
 
-function SecondPoincareInvariant{T}(Ω::ΩT, D::Integer, N::Integer) where {T, ΩT <: AbstractMatrix}
-    @argcheck size(Ω) == (D, D) "Ω must be a $D × $D matrix"
-    plan = Chebyshev.ChebyshevPlan{T}(Ω, D, N)
-    SecondPoincareInvariant{T, ΩT, typeof(plan)}(Ω, D, plan)
+function SecondPoincareInvariant{T}(
+    Ω::ΩT, D::Integer, N, P::Type=DEFAULT_PLAN_TYPE
+) where {T, ΩT}
+    ps = getpointspec(N, P)
+    plan = P{T}(Ω, D, ps)
+    SecondPoincareInvariant{T, ΩT, typeof(ps), typeof(plan)}(Ω, D, ps, plan)
 end
 
-function SecondPoincareInvariant{T}(
-    Ω::ΩT, D::Integer, N::Integer, ::Val{inplace}
-) where {T, ΩT <: Callable, inplace}
-    plan = Chebyshev.ChebyshevPlan{T}(Ω, D, N, Val(inplace))
-    SecondPoincareInvariant{T, ΩT, typeof(plan)}(Ω, D, plan)
+function SecondPoincareInvariant{T}(Ω::ΩT, D::Integer, ps::PS, plan::P) where {T, ΩT, PS, P}
+    SecondPoincareInvariant{T, ΩT, PS, P}(Ω, D, ps, plan)
 end
 
 # Unexported convenience alias
@@ -46,15 +41,21 @@ const PI2 = SecondPoincareInvariant
 getdim(pinv::SecondPoincareInvariant) = pinv.D
 getform(pinv::SecondPoincareInvariant) = pinv.Ω
 
-## Internal interface to implementation ##
+# Interface should define getpoints(f, T, N, P) method
+getpoints(f::Function, pinv::SecondPoincareInvariant{T, Ω, NT, P}) where {T, Ω, NT, P} =
+    getpoints(f, T, pinv.pointspec, P)
+getpoints(pinv::SecondPoincareInvariant) = getpoints((x, y) -> (x, y), pinv)
 
-compute!(pinv::SecondPoincareInvariant, phasepoints, t, p) =
-    compute!(pinv.plan, pinv.Ω, phasepoints, t, p)
-compute!(pinv::SecondPoincareInvariant, phasepoints) =
-    compute!(pinv.plan, pinv.Ω, phasepoints)
+getpointnum(pinv::SecondPoincareInvariant{T, Ω, PS, P}) where {T, Ω, PS, P} =
+    getpointnum(pinv.pointspec, P)
 
-getpoints(pinv::SecondPoincareInvariant) = getpoints(pinv.plan)
-getpoints(f::Function, pinv::SecondPoincareInvariant) = getpoints(f, pinv.plan)
-getpointnum(pinv::SecondPoincareInvariant) = getpointnum(pinv.plan)
+getpointspec(N, P) = getpointnum(N, P)
+
+## Implementation(s)
+
+include("Chebyshev.jl")
+include("FiniteDifferences.jl")
+
+const DEFAULT_PLAN_TYPE = Chebyshev.ChebyshevPlan
 
 end  # module SecondPoincareInvariants
