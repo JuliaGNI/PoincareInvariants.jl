@@ -174,3 +174,28 @@ end
         end
     end
 end
+
+@safetestset "Simpson weights" begin
+    using ..FiniteDifferences: getpoints, FiniteDiffPlan, simpsonweights
+
+    @test simpsonweights(Float64, 5, 3) ≈ [
+        1, 4, 1,  4, 16, 4,  2, 8, 2,  4, 16, 4,  1, 4, 1
+    ] ./ (9 * 4 * 2)
+
+    @test simpsonweights(Float64, 5, 7) ≈ [
+        1  4  2  4  1
+        4 16  8 16  4
+        2  8  4  8  2
+        4 16  8 16  4
+        2  8  4  8  2
+        4 16  8 16  4
+        1  4  2  4  1
+    ] ./ (9 * 4 * 6) |> vec
+
+    let f(x, y) = 1 + 2x + 3y + 4x^2 + 5x*y + 6y^2
+        nx, ny = (3, 3)
+        vals = getpoints(f, Float64, (nx, ny), FiniteDiffPlan)
+        weights = simpsonweights(Float64, nx, ny)
+        @test sum(weights .* vals) ≈ 97 / 12 atol=10eps()
+    end
+end

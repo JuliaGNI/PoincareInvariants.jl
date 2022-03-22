@@ -131,7 +131,27 @@ function differentiate!(∂x, ∂y, vals, dims::NTuple{2, Integer})
     return ∂x, ∂y
 end
 
+function _sw(i, n)
+    if i == 1 || i == n
+        return 1
+    elseif iseven(i)
+        return 4
+    else  # odd
+        return 2
+    end
+end
 
+function simpsonweights(::Type{T}, nx, ny) where T
+    w = Matrix{T}(undef, ny, nx)
+    for x in 1:nx
+        wx = _sw(x, nx)
+        for y in 1:ny
+            wy = _sw(y, ny)
+            w[y, x] = T(wx * wy) / (9 * (nx - 1) * (ny - 1))
+        end
+    end
+    return vec(w)
+end
 
 #=
 
