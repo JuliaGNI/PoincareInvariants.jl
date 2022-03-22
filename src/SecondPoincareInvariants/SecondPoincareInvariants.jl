@@ -46,7 +46,7 @@ getpoints(f::Function, pinv::SecondPoincareInvariant{T, Ω, NT, P}) where {T, Ω
     getpoints(f, T, pinv.pointspec, P)
 getpoints(pinv::SecondPoincareInvariant) = getpoints((x, y) -> (x, y), pinv)
 
-getpointnum(pinv::SecondPoincareInvariant{T, Ω, P}) where {T, Ω, NT, P} =
+getpointnum(pinv::SecondPoincareInvariant{T, Ω, PS, P}) where {T, Ω, PS, P} =
     getpointnum(pinv.pointspec, P)
 
 getpointspec(N, P) = getpointnum(N, P)
