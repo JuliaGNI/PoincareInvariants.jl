@@ -4,24 +4,27 @@
     include("test_FiniteDifferences.jl")
 end
 
-@safetestset "SecondPoincareInvariant OOP" begin
+@safetestset "One by One Square" begin
     using PoincareInvariants
+    using PoincareInvariants.SecondPoincareInvariants.Chebyshev: ChebyshevPlan
+    using PoincareInvariants.SecondPoincareInvariants.FiniteDifferences: FiniteDiffPlan
 
-    @testset "Points on Square" begin
-        D = 10
-        N = 500
-        Ω(z, t, p) = CanonicalSymplecticMatrix(D)
-        pinv = SecondPoincareInvariant{Float64}(Ω, D, N)
+    D = 2
+    Ω(z, t, p) = CanonicalSymplecticMatrix(D)
 
-        phasepoints = getpoints(pinv) do x, y
-            ntuple(D) do i
-                i == 1 && return x
-                i == D ÷ 2 + 1 && return y
-                return 0
-            end
-        end
+    let pinv = SecondPoincareInvariant{Float64}(Ω, D, 432)
+        I = compute!(pinv, getpoints(pinv), 0, nothing)
+        @test abs(1 - I) / eps() < 10
+    end
 
-        @test abs(1 - compute!(pinv, phasepoints, 0, nothing)) / eps() < 10
+    let pinv = SecondPoincareInvariant{Float64}(Ω, D, 567, ChebyshevPlan)
+        I = compute!(pinv, getpoints(pinv), 0, nothing)
+        @test abs(1 - I) / eps() < 10
+    end
+
+    let pinv = SecondPoincareInvariant{Float64}(Ω, D, (35, 75), FiniteDiffPlan)
+        I = compute!(pinv, getpoints(pinv), 0, nothing)
+        @test abs(1 - I) / eps() < 10
     end
 end
 

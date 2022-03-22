@@ -199,3 +199,49 @@ end
         @test sum(weights .* vals) ≈ 97 / 12 atol=10eps()
     end
 end
+
+@safetestset "compute!" begin
+    using ..FiniteDifferences: getpoints, FiniteDiffPlan, getsimpweights
+    using PoincareInvariants
+    using LinearAlgebra: dot
+
+    f(x, y) = [
+         1 +  2*x +  3*y +  4*x^2 +  5*x*y +  6*y^2,
+         7 +  8*x +  9*y + 10*x^2 + 11*x*y + 12*y^2,
+        13 + 14*x + 15*y + 16*x^2 + 17*x*y + 18*y^2,
+        19 + 20*x + 21*y + 22*x^2 + 23*x*y + 24*y^2]
+
+    fx(x, y) = [
+         2 +  8*x +  5*y,
+         8 + 20*x + 11*y,
+        14 + 32*x + 17*y,
+        20 + 44*x + 23*y]
+
+    fy(x, y) = [
+         3 +  5*x + 12*y,
+         9 + 11*x + 24*y,
+        15 + 17*x + 36*y,
+        21 + 23*x + 48*y]
+
+    Ω(z, ::Any, ::Any) = [0 0 z[1] z[2]; 0 0 z[3] z[4]; -z[1] -z[3] 0 0; -z[2] -z[4] 0 0]
+    dims = (11, 17)
+    integrand = getpoints(Float64, dims, FiniteDiffPlan) do x, y
+        dot(fy(x, y), Ω(f(x, y), 0, nothing), fx(x, y))
+    end
+
+    testI = dot(getsimpweights(Float64, dims...), integrand)
+
+    pinv = SecondPoincareInvariant{Float64}(Ω, 4, (11, 17), FiniteDiffPlan)
+
+    @test pinv.plan isa FiniteDiffPlan
+
+    points = getpoints(f, Float64, dims, FiniteDiffPlan)
+    I = compute!(pinv, points, 0, nothing)
+
+    for i in 1:4
+        @test pinv.plan.∂x[i] ≈ getpoints(fx, Float64, dims, FiniteDiffPlan)[i]
+        @test pinv.plan.∂y[i] ≈ getpoints(fy, Float64, dims, FiniteDiffPlan)[i]
+    end
+
+    @test I ≈ testI rtol=100eps()
+end
