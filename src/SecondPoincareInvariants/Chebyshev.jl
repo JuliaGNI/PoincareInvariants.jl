@@ -69,10 +69,10 @@ end
 
 ## Integration ##
 
-getintegrator(::Type{T}, n) where T = T[isodd(i) ? 0 : T(2) / T(1 - i^2) for i in 0:n]
-getintegrator(n) = getintegrator(Float64, n)
+getintweights(::Type{T}, n) where T = T[isodd(i) ? 0 : T(2) / T(1 - i^2) for i in 0:n]
+getintweights(n) = getintweights(Float64, n)
 
-integrate(coeffs, integrator) = dot(integrator, coeffs, integrator)
+integrate(coeffs, intweights) = dot(intweights, coeffs, intweights)
 
 ## getintegrand for Ω Callable and out-of-place ##
 
@@ -136,7 +136,7 @@ struct ChebyshevPlan{T, IP, PP<:PaduaTransformPlan}
     ∂y::Vector{Matrix{T}}
     intplan::IP  # getting coefficients of integrand to integrate
     intcoeffs::Matrix{T}
-    integrator::Vector{T}
+    intweights::Vector{T}
 end
 
 function ChebyshevPlan{T}(Ω::Callable, D::Integer, N::Integer) where T
@@ -149,10 +149,10 @@ function ChebyshevPlan{T}(Ω::Callable, D::Integer, N::Integer) where T
     ∂y = [Matrix{T}(undef, degree+1, degree+1) for _ in 1:D]
     intplan = getintplan(T, Ω, D, degree)
     intcoeffs = zeros(T, degree+1, degree+1)
-    integrator = getintegrator(T, degree)
+    intweights = getintweights(T, degree)
 
     ChebyshevPlan{T, typeof(intplan), typeof(paduaplan)}(
-        degree, paduaplan, phasecoeffs, diffplan, ∂x, ∂y, intplan, intcoeffs, integrator
+        degree, paduaplan, phasecoeffs, diffplan, ∂x, ∂y, intplan, intcoeffs, intweights
     )
 end
 
@@ -163,7 +163,7 @@ function compute!(
     paduatransform!(plan.phasecoeffs, plan.paduaplan, phasepoints)
     differentiate!(plan.∂x, plan.∂y, plan.diffplan, plan.phasecoeffs)
     getintegrand!(plan.intcoeffs, plan.intplan, pinv.Ω, phasepoints, t, p, plan.∂x, plan.∂y)
-    integrate(plan.intcoeffs, plan.integrator)
+    integrate(plan.intcoeffs, plan.intweights)
 end
 
 # function _compute!(plan::ChebyshevPlan, Ω::AbstractMatrix, D, phasepoints)

@@ -8,7 +8,7 @@ function compute!(plan::ChebyshevPlan, Ω::Callable, phasepoints, t, p)
     paduatransform!(plan.phasecoeffs, plan.paduaplan, phasepoints)
     differentiate!(plan.∂x, plan.∂y, plan.diffplan, plan.phasecoeffs)
     getintegrand!(plan.intcoeffs, plan.intplan, Ω, phasepoints, t, p, plan.∂x, plan.∂y)
-    integrate(plan.intcoeffs, plan.integrator)
+    integrate(plan.intcoeffs, plan.intweights)
 end
 ```
 
@@ -20,4 +20,4 @@ Third, the approximation of the derivatives is evaluated at the Padua points usi
 
 Fourth, at each Padua point the derivatives in both directions (two vectors) and the invariant two-form are contracted via a vector matrix vector product. This is the integrand evaluated at each Padua point. (See `getintegrand!`)
 
-Finally, we put the integrand values through one final Padua transform, obtaining a polynomial approximation of the integrand. This is then integrated in 2D by another vector matrix vector product, where the matrix is the matrix of Chebyshev coefficients and the vector is a vector of definite integrals of each of the Chebyshev polynomials. (See `getintegrator` for the calculation of the definite integrals and `integrate` to perform the integration.)
+Finally, we put the integrand values through one final Padua transform, obtaining a polynomial approximation of the integrand. This is then integrated in 2D by another vector matrix vector product, where the matrix is the matrix of Chebyshev coefficients and the vector is a vector of definite integrals of each of the Chebyshev polynomials. (See `getintweights` for the calculation of the definite integrals and `integrate` to perform the integration.)

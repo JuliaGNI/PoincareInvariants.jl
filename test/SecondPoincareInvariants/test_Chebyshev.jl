@@ -55,18 +55,18 @@ end
 
 @safetestset "Integration" begin
     using ..Chebyshev:
-        getintegrator, integrate
+        getintweights, integrate
 
     # integrating odd polynomials over symmetric boundary conditions gives 0
-    @test all(getintegrator(100)[2:2:end] .== 0)
-    @test all(getintegrator(999)[2:2:end] .== 0)
+    @test all(getintweights(100)[2:2:end] .== 0)
+    @test all(getintweights(999)[2:2:end] .== 0)
 
     coeffs = [1 4 7 0;
               2 5 8 0;
               3 6 9 0;
 		      0 0 0 0]
 
-    @test integrate(coeffs, getintegrator(3)) ≈ 1 * 4 + 3 * -4/3 + 7 * -4/3 + 9 * 4/9 atol=5eps()
+    @test integrate(coeffs, getintweights(3)) ≈ 1 * 4 + 3 * -4/3 + 7 * -4/3 + 9 * 4/9 atol=5eps()
 end
 
 @safetestset "getintegrand! with CallIntPlan" begin
