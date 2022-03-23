@@ -52,15 +52,15 @@ end
         x + y
     )
 
-    Idefault = let pinv = SecondPoincareInvariant{Float64}(Ω, D, 10_000)
+    Idefault = let pinv = PI2{Float64}(Ω, D, 10_000)
         compute!(pinv, getpoints(f, pinv), 0, nothing)
     end
 
-    Icheb = let pinv = SecondPoincareInvariant{Float64}(Ω, D, 10_000, ChebyshevPlan)
+    Icheb = let pinv = PI2{Float64}(Ω, D, 10_000, ChebyshevPlan)
         compute!(pinv, getpoints(f, pinv), 0, nothing)
     end
 
-    Ifindiff = let pinv = SecondPoincareInvariant{Float64}(Ω, D, (100, 100), FiniteDiffPlan)
+    Ifindiff = let pinv = PI2{Float64}(Ω, D, (100, 100), FiniteDiffPlan)
         compute!(pinv, getpoints(f, pinv), 0, nothing)
     end
 

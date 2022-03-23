@@ -6,7 +6,7 @@ using Base: Callable
 using ..PoincareInvariants: AbstractPoincareInvariant, @argcheck
 import ..PoincareInvariants: compute!, getpoints, getpointnum, getdim, getform
 
-export SecondPoincareInvariant
+export SecondPoincareInvariant, PI2
 
 ## SecondPoincareInvariant ##
 
@@ -34,8 +34,6 @@ function SecondPoincareInvariant{T}(Ω::ΩT, D::Integer, ps::PS, plan::P) where 
     SecondPoincareInvariant{T, ΩT, PS, P}(Ω, D, ps, plan)
 end
 
-# Unexported convenience alias
-# TODO: move or export these aliases to top level module?
 const PI2 = SecondPoincareInvariant
 
 getdim(pinv::SecondPoincareInvariant) = pinv.D
@@ -56,6 +54,9 @@ getpointspec(N, P) = getpointnum(N, P)
 include("Chebyshev.jl")
 include("FiniteDifferences.jl")
 
-const DEFAULT_PLAN_TYPE = Chebyshev.ChebyshevPlan
+using .Chebyshev: ChebyshevPlan
+using .FiniteDifferences: FiniteDiffPlan
+
+const DEFAULT_PLAN_TYPE = ChebyshevPlan
 
 end  # module SecondPoincareInvariants
