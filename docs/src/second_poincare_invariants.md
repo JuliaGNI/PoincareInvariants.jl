@@ -64,7 +64,7 @@ The last two arguments represent the time and any additional parameters. Both ar
 
 ```jldoctest usage
 julia> p = compute!(pinv, phasepoints, 0, nothing)
-1.5707963267948968
+1.570796326794897
 
 julia> (p - π/2) < 5eps()
 true
