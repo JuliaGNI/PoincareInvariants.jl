@@ -28,6 +28,46 @@ end
     end
 end
 
+@safetestset "Consistency Between Implementations" begin
+    using PoincareInvariants
+    using PoincareInvariants.SecondPoincareInvariants.Chebyshev: ChebyshevPlan
+    using PoincareInvariants.SecondPoincareInvariants.FiniteDifferences: FiniteDiffPlan
+
+    D = 6
+    Ω(z, t, p) = [
+            0     0     0  z[1]  z[2]  z[3]
+            0     0     0  z[4]  z[5]  z[6]
+            0     0     0     0     0     0
+        -z[1] -z[4]     0     0     0     0
+        -z[2] -z[5]     0     0     0     0
+        -z[3] -z[6]     0     0     0     0
+    ]
+
+    f(x, y) = (
+        exp(x) * y,
+        cospi(x * y),
+        x^2 - y^3 + x*y,
+        5.0,
+        exp(-(x^2 + y^2)),
+        x + y
+    )
+
+    Idefault = let pinv = SecondPoincareInvariant{Float64}(Ω, D, 10_000)
+        compute!(pinv, getpoints(f, pinv), 0, nothing)
+    end
+
+    Icheb = let pinv = SecondPoincareInvariant{Float64}(Ω, D, 10_000, ChebyshevPlan)
+        compute!(pinv, getpoints(f, pinv), 0, nothing)
+    end
+
+    Ifindiff = let pinv = SecondPoincareInvariant{Float64}(Ω, D, (100, 100), FiniteDiffPlan)
+        compute!(pinv, getpoints(f, pinv), 0, nothing)
+    end
+
+    @test Icheb ≈ Idefault rtol=10eps()
+    @test Icheb ≈ Ifindiff rtol=1e-3
+end
+
 @safetestset "Free Particle" begin
     using PoincareInvariants
 
