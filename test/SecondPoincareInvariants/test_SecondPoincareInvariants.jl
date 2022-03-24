@@ -4,6 +4,21 @@
     include("test_FiniteDifferences.jl")
 end
 
+@safetestset "Interface" begin
+    @safetestset "Basic properties" begin
+        using PoincareInvariants
+
+        D = 6; N = 123
+        Ω(z, t, p) = CanonicalSymplecticMatrix(D)
+        pinv = SecondPoincareInvariant{Float64, D}(Ω, N)
+
+        @test getdim(pinv) == 6
+        @test N <= getpointnum(pinv) <= 2N
+        @test getpointspec(pinv) == getpointspec(N, typeof(pinv.plan)) == pinv.pointspec
+        @test getform(pinv) === pinv.Ω === Ω
+    end
+end
+
 @safetestset "One by One Square" begin
     using PoincareInvariants
     using PoincareInvariants.SecondPoincareInvariants.Chebyshev: ChebyshevPlan
@@ -12,17 +27,17 @@ end
     D = 2
     Ω(z, t, p) = CanonicalSymplecticMatrix(D)
 
-    let pinv = SecondPoincareInvariant{Float64}(Ω, D, 432)
+    let pinv = SecondPoincareInvariant{Float64, D}(Ω, 432)
         I = compute!(pinv, getpoints(pinv), 0, nothing)
         @test abs(1 - I) / eps() < 10
     end
 
-    let pinv = SecondPoincareInvariant{Float64}(Ω, D, 567, ChebyshevPlan)
+    let pinv = SecondPoincareInvariant{Float64, D}(Ω, 567, ChebyshevPlan)
         I = compute!(pinv, getpoints(pinv), 0, nothing)
         @test abs(1 - I) / eps() < 10
     end
 
-    let pinv = SecondPoincareInvariant{Float64}(Ω, D, (35, 75), FiniteDiffPlan)
+    let pinv = SecondPoincareInvariant{Float64, D}(Ω, (35, 75), FiniteDiffPlan)
         I = compute!(pinv, getpoints(pinv), 0, nothing)
         @test abs(1 - I) / eps() < 10
     end
@@ -52,15 +67,15 @@ end
         x + y
     )
 
-    Idefault = let pinv = PI2{Float64}(Ω, D, 1_000)
+    Idefault = let pinv = PI2{Float64, D}(Ω, 1_000)
         compute!(pinv, getpoints(f, pinv), 5, 11)
     end
 
-    Icheb = let pinv = PI2{Float64}(Ω, D, 1_000, ChebyshevPlan)
+    Icheb = let pinv = PI2{Float64, D}(Ω, 1_000, ChebyshevPlan)
         compute!(pinv, getpoints(f, pinv), 5, 11)
     end
 
-    Ifindiff = let pinv = PI2{Float64}(Ω, D, (31, 33), FiniteDiffPlan)
+    Ifindiff = let pinv = PI2{Float64, D}(Ω, (31, 33), FiniteDiffPlan)
         compute!(pinv, getpoints(f, pinv), 5, 11)
     end
 
@@ -74,8 +89,8 @@ end
         using PoincareInvariants.SecondPoincareInvariants: FiniteDiffPlan
 
         Ω(z, t, p) = CanonicalSymplecticMatrix(2)
-        pinv1 = PI2{Float64}(Ω, 2, 1_000)
-        pinv2 = PI2{Float64}(Ω, 2, 1_000, FiniteDiffPlan)
+        pinv1 = PI2{Float64, 2}(Ω, 1_000)
+        pinv2 = PI2{Float64, 2}(Ω, 1_000, FiniteDiffPlan)
 
         A = [1 5;
              0 1]
@@ -93,8 +108,8 @@ end
         using PoincareInvariants.SecondPoincareInvariants: FiniteDiffPlan
 
         Ω(z, t, p) = CanonicalSymplecticMatrix(8)
-        pinv1 = PI2{Float64}(Ω, 8, 1_000)
-        pinv2 = PI2{Float64}(Ω, 8, 1_000, FiniteDiffPlan)
+        pinv1 = PI2{Float64, 8}(Ω, 1_000)
+        pinv2 = PI2{Float64, 8}(Ω, 1_000, FiniteDiffPlan)
 
         A = CanonicalSymplecticMatrix(8)
 
@@ -129,8 +144,8 @@ end
     using PoincareInvariants.SecondPoincareInvariants: FiniteDiffPlan
 
     Ω(z, t, p) = CanonicalSymplecticMatrix(4)
-    pinv1 = PI2{Float64}(Ω, 4, 1_000)
-    pinv2 = PI2{Float64}(Ω, 4, 1_000, FiniteDiffPlan)
+    pinv1 = PI2{Float64, 4}(Ω, 1_000)
+    pinv2 = PI2{Float64, 4}(Ω, 1_000, FiniteDiffPlan)
 
     init(x, y) = (x, -x, y, -y)
     henon(q, p, a) = (p + a - q^2, -q)

@@ -6,14 +6,14 @@ Chebyshev polynomials
 """
 module Chebyshev
 
-import ...PoincareInvariants: compute!, getpoints, getpointnum
-import ..SecondPoincareInvariants: getpointspec
+import ...PoincareInvariants: compute!, getpoints, getpointspec
 
 using ...PoincareInvariants: @argcheck
 using ..SecondPoincareInvariants: SecondPoincareInvariant
 
 using Base: Callable
 using LinearAlgebra
+using StaticArrays: SVector
 
 include("PaduaTransforms.jl")
 using .PaduaTransforms
@@ -76,44 +76,37 @@ integrate(coeffs, intweights) = dot(intweights, coeffs, intweights)
 
 ## getintegrand for Ω Callable and out-of-place ##
 
-struct CallIntPlan{T, IP, P}
+struct CallIntPlan{T, D, IP, P}
     invpaduaplan::IP
-    phasevals::Matrix{T}
-    ∂xvals::Matrix{T}
-    ∂yvals::Matrix{T}
+    ∂xvals::NTuple{D, Vector{T}}
+    ∂yvals::NTuple{D, Vector{T}}
     intvals::Vector{T}
     paduaplan::P
 end
 
-function CallIntPlan{T}(D, degree) where T
+function CallIntPlan{T, D}(degree) where {T, D}
     invpaduaplan = InvPaduaTransformPlan{T}(degree)
-    phasevals = Matrix{T}(undef, D, getpaduanum(degree))
-    ∂xvals = Matrix{T}(undef, D, getpaduanum(degree))
-    ∂yvals = Matrix{T}(undef, D, getpaduanum(degree))
+    ∂xvals = ntuple(_ -> Vector{T}(undef, getpaduanum(degree)), D)
+    ∂yvals = ntuple(_ -> Vector{T}(undef, getpaduanum(degree)), D)
     intvals = Vector{T}(undef, getpaduanum(degree))
     paduaplan = PaduaTransformPlan{T}(degree)
 
-    CallIntPlan{T, typeof(invpaduaplan), typeof(paduaplan)}(
-        invpaduaplan, phasevals, ∂xvals, ∂yvals, intvals, paduaplan
+    CallIntPlan{T, D, typeof(invpaduaplan), typeof(paduaplan)}(
+        invpaduaplan, ∂xvals, ∂yvals, intvals, paduaplan
     )
 end
 
 function getintegrand!(
-    intcoeffs::AbstractMatrix, plan::CallIntPlan{T}, Ω::Callable,
+    intcoeffs::AbstractMatrix, plan::CallIntPlan{T, D}, Ω::Callable,
     phasepoints, t, p, ∂xcoeffs, ∂ycoeffs
-) where T
-    invpaduatransform!(eachrow(plan.∂xvals), plan.invpaduaplan, ∂xcoeffs)
-    invpaduatransform!(eachrow(plan.∂yvals), plan.invpaduaplan, ∂ycoeffs)
-
-    D = length(phasepoints)
-    for d in 1:D
-        plan.phasevals[d, :] .= phasepoints[d]
-    end
+) where {T, D}
+    invpaduatransform!(plan.∂xvals, plan.invpaduaplan, ∂xcoeffs)
+    invpaduatransform!(plan.∂yvals, plan.invpaduaplan, ∂ycoeffs)
 
     for i in axes(plan.intvals, 1)
-        pnti = view(plan.phasevals, :, i)
-        ∂xi = view(plan.∂xvals, :, i)
-        ∂yi = view(plan.∂yvals, :, i)
+        pnti = SVector{D}(ntuple(d -> phasepoints[d][i], D))
+        ∂xi = SVector{D}(ntuple(d -> plan.∂xvals[d][i], D))
+        ∂yi = SVector{D}(ntuple(d -> plan.∂yvals[d][i], D))
         plan.intvals[i] = dot(∂yi, Ω(pnti, t, p), ∂xi)
     end
 
@@ -124,41 +117,41 @@ end
 
 ## ChebyshevPlan and compute! ##
 
-getintplan(::Type{T}, ::Callable, D, degree) where T = CallIntPlan{T}(D, degree)
+getintplan(::Type{T}, ::Callable, ::Val{D}, degree) where {T, D} = CallIntPlan{T, D}(degree)
 # getintplan(::Type{T}, Ω::AbstractMatrix, D, degree) where T = ConstIntPlan{T}(Ω, D, degree)
 
-struct ChebyshevPlan{T, IP, PP<:PaduaTransformPlan}
+struct ChebyshevPlan{T, D, IP, PP<:PaduaTransformPlan}
     degree::Int
     paduaplan::PP
-    phasecoeffs::Vector{Matrix{T}}
+    phasecoeffs::NTuple{D, Matrix{T}}
     diffplan::DiffPlan{T}
-    ∂x::Vector{Matrix{T}}
-    ∂y::Vector{Matrix{T}}
+    ∂x::NTuple{D, Matrix{T}}
+    ∂y::NTuple{D, Matrix{T}}
     intplan::IP  # getting coefficients of integrand to integrate
     intcoeffs::Matrix{T}
     intweights::Vector{T}
 end
 
-function ChebyshevPlan{T}(Ω::Callable, D::Integer, N::Integer) where T
+function ChebyshevPlan{T, D}(Ω::Callable, N::Integer) where {T, D}
     degree = getdegree(nextpaduanum(N))
 
     paduaplan = PaduaTransformPlan{T}(degree)
-    phasecoeffs = [zeros(T, degree+1, degree+1) for _ in 1:D]
+    phasecoeffs = ntuple(_ -> zeros(T, degree+1, degree+1), D)
     diffplan = DiffPlan{T}(degree)
-    ∂x = [Matrix{T}(undef, degree+1, degree+1) for _ in 1:D]
-    ∂y = [Matrix{T}(undef, degree+1, degree+1) for _ in 1:D]
-    intplan = getintplan(T, Ω, D, degree)
+    ∂x = ntuple(_ -> Matrix{T}(undef, degree+1, degree+1), D)
+    ∂y = ntuple(_ -> Matrix{T}(undef, degree+1, degree+1), D)
+    intplan = getintplan(T, Ω, Val(D), degree)
     intcoeffs = zeros(T, degree+1, degree+1)
     intweights = getintweights(T, degree)
 
-    ChebyshevPlan{T, typeof(intplan), typeof(paduaplan)}(
+    ChebyshevPlan{T, D, typeof(intplan), typeof(paduaplan)}(
         degree, paduaplan, phasecoeffs, diffplan, ∂x, ∂y, intplan, intcoeffs, intweights
     )
 end
 
 function compute!(
-    pinv::SecondPoincareInvariant{T, ΩT, NT, P}, phasepoints, t, p
-) where {T, ΩT <: Callable, NT, P <: ChebyshevPlan}
+    pinv::SecondPoincareInvariant{<:Any, <:Any, ΩT, <:Any, P}, phasepoints, t, p
+) where {ΩT <: Callable, P <: ChebyshevPlan}
     plan = pinv.plan
     paduatransform!(plan.phasecoeffs, plan.paduaplan, phasepoints)
     differentiate!(plan.∂x, plan.∂y, plan.diffplan, plan.phasecoeffs)
@@ -175,11 +168,11 @@ end
 
 ## getpoints, getpointspec and getpointnum ##
 
-getpointnum(N::Integer, ::Type{<:ChebyshevPlan}) = nextpaduanum(N)
-getpointnum(dims::NTuple{2, Integer}, ::Type{<:ChebyshevPlan}) = nextpaduanum(dims[1] * dims[2])
+getpointspec(N::Integer, ::Type{<:ChebyshevPlan}) = nextpaduanum(N)
+getpointspec((nx, ny)::NTuple{2, Integer}, ::Type{<:ChebyshevPlan}) = nextpaduanum(nx * ny)
 
 function getpoints(f, ::Type{T}, N, ::Type{<:ChebyshevPlan}) where T
-    degree = nextdegree(N)
+    degree = getdegree(getpointspec(N, ChebyshevPlan))
     return getpaduapoints(T, degree) do x, y
         f((x + T(1)) / T(2), (y + T(1)) / T(2))
     end

@@ -7,13 +7,9 @@ using PoincareInvariants.SecondPoincareInvariants.FiniteDifferences
     @test getpointspec(87, FiniteDiffPlan) == (11, 11)
     @test getpointspec((53, 42), FiniteDiffPlan) == (53, 43)
 
-    @test getpointnum(50, FiniteDiffPlan) == 81
-    @test getpointnum(87, FiniteDiffPlan) == 121
-    @test getpointnum(400, FiniteDiffPlan) == 441
-
-    @test getpointnum((3, 5), FiniteDiffPlan) == 15
-    @test getpointnum((423789, 326), FiniteDiffPlan) == 423789 * 327
-    @test getpointnum((123, 908342), FiniteDiffPlan) == 123 * 908343
+    @test getpointnum((3, 5)) == 15
+    @test getpointnum((423789, 326)) == 423789 * 326
+    @test getpointnum((123, 908343)) == 123 * 908343
 
     @inferred NTuple{3, Vector{Float64}} getpoints((x, y) -> (x, y, x+y), Float64, (7, 5), FiniteDiffPlan)
     @inferred Vector{Float32} getpoints((x, y) -> sin(x), Float32, (9, 9), FiniteDiffPlan)
@@ -70,7 +66,7 @@ using PoincareInvariants.SecondPoincareInvariants.FiniteDifferences
     end
     @test pnts4 isa NTuple{4, Vector{Float64}}
     @test all(pnts4) do v
-        length(v) == getpointnum(ps, FiniteDiffPlan)
+        length(v) == getpointnum(ps)
     end
 
     @test pnts4[1] ≈ testpnts[1]
@@ -231,7 +227,7 @@ end
 
     testI = dot(getsimpweights(Float64, dims...), integrand)
 
-    pinv = SecondPoincareInvariant{Float64}(Ω, 4, (11, 17), FiniteDiffPlan)
+    pinv = SecondPoincareInvariant{Float64, 4}(Ω, (11, 17), FiniteDiffPlan)
 
     @test pinv.plan isa FiniteDiffPlan
 
@@ -243,5 +239,5 @@ end
         @test pinv.plan.∂y[i] ≈ getpoints(fy, Float64, dims, FiniteDiffPlan)[i]
     end
 
-    @test I ≈ testI rtol=100eps()
+    @test I ≈ testI atol=5e-11
 end

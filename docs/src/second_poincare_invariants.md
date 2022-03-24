@@ -27,7 +27,7 @@ In future it will also be possible to use a constant matrix or an in-place funct
 Now, we can initialise the setup object used to calculate the invariant.
 
 ```jldoctest usage
-julia> pinv = SecondPoincareInvariant{Float64}(Ω, D, N);
+julia> pinv = SecondPoincareInvariant{Float64, D}(Ω, N);
 ```
 
 The type `Float64` specifies that the final result as well as all intermediate calculations will use the type `Float64`.

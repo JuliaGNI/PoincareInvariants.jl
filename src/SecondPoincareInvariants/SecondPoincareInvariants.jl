@@ -1,10 +1,11 @@
 @reexport module SecondPoincareInvariants
 
-# Callable is Union{Function, Type}
-using Base: Callable
+import ..PoincareInvariants: compute!, getpoints, getpointspec, getdim, getform
 
 using ..PoincareInvariants: AbstractPoincareInvariant, @argcheck
-import ..PoincareInvariants: compute!, getpoints, getpointnum, getdim, getform
+
+# Callable is Union{Function, Type}
+using Base: Callable
 
 export SecondPoincareInvariant, PI2
 
@@ -12,42 +13,44 @@ export SecondPoincareInvariant, PI2
 
 struct SecondPoincareInvariant{
     T,  # phase space and return type
+    D,  # dimension of phase space
     ΩT <: Union{Callable, AbstractMatrix},
     PS,
     P
 } <: AbstractPoincareInvariant
     Ω::ΩT  # symplectic matrix or function returning one
-    D::Int  # dimension of phase space
     pointspec::PS  # specifies how many points
     plan::P  # plan for chebyshev transform, differentiation, etc...
 end
 
-function SecondPoincareInvariant{T}(
-    Ω::ΩT, D::Integer, N, P::Type=DEFAULT_PLAN_TYPE
-) where {T, ΩT}
+function SecondPoincareInvariant{T, D}(
+    Ω::ΩT, N, P::Type=DEFAULT_PLAN_TYPE
+) where {T, D, ΩT}
     ps = getpointspec(N, P)
-    plan = P{T}(Ω, D, ps)
-    SecondPoincareInvariant{T, ΩT, typeof(ps), typeof(plan)}(Ω, D, ps, plan)
+    plan = P{T, D}(Ω, ps)
+    SecondPoincareInvariant{T, D, ΩT, typeof(ps), typeof(plan)}(Ω, ps, plan)
 end
 
-function SecondPoincareInvariant{T}(Ω::ΩT, D::Integer, ps::PS, plan::P) where {T, ΩT, PS, P}
-    SecondPoincareInvariant{T, ΩT, PS, P}(Ω, D, ps, plan)
+function SecondPoincareInvariant{T, D}(Ω::ΩT, ps::PS, plan::P) where {T, D, ΩT, PS, P}
+    SecondPoincareInvariant{T, D, ΩT, PS, P}(Ω, ps, plan)
 end
 
 const PI2 = SecondPoincareInvariant
 
-getdim(pinv::SecondPoincareInvariant) = pinv.D
+getdim(::SecondPoincareInvariant{<:Any, D, <:Any, <:Any, <:Any}) where D = D
 getform(pinv::SecondPoincareInvariant) = pinv.Ω
 
 # Interface should define getpoints(f, T, N, P) method
-getpoints(f::Function, pinv::SecondPoincareInvariant{T, Ω, NT, P}) where {T, Ω, NT, P} =
+function getpoints(
+    f::Function,
+    pinv::SecondPoincareInvariant{T, D, ΩT, PS, P}
+) where {T, D, ΩT, PS, P}
     getpoints(f, T, pinv.pointspec, P)
+end
+
 getpoints(pinv::SecondPoincareInvariant) = getpoints((x, y) -> (x, y), pinv)
 
-getpointnum(pinv::SecondPoincareInvariant{T, Ω, PS, P}) where {T, Ω, PS, P} =
-    getpointnum(pinv.pointspec, P)
-
-getpointspec(N, P) = getpointnum(N, P)
+getpointspec(pinv::SecondPoincareInvariant) = pinv.pointspec
 
 ## Implementation(s)
 

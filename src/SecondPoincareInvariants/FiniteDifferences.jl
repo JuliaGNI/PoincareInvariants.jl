@@ -1,51 +1,46 @@
 module FiniteDifferences
 
-using LinearAlgebra: dot
+import ...PoincareInvariants: compute!, getpoints, getpointnum, getpointspec
+import ..SecondPoincareInvariants: SecondPoincareInvariant
+
 using ...PoincareInvariants: @argcheck
 
-import ...PoincareInvariants: compute!, getpoints, getpointnum
-import ..SecondPoincareInvariants: SecondPoincareInvariant, getpointspec
+using LinearAlgebra: dot
+using Base: Callable
+using StaticArrays: SVector
 
-struct FiniteDiffPlan{T}
-    ∂x::Vector{Vector{T}}
-    ∂y::Vector{Vector{T}}
+struct FiniteDiffPlan{T, D}
+    ∂x::NTuple{D, Vector{T}}
+    ∂y::NTuple{D, Vector{T}}
     simpweights::Vector{T}
 end
 
-function FiniteDiffPlan{T}(Ω, D::Integer, ps::NTuple{2, Int}) where T
+function FiniteDiffPlan{T, D}(Ω, ps::NTuple{2, Int}) where {T, D}
     nx, ny = ps
     N = nx * ny
 
-    ∂x = [Vector{T}(undef, N) for _ in 1:D]
-    ∂y = [Vector{T}(undef, N) for _ in 1:D]
+    ∂x = ntuple(_ -> Vector{T}(undef, N), D)
+    ∂y = ntuple(_ -> Vector{T}(undef, N), D)
     simpweights = getsimpweights(T, nx, ny)
 
-    FiniteDiffPlan{T}(∂x, ∂y, simpweights)
+    FiniteDiffPlan{T, D}(∂x, ∂y, simpweights)
 end
 
 function compute!(
-    pinv::SecondPoincareInvariant{T, ΩT, PS, P}, phasepoints, t, p
-) where {T, ΩT, PS, P <: FiniteDiffPlan}
+    pinv::SecondPoincareInvariant{T, D, ΩT, <:Any, P}, phasepoints, t, p
+) where {T, D, ΩT<:Callable, P <: FiniteDiffPlan}
     nx, ny = pinv.pointspec
     N = nx * ny
 
     differentiate!(pinv.plan.∂x, pinv.plan.∂y, phasepoints, (nx, ny))
 
-    # These should probably be static vectors, but that requires making
-    # the dimension of the phase space a type variable
-    ∂xi = Vector{T}(undef, pinv.D)
-    ∂yi = Vector{T}(undef, pinv.D)
-    pnti = Vector{T}(undef, pinv.D)
-
     I = zero(T)
     w = pinv.plan.simpweights
 
     @inbounds for i in 1:N
-        for d in 1:pinv.D
-            ∂xi[d] = pinv.plan.∂x[d][i]
-            ∂yi[d] = pinv.plan.∂y[d][i]
-            pnti[d] = phasepoints[d][i]
-        end
+        pnti = SVector{D}(ntuple(d -> phasepoints[d][i], D))
+        ∂xi = SVector{D}(ntuple(d -> pinv.plan.∂x[d][i], D))
+        ∂yi = SVector{D}(ntuple(d -> pinv.plan.∂y[d][i], D))
 
         I += w[i] * dot(∂yi, pinv.Ω(pnti, t, p), ∂xi)
     end
@@ -55,12 +50,7 @@ end
 
 ## getpoints, getpointnum and getpointspec ##
 
-function getpointnum(dims::NTuple{2, Integer}, ::Type{<:FiniteDiffPlan})
-    nx, ny = getpointspec(dims, FiniteDiffPlan)
-    return nx * ny
-end
-
-getpointnum(N, ::Type{T}) where T <: FiniteDiffPlan = getpointnum(getpointspec(N, T), T)
+getpointnum((nx, ny)::NTuple{2, Integer}) = nx * ny
 
 nextodd(n::Integer)::Int = n <= 3 ? 3 : 2 * fld(n, 2) + 1
 
