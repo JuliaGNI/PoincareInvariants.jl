@@ -38,8 +38,7 @@ function getpoints end
 get point specification, which may, for example, be a tuple specifying a grid or
 a number giving the number of points used to sample in phase space.
 """
-getpointspec(ps, P) = getpointnum(ps)
-# falls back to giving number of points
+function getpointspec end
 
 """
     getpointnum(pinv::AbstractPoincareInvariant)
