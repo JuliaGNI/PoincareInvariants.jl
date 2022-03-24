@@ -89,8 +89,8 @@ end
         using PoincareInvariants.SecondPoincareInvariants: FiniteDiffPlan
 
         Ω(z, t, p) = CanonicalSymplecticMatrix(2)
-        pinv1 = PI2{Float64, 2}(Ω, 1_000)
-        pinv2 = PI2{Float64, 2}(Ω, 1_000, FiniteDiffPlan)
+        chebpi = PI2{Float64, 2}(Ω, 1_000)
+        diffpi = PI2{Float64, 2}(Ω, 1_000, FiniteDiffPlan)
 
         A = [1 5;
              0 1]
@@ -99,8 +99,8 @@ end
         f(r, θ) = A * B * [r*cospi(θ), r*sinpi(θ)]
         # half circle with radius one
 
-        @test abs(π/2 - compute!(pinv1, getpoints(f, pinv1), 0, nothing)) / eps() < 10
-        @test abs(π/2 - compute!(pinv2, getpoints(f, pinv2), 0, nothing)) < 5e-3
+        @test abs(π/2 - compute!(chebpi, getpoints(f, chebpi), 0, nothing)) / eps() < 10
+        @test abs(π/2 - compute!(diffpi, getpoints(f, diffpi), 0, nothing)) < 5e-3
     end
 
     @safetestset "In 8D" begin
@@ -108,8 +108,8 @@ end
         using PoincareInvariants.SecondPoincareInvariants: FiniteDiffPlan
 
         Ω(z, t, p) = CanonicalSymplecticMatrix(8)
-        pinv1 = PI2{Float64, 8}(Ω, 1_000)
-        pinv2 = PI2{Float64, 8}(Ω, 1_000, FiniteDiffPlan)
+        chebpi = PI2{Float64, 8}(Ω, 1_000)
+        diffpi = PI2{Float64, 8}(Ω, 1_000, FiniteDiffPlan)
 
         A = CanonicalSymplecticMatrix(8)
 
@@ -134,8 +134,8 @@ end
         f(r, θ) = A * B * C * [r*sinpi(θ), 0, 0, 0, r*cospi(θ), 0, 0, 0]
         # half circle with radius one and negative orientation
 
-        @test abs(-π/2 - compute!(pinv1, getpoints(f, pinv1), 0, nothing)) / eps() < 10
-        @test abs(-π/2 - compute!(pinv2, getpoints(f, pinv2), 0, nothing)) < 5e-3
+        @test abs(-π/2 - compute!(chebpi, getpoints(f, chebpi), 0, nothing)) / eps() < 10
+        @test abs(-π/2 - compute!(diffpi, getpoints(f, diffpi), 0, nothing)) < 5e-3
     end
 end
 
@@ -143,29 +143,74 @@ end
     using PoincareInvariants
     using PoincareInvariants.SecondPoincareInvariants: FiniteDiffPlan
 
-    Ω(z, t, p) = CanonicalSymplecticMatrix(4)
-    pinv1 = PI2{Float64, 4}(Ω, 1_000)
-    pinv2 = PI2{Float64, 4}(Ω, 1_000, FiniteDiffPlan)
+    init(x, y) = 2 .* (x - 0.5, -x + 0.5, y - 0.5, -y + 0.5)
+    I = 2^2 * 2
 
-    init(x, y) = (x, -x, y, -y)
-    henon(q, p, a) = (p + a - q^2, -q)
+    # Area preserving Henon map
+    function henon(q, p)
+        a = 1.4; b = 0.3
+        q, p = q, 1 + p - a * q^2 # fold
+        q, p = b * q, p / b # press
+        q, p = -p, q  # rotate
+        return q, p
+    end
 
     # henon plus symplectic intermixing of q1/p1 with q2/p2
     function f((q1, q2, p1, p2))
-        q1, p1 = henon(q1, p1, 2)
-        q2, p2 = henon(q2, p2, 3)
-        return (q1 - p2, q2 - p1, p1, p2)
+        q1, p1 = henon(q1, p1)
+        q2, p2 = henon(q2, p2)
+        return (q1, q2, p1 - q2, p2 - q1)
     end
 
+    Ω(z, t, p) = CanonicalSymplecticMatrix(4)
+    chebpi = PI2{Float64, 4}(Ω, 1_000)
+    diffpi = PI2{Float64, 4}(Ω, 1_000, FiniteDiffPlan)
+
     f1(x, y) = init(x, y) |> f
-    @test abs(2 - compute!(pinv1, getpoints(f1, pinv1), 0, nothing)) / eps() < 10
-    @test abs(2 - compute!(pinv2, getpoints(f1, pinv2), 0, nothing)) / eps() < 500
+    @test abs(I - compute!(chebpi, getpoints(f1, chebpi), 0, nothing)) < 1e-14
+    @test abs(I - compute!(diffpi, getpoints(f1, diffpi), 0, nothing)) < 5e-13
 
     f2(x, y) = init(x, y) |> f |> f
-    @test abs(2 - compute!(pinv1, getpoints(f2, pinv1), 0, nothing)) / eps() < 50
-    @test abs(2 - compute!(pinv2, getpoints(f2, pinv2), 0, nothing)) < 0.01
+    @test abs(I - compute!(chebpi, getpoints(f2, chebpi), 0, nothing)) < 1e-11
+    @test abs(I - compute!(diffpi, getpoints(f2, diffpi), 0, nothing)) < 5e-12
 
     f3(x, y) = init(x, y) |> f |> f |> f
-    @test abs(2 - compute!(pinv1, getpoints(f3, pinv1), 0, nothing)) / eps() < 100
-    @test abs(2 - compute!(pinv2, getpoints(f3, pinv2), 0, nothing)) < 0.5
+    @test abs(I - compute!(chebpi, getpoints(f3, chebpi), 0, nothing)) < 5e-6
+end
+
+@safetestset "Wavy Map" begin
+    using PoincareInvariants
+    using PoincareInvariants.SecondPoincareInvariants: FiniteDiffPlan
+
+    function wavy(x, y)
+        x, y = x, y + sinpi(x)
+        x, y = -y, x
+        return x, y
+    end
+
+    # make wavy and mix dims
+    function f((x1, x2, x3, y1, y2, y3))
+        x1, y1 = wavy(x1, y1)
+        x2, y2 = wavy(x2, y2)
+        x3, y3 = wavy(x3, y3)
+        return (x1 + y2, x2 + y1 + y3, x3 + y2, y1, y2, y3)
+    end
+
+    init(x, y) = (2x, 2x-1, 2x-2, 2y-1, 2y-1, 2y-1)
+    I = 3 * 2^2
+
+    Ω(z, t, p) = CanonicalSymplecticMatrix(6)
+    chebpi = PI2{Float64, 6}(Ω, 1_000)
+    diffpi = PI2{Float64, 6}(Ω, 1_000, FiniteDiffPlan)
+
+    f1(x, y) = init(x, y) |> f
+    @test abs(I - compute!(chebpi, getpoints(f1, chebpi), 0, nothing)) < 1e-14
+    @test abs(I - compute!(diffpi, getpoints(f1, diffpi), 0, nothing)) < 5e-15
+
+    f2(x, y) = init(x, y) |> f |> f
+    @test abs(I - compute!(chebpi, getpoints(f2, chebpi), 0, nothing)) < 5e-6
+    @test abs(I - compute!(diffpi, getpoints(f2, diffpi), 0, nothing)) < 1e-4
+
+    f3(x, y) = init(x, y) |> f |> f |> f
+    @test abs(I - compute!(chebpi, getpoints(f3, chebpi), 0, nothing)) < 1
 end
