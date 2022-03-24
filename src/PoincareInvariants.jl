@@ -7,7 +7,8 @@ module PoincareInvariants
 
 using Reexport
 
-export AbstractPoincareInvariant, compute!, getdim, getform, getpoints, getpointnum
+export AbstractPoincareInvariant, compute!, getdim, getform,
+    getpoints, getpointspec, getpointnum
 
 """
     AbstractPoincareInvariant
@@ -32,11 +33,21 @@ so as to `compute!` `pinv`.
 function getpoints end
 
 """
+    getpointspec(pinv::AbstractPoincareInvariant)
+
+get point specification, which may, for example, be a tuple specifying a grid or
+a number giving the number of points used to sample in phase space.
+"""
+getpointspec(ps, P) = getpointnum(ps)
+# falls back to giving number of points
+
+"""
     getpointnum(pinv::AbstractPoincareInvariant)
 
 returns number of points to sample in phase space to `compute!` `pinv`.
 """
-function getpointnum end
+getpointnum(pinv::AbstractPoincareInvariant) = getpointnum(getpointspec(pinv))
+getpointnum(N::Integer) = N
 
 """
     getdim(pinv::AbstractPoincareInvariant)
