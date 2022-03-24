@@ -7,10 +7,11 @@ using ...PoincareInvariants: @argcheck
 
 using LinearAlgebra: dot
 using Base: Callable
+using StaticArrays: SVector
 
 struct FiniteDiffPlan{T, D}
-    ∂x::Vector{Vector{T}}
-    ∂y::Vector{Vector{T}}
+    ∂x::NTuple{D, Vector{T}}
+    ∂y::NTuple{D, Vector{T}}
     simpweights::Vector{T}
 end
 
@@ -18,8 +19,8 @@ function FiniteDiffPlan{T, D}(Ω, ps::NTuple{2, Int}) where {T, D}
     nx, ny = ps
     N = nx * ny
 
-    ∂x = [Vector{T}(undef, N) for _ in 1:D]
-    ∂y = [Vector{T}(undef, N) for _ in 1:D]
+    ∂x = ntuple(_ -> Vector{T}(undef, N), D)
+    ∂y = ntuple(_ -> Vector{T}(undef, N), D)
     simpweights = getsimpweights(T, nx, ny)
 
     FiniteDiffPlan{T, D}(∂x, ∂y, simpweights)
@@ -33,21 +34,13 @@ function compute!(
 
     differentiate!(pinv.plan.∂x, pinv.plan.∂y, phasepoints, (nx, ny))
 
-    # These should probably be static vectors, but that requires making
-    # the dimension of the phase space a type variable
-    ∂xi = Vector{T}(undef, D)
-    ∂yi = Vector{T}(undef, D)
-    pnti = Vector{T}(undef, D)
-
     I = zero(T)
     w = pinv.plan.simpweights
 
     @inbounds for i in 1:N
-        for d in 1:D
-            ∂xi[d] = pinv.plan.∂x[d][i]
-            ∂yi[d] = pinv.plan.∂y[d][i]
-            pnti[d] = phasepoints[d][i]
-        end
+        pnti = SVector{D}(ntuple(d -> phasepoints[d][i], D))
+        ∂xi = SVector{D}(ntuple(d -> pinv.plan.∂x[d][i], D))
+        ∂yi = SVector{D}(ntuple(d -> pinv.plan.∂y[d][i], D))
 
         I += w[i] * dot(∂yi, pinv.Ω(pnti, t, p), ∂xi)
     end

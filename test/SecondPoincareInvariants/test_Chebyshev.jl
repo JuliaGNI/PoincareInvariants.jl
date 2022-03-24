@@ -89,7 +89,7 @@ end
         ∂ycoeffs = ntuple(_ -> zeros(degree+1, degree+1), D)
         differentiate!(∂xcoeffs, ∂ycoeffs, DiffPlan{Float64}(degree), phasecoeffs)
 
-        phasepoints = [Vector{Float64}(undef, getpaduanum(degree)) for _ in 1:D]
+        phasepoints = ntuple(_ -> Vector{Float64}(undef, getpaduanum(degree)), D)
         iplan = InvPaduaTransformPlan{Float64}(degree)
         invpaduatransform!(phasepoints, iplan, phasecoeffs)
 
