@@ -59,5 +59,5 @@ end
     end
 
     pinv = FirstPoincareInvariant{Float64, 3}(θ, N, LoopFinDiffPlan())
-    @test compute!(pinv, fvals, 2, 3) ≈ testI
+    @test compute!(pinv, fvals, 2, 3) ≈ testI atol=500eps()
 end
