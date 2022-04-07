@@ -13,7 +13,6 @@ using ..SecondPoincareInvariants: SecondPoincareInvariant
 
 using Base: Callable
 using LinearAlgebra
-using StaticArrays: SVector
 
 include("PaduaTransforms.jl")
 using .PaduaTransforms
@@ -78,16 +77,16 @@ integrate(coeffs, intweights) = dot(intweights, coeffs, intweights)
 
 struct CallIntPlan{T, D, IP, P}
     invpaduaplan::IP
-    ∂xvals::NTuple{D, Vector{T}}
-    ∂yvals::NTuple{D, Vector{T}}
+    ∂xvals::Matrix{T}
+    ∂yvals::Matrix{T}
     intvals::Vector{T}
     paduaplan::P
 end
 
 function CallIntPlan{T, D}(degree) where {T, D}
     invpaduaplan = InvPaduaTransformPlan{T}(degree)
-    ∂xvals = ntuple(_ -> Vector{T}(undef, getpaduanum(degree)), D)
-    ∂yvals = ntuple(_ -> Vector{T}(undef, getpaduanum(degree)), D)
+    ∂xvals = Matrix{T}(undef, getpaduanum(degree), D)
+    ∂yvals = Matrix{T}(undef, getpaduanum(degree), D)
     intvals = Vector{T}(undef, getpaduanum(degree))
     paduaplan = PaduaTransformPlan{T}(degree)
 
@@ -104,9 +103,9 @@ function getintegrand!(
     invpaduatransform!(plan.∂yvals, plan.invpaduaplan, ∂ycoeffs)
 
     for i in axes(plan.intvals, 1)
-        pnti = SVector{D}(ntuple(d -> phasepoints[d][i], D))
-        ∂xi = SVector{D}(ntuple(d -> plan.∂xvals[d][i], D))
-        ∂yi = SVector{D}(ntuple(d -> plan.∂yvals[d][i], D))
+        pnti = view(phasepoints, i, :)
+        ∂xi = view(plan.∂xvals, i, :)
+        ∂yi = view(plan.∂yvals, i, :)
         plan.intvals[i] = dot(∂yi, Ω(pnti, t, p), ∂xi)
     end
 

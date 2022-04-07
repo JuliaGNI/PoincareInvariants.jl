@@ -89,7 +89,7 @@ end
         ∂ycoeffs = ntuple(_ -> zeros(degree+1, degree+1), D)
         differentiate!(∂xcoeffs, ∂ycoeffs, DiffPlan{Float64}(degree), phasecoeffs)
 
-        phasepoints = ntuple(_ -> Vector{Float64}(undef, getpaduanum(degree)), D)
+        phasepoints = Matrix{Float64}(undef, getpaduanum(degree), D)
         iplan = InvPaduaTransformPlan{Float64}(degree)
         invpaduatransform!(phasepoints, iplan, phasecoeffs)
 
@@ -122,7 +122,7 @@ end
         ∂ycoeffs = ntuple(_ -> zeros(degree+1, degree+1), D)
         differentiate!(∂xcoeffs, ∂ycoeffs, DiffPlan{Float64}(degree), phasecoeffs)
 
-        phasepoints = [Vector{Float64}(undef, getpaduanum(degree)) for _ in 1:D]
+        phasepoints = Matrix{Float64}(undef, getpaduanum(degree), D)
         iplan = InvPaduaTransformPlan{Float64}(degree)
         invpaduatransform!(phasepoints, iplan, phasecoeffs)
 
@@ -195,6 +195,9 @@ end
         @test getpointspec(N, ChebyshevPlan) == nextpaduanum(N)
         @test getpointspec((N, 2N), ChebyshevPlan) == nextpaduanum(N * 2N)
 
+        @inferred Vector{T} getpoints((x, y) -> x, T, N, ChebyshevPlan)
+        @inferred Matrix{T} getpoints((x, y) -> (x, y), T, N, ChebyshevPlan)
+
         f(x, y) = 5 * x, cos(x*y), x+y
         rescale(x, y) = ((x, y) .+ 1) ./ 2
 
@@ -204,8 +207,8 @@ end
             return f(px, py)
         end
 
-        for i in 1:3
-            @test pnts[i] ≈ testpnts[i]
-        end
+        @test pnts isa Matrix{T}
+        @test size(pnts) == (nextpaduanum(N), 3)
+        @test pnts ≈ testpnts
     end
 end

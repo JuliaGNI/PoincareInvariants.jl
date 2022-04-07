@@ -175,24 +175,21 @@ julia> getpaduapoints(2) do x, y; x*y, 5*x*y; end
 """
 function getpaduapoints(f::Function, ::Type{T}, n) where T
     D = length(f(zero(T), zero(T)))
-    out = ntuple(_ -> Vector{T}(undef, getpaduanum(n)), D)
+    out = Matrix{T}(undef, getpaduanum(n), D)
 
     i = 1
     for x in 0:n
         for y in 0:n+1
             if ispadua(x, y)
                 px, py = paduapoint(T, x, y, n)
-                fpnt = f(px, py)
-                for d in 1:D
-                    out[d][i] = fpnt[d]
-                end
+                out[i, :] .= f(px, py)
                 i += 1
             end
         end
     end
 
-    # Should return vector [...] instead of ([...],) in 1D case
-    return D == 1 ? out[1] : out
+    # Should return vector instead of matrix in 1D case
+    return D == 1 ? vec(out) : out
 end
 
 getpaduapoints(f::Function, n) = getpaduapoints(f, Float64, n)
@@ -515,6 +512,10 @@ function paduatransform!(coeffs, P::PaduaTransformPlan, vals, args...)
     coeffs
 end
 
+function paduatransform!(coeffs, P::PaduaTransformPlan, vals::AbstractMatrix{<:Number}, args...)
+    paduatransform!(coeffs, P, eachcol(vals), args...)
+end
+
 ## Inverse Padua Transform ##
 
 struct InvPaduaTransformPlan{T, P}
@@ -697,6 +698,10 @@ function invpaduatransform!(vals, IP::InvPaduaTransformPlan, coeffs)
     end
 
     vals
+end
+
+function invpaduatransform!(vals::AbstractMatrix{<:Number}, IP::InvPaduaTransformPlan, coeffs, args...)
+    invpaduatransform!(eachcol(vals), IP, coeffs, args...)
 end
 
 end  # PaduaTransforms

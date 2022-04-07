@@ -7,42 +7,41 @@ using ...PoincareInvariants: @argcheck
 
 using LinearAlgebra: dot
 using Base: Callable
-using StaticArrays: SVector
 
-struct FiniteDiffPlan{T, D}
-    ∂x::NTuple{D, Vector{T}}
-    ∂y::NTuple{D, Vector{T}}
-    simpweights::Vector{T}
-end
+struct FiniteDiffPlan{T, D} end
 
 function FiniteDiffPlan{T, D}(Ω, ps::NTuple{2, Int}) where {T, D}
-    nx, ny = ps
-    N = nx * ny
-
-    ∂x = ntuple(_ -> Vector{T}(undef, N), D)
-    ∂y = ntuple(_ -> Vector{T}(undef, N), D)
-    simpweights = getsimpweights(T, nx, ny)
-
-    FiniteDiffPlan{T, D}(∂x, ∂y, simpweights)
+    FiniteDiffPlan{T, D}()
 end
 
 function compute!(
-    pinv::SecondPoincareInvariant{T, D, ΩT, <:Any, P}, phasepoints, t, p
+    pinv::SecondPoincareInvariant{T, D, ΩT, <:Any, P}, vals, t, p
 ) where {T, D, ΩT<:Callable, P <: FiniteDiffPlan}
     nx, ny = pinv.pointspec
-    N = nx * ny
-
-    differentiate!(pinv.plan.∂x, pinv.plan.∂y, phasepoints, (nx, ny))
+    @argcheck size(vals) == (nx * ny, D) "Expected points mtarix to have size $((nx * ny, D))"
 
     I = zero(T)
-    w = pinv.plan.simpweights
 
-    @inbounds for i in 1:N
-        pnti = SVector{D}(ntuple(d -> phasepoints[d][i], D))
-        ∂xi = SVector{D}(ntuple(d -> pinv.plan.∂x[d][i], D))
-        ∂yi = SVector{D}(ntuple(d -> pinv.plan.∂y[d][i], D))
+    ∂xi = Vector{T}(undef, D)
+    ∂yi = Vector{T}(undef, D)
 
-        I += w[i] * dot(∂yi, pinv.Ω(pnti, t, p), ∂xi)
+    colviews = [view(vals, :, d) for d in 1:D]
+
+    i = 1
+    for ix in 1:nx
+        for iy in 1:ny
+            for d in 1:D
+                ∂xi[d], ∂yi[d] = differentiate(colviews[d], ix, iy, (nx, ny))
+            end
+
+            pnti = view(vals, i, :)
+
+            w = getsimpweight(T, ix, iy, (nx, ny))
+
+            I += w * dot(∂yi, pinv.Ω(pnti, t, p), ∂xi)
+
+            i += 1
+        end
     end
 
     return I
@@ -67,52 +66,75 @@ function getpoints(f, ::Type{T}, dims::NTuple{2, Integer}, ::Type{<:FiniteDiffPl
     D = length(f(zero(T), zero(T)))
     nx, ny = dims
     N = nx * ny
-    out = ntuple(_ -> Vector{T}(undef, N), D)
+    out = Matrix{T}(undef, N, D)
 
     i = 1
     for x in range(0, 1, length=nx)
         for y in range(0, 1, length=ny)
-            fpnt = f(x, y)
-            for d in 1:D
-                out[d][i] = fpnt[d]
-            end
+            out[i, :] .= f(x, y)
             i += 1
         end
     end
 
-    # Should return vector [...] instead of ([...],) in 1D case
-    return D == 1 ? out[1] : out
+    # Should return vector instead of matrix in 1D case
+    return D == 1 ? vec(out) : out
 end
 
 ## Differentiation ##
 
-# convert a cartesian index (x, y) to a linear index and index into vector
-_tolin(x::Integer, y::Integer, ny::Integer) = (x - 1) * ny + y
+function _getmid(ix, iy, nx, ny)
+    x0, y0 = ix, iy
+    edge = false
+
+    if ix == 1
+        x0 = 2
+        edge = true
+    end
+
+    if iy == 1
+        y0 = 2
+        edge = true
+    end
+
+    if ix == nx
+        x0 = nx - 1
+        edge = true
+    end
+
+    if iy == ny
+        y0 = ny - 1
+        edge = true
+    end
+
+    return x0, y0, edge
+end
 
 # evaluate derivative of quadratic approxmiation around (x0, y0) at (x0 + x, y0 + y)
 # We have approximation f(x, y) = c + cx*x + cy*y + cxx*x^2 + cxy*x*y + cyy*y^2
-function _diff(
-    vals::AbstractVector{T}, x0::Integer, y0::Integer,
-    x::Integer, y::Integer, nx::Integer, ny::Integer,
-    ::Val{edge}
-) where {T, edge}
-    f(ix, iy) = @inbounds vals[_tolin(x0 + ix, y0 + iy, ny)]
+function differentiate(
+    vals::AbstractVector{T}, ix::Integer, iy::Integer, (nx, ny)::NTuple{2, Integer}
+) where T
+    x0, y0, edge = _getmid(ix, iy, nx, ny)
+
+    mat = reshape(vals, ny, nx)
+    f(x, y) = @inbounds mat[y0 + y, x0 + x]
 
     # All coefficients are multiplied by 2*Δx or 2*Δy
     bx = f(1, 0); ax = f(-1, 0)
-    fx = cx = bx - ax
+    fx = bx - ax  # cx
 
     by = f(0, 1); ay = f(0, -1)
-    fy = cy = by - ay
+    fy = by - ay  # cy
 
-    if edge  # meaning if (x, y) not (0, 0)
+    if edge
         f00 = f(0, 0)
         cxx = bx + ax - 2*f00
         cyy = by + ay - 2*f00
         cxy = (f(1, 1) + f(-1, -1) - f(1, -1) - f(-1, 1)) / 2
 
-        fx += 2*cxx * x + cxy * y
-        fy += 2*cyy * y + cxy * x
+        dx, dy = ix - x0, iy - y0
+        fx += 2*cxx * dx + cxy * dy
+        fy += 2*cyy * dy + cxy * dx
     end
 
     invΔx = nx - 1; invΔy = ny - 1
@@ -177,21 +199,14 @@ function _sw(i, n)
         return 1
     elseif iseven(i)
         return 4
-    else  # odd
+    else
+        @assert isodd(i)
         return 2
     end
 end
 
-function getsimpweights(::Type{T}, nx, ny) where T
-    w = Matrix{T}(undef, ny, nx)
-    for x in 1:nx
-        wx = _sw(x, nx)
-        for y in 1:ny
-            wy = _sw(y, ny)
-            w[y, x] = T(wx * wy) / (9 * (nx - 1) * (ny - 1))
-        end
-    end
-    return vec(w)
+function getsimpweight(::Type{T}, x, y, (nx, ny)) where T
+    return T(_sw(x, nx) * _sw(y, ny)) / (9 * (nx - 1) * (ny - 1))
 end
 
 end  # FiniteDifferences
