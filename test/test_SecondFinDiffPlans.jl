@@ -1,20 +1,20 @@
-using PoincareInvariants.SecondPoincareInvariants.FiniteDifferences
+using PoincareInvariants.SecondFinDiffPlans
 
 @safetestset "getpoints, getpointspec and getpointnum" begin
-    using ..FiniteDifferences: FiniteDiffPlan, getpoints, getpointnum, getpointspec
+    using PoincareInvariants
 
-    @test getpointspec(50, FiniteDiffPlan) == (9, 9)
-    @test getpointspec(87, FiniteDiffPlan) == (11, 11)
-    @test getpointspec((53, 42), FiniteDiffPlan) == (53, 43)
+    @test getpointspec(50, SecondFinDiffPlan) == (9, 9)
+    @test getpointspec(87, SecondFinDiffPlan) == (11, 11)
+    @test getpointspec((53, 42), SecondFinDiffPlan) == (53, 43)
 
     @test getpointnum((3, 5)) == 15
     @test getpointnum((423789, 326)) == 423789 * 326
     @test getpointnum((123, 908343)) == 123 * 908343
 
-    @inferred Matrix{Float64} getpoints((x, y) -> (x, x+y), Float64, (7, 5), FiniteDiffPlan)
-    @inferred Vector{Float32} getpoints((x, y) -> sin(x), Float32, (9, 9), FiniteDiffPlan)
+    @inferred Matrix{Float64} getpoints((x, y) -> (x, x+y), Float64, (7, 5), SecondFinDiffPlan)
+    @inferred Vector{Float32} getpoints((x, y) -> sin(x), Float32, (9, 9), SecondFinDiffPlan)
 
-    @test getpoints((x, y) -> (x, y), Float64, (5, 3), FiniteDiffPlan) ≈ [
+    @test getpoints((x, y) -> (x, y), Float64, (5, 3), SecondFinDiffPlan) ≈ [
         0    0  ;
         0    0.5;
         0    1  ;
@@ -31,7 +31,7 @@ using PoincareInvariants.SecondPoincareInvariants.FiniteDifferences
         1.0  0.5;
         1.0  1  ]
 
-    @test getpoints((x, y) -> (4x, 6y), Float64, (5, 7), FiniteDiffPlan) ≈ [
+    @test getpoints((x, y) -> (4x, 6y), Float64, (5, 7), SecondFinDiffPlan) ≈ [
         0 0;
         0 1;
         0 2;
@@ -68,7 +68,7 @@ using PoincareInvariants.SecondPoincareInvariants.FiniteDifferences
         4 5;
         4 6]
 
-    @test getpoints((x, y) -> y, Float64, (11, 11), FiniteDiffPlan) ≈ Float64[
+    @test getpoints((x, y) -> y, Float64, (11, 11), SecondFinDiffPlan) ≈ Float64[
         0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,
         0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,
         0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,
@@ -82,9 +82,9 @@ using PoincareInvariants.SecondPoincareInvariants.FiniteDifferences
         0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,
     ]
 
-    ps = getpointspec(6342, FiniteDiffPlan)
-    testpnts = getpoints((x, y) -> (x, y), Float64, ps, FiniteDiffPlan)
-    pnts4 = getpoints(Float64, ps, FiniteDiffPlan) do x, y
+    ps = getpointspec(6342, SecondFinDiffPlan)
+    testpnts = getpoints((x, y) -> (x, y), Float64, ps, SecondFinDiffPlan)
+    pnts4 = getpoints(Float64, ps, SecondFinDiffPlan) do x, y
         x, y, x * y, x + y
     end
     @test pnts4 isa Matrix{Float64}
@@ -97,7 +97,7 @@ using PoincareInvariants.SecondPoincareInvariants.FiniteDifferences
 end
 
 @safetestset "Differentiation" begin
-    using ..FiniteDifferences: getpoints, FiniteDiffPlan, differentiate
+    using ..SecondFinDiffPlans: getpoints, SecondFinDiffPlan, differentiate
 
     # Finite difference derivatives should be exact for a quadratic
     let f(x, y)  = 1 + 0.75*x + y - 0.5*x*x - y*y - 1.5*x*y
@@ -105,7 +105,7 @@ end
         fy(x, y) = 1 - 2*y - 1.5*x
 
         for (nx, ny, maxerr) in [(3, 3, 50), (21, 33, 500), (331, 123, 5000)]
-            vals = getpoints(f, Float64, (nx, ny), FiniteDiffPlan)
+            vals = getpoints(f, Float64, (nx, ny), SecondFinDiffPlan)
 
             @test all((ix, iy) for ix in 1:nx, iy in 1:ny) do (ix, iy)
                 ∂x, ∂y = differentiate(vals, ix, iy, (nx, ny))
@@ -121,7 +121,7 @@ end
         fy(x, y) = sinpi(x) * exp(y)
 
         nx, ny = 1321, 1235
-        vals = getpoints(f, Float64, (nx, ny), FiniteDiffPlan)
+        vals = getpoints(f, Float64, (nx, ny), SecondFinDiffPlan)
         maxerr = 5e-5
 
         @test all((ix, iy) for ix in 1:nx, iy in 1:ny) do (ix, iy)
@@ -134,7 +134,7 @@ end
 end
 
 @safetestset "Simpson weights" begin
-    using ..FiniteDifferences: getpoints, FiniteDiffPlan, getsimpweight
+    using ..SecondFinDiffPlans: getpoints, SecondFinDiffPlan, getsimpweight
 
     @test [getsimpweight(Float64, ix, iy, (3, 5)) * 9 * 4 * 2 for iy in 1:5, ix in 1:3] ≈ [
         1  4 1;
@@ -155,14 +155,14 @@ end
 
     let f(x, y) = 1 + 2x + 3y + 4x^2 + 5x*y + 6y^2
         nx, ny = (3, 3)
-        vals = getpoints(f, Float64, (nx, ny), FiniteDiffPlan)
+        vals = getpoints(f, Float64, (nx, ny), SecondFinDiffPlan)
         weights = [getsimpweight(Float64, ix, iy, (nx, ny)) for iy in 1:ny, ix in 1:nx] |> vec
         @test sum(weights .* vals) ≈ 97 / 12 atol=10eps()
     end
 end
 
 @safetestset "compute!" begin
-    using ..FiniteDifferences: getpoints, FiniteDiffPlan, getsimpweight
+    using ..SecondFinDiffPlans: getpoints, SecondFinDiffPlan, getsimpweight
     using PoincareInvariants
     using LinearAlgebra: dot
 
@@ -186,18 +186,18 @@ end
 
     Ω(z, ::Any, ::Any) = [0 0 z[1] z[2]; 0 0 z[3] z[4]; -z[1] -z[3] 0 0; -z[2] -z[4] 0 0]
     nx, ny = 11, 17
-    integrand = getpoints(Float64, (nx, ny), FiniteDiffPlan) do x, y
+    integrand = getpoints(Float64, (nx, ny), SecondFinDiffPlan) do x, y
         dot(fy(x, y), Ω(f(x, y), 0, nothing), fx(x, y))
     end
 
     ws = [getsimpweight(Float64, ix, iy, (nx, ny)) for iy in 1:ny, ix in 1:nx] |> vec
     testI = dot(ws, integrand)
 
-    pinv = SecondPoincareInvariant{Float64, 4}(Ω, (nx, ny), FiniteDiffPlan)
+    pinv = SecondPoincareInvariant{Float64, 4}(Ω, (nx, ny), SecondFinDiffPlan)
 
-    @test pinv.plan isa FiniteDiffPlan
+    @test pinv.plan isa SecondFinDiffPlan
 
-    points = getpoints(f, Float64, (nx, ny), FiniteDiffPlan)
+    points = getpoints(f, Float64, (nx, ny), SecondFinDiffPlan)
     I = compute!(pinv, points, 0, nothing)
 
     @test I ≈ testI atol=5e-11

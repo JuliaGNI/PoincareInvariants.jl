@@ -1,18 +1,17 @@
-module LoopFinDiff
+module FirstFinDiffPlans
 
 using LinearAlgebra: dot
 using Base: Callable
 using StaticArrays: SVector
 
-using ...PoincareInvariants: getpointnum, getform
-using ..FirstPoincareInvariants: FirstPoincareInvariant
+using ..PoincareInvariants: FirstPoincareInvariant, getpointnum, getform
 
-import ...PoincareInvariants: compute!, getpoints, getpointspec
+import ..PoincareInvariants: compute!, getpoints, getpointspec
 
-struct LoopFinDiffPlan end
+struct FirstFinDiffPlan end
 
 function compute!(
-    pinv::FirstPoincareInvariant{T, D, <:Callable, <:LoopFinDiffPlan}, zs, t, p
+    pinv::FirstPoincareInvariant{T, D, <:Callable, <:FirstFinDiffPlan}, zs, t, p
 ) where {T, D}
 
     N = getpointnum(pinv)
@@ -51,7 +50,7 @@ end
 
 ## getpoints and getpointspec ##
 
-function getpointspec(N::Integer, ::Type{<:LoopFinDiffPlan})::Int
+function getpointspec(N::Integer, ::Type{<:FirstFinDiffPlan})::Int
     if N < 2
         return 2
     elseif isodd(N)
@@ -61,7 +60,7 @@ function getpointspec(N::Integer, ::Type{<:LoopFinDiffPlan})::Int
     end
 end
 
-function getpoints(f, ::Type{T}, N::Integer, ::Type{<:LoopFinDiffPlan}) where T
+function getpoints(f, ::Type{T}, N::Integer, ::Type{<:FirstFinDiffPlan}) where T
     D = length(f(zero(T)))
     out = ntuple(_ -> Vector{T}(undef, N), D)
 

@@ -1,4 +1,4 @@
-@reexport module CanonicalSymplecticStructures
+module CanonicalSymplecticStructures
 
 import Base
 import LinearAlgebra

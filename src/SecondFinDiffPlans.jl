@@ -1,22 +1,22 @@
-module FiniteDifferences
+module SecondFinDiffPlans
 
-import ...PoincareInvariants: compute!, getpoints, getpointnum, getpointspec
-import ..SecondPoincareInvariants: SecondPoincareInvariant
+import ..PoincareInvariants: compute!, getpoints, getpointnum, getpointspec
+import ..PoincareInvariants: SecondPoincareInvariant
 
-using ...PoincareInvariants: @argcheck
+using ..PoincareInvariants: @argcheck
 
 using LinearAlgebra: dot
 using Base: Callable
 
-struct FiniteDiffPlan{T, D} end
+struct SecondFinDiffPlan{T, D} end
 
-function FiniteDiffPlan{T, D}(Ω, ps::NTuple{2, Int}) where {T, D}
-    FiniteDiffPlan{T, D}()
+function SecondFinDiffPlan{T, D}(Ω, ps::NTuple{2, Int}) where {T, D}
+    SecondFinDiffPlan{T, D}()
 end
 
 function compute!(
     pinv::SecondPoincareInvariant{T, D, ΩT, <:Any, P}, vals, t, p
-) where {T, D, ΩT<:Callable, P <: FiniteDiffPlan}
+) where {T, D, ΩT<:Callable, P <: SecondFinDiffPlan}
     nx, ny = pinv.pointspec
     @argcheck size(vals) == (nx * ny, D) "Expected points mtarix to have size $((nx * ny, D))"
 
@@ -53,16 +53,16 @@ getpointnum((nx, ny)::NTuple{2, Integer}) = nx * ny
 
 nextodd(n::Integer)::Int = n <= 3 ? 3 : 2 * fld(n, 2) + 1
 
-function getpointspec(dims::NTuple{2, Integer}, ::Type{<:FiniteDiffPlan})
+function getpointspec(dims::NTuple{2, Integer}, ::Type{<:SecondFinDiffPlan})
     return (nextodd(dims[1]), nextodd(dims[2]))
 end
 
-function getpointspec(N::Integer, ::Type{<:FiniteDiffPlan})
+function getpointspec(N::Integer, ::Type{<:SecondFinDiffPlan})
     n = nextodd(ceil(Int, sqrt(Int(N))))
     return (n, n)
 end
 
-function getpoints(f, ::Type{T}, dims::NTuple{2, Integer}, ::Type{<:FiniteDiffPlan}) where T
+function getpoints(f, ::Type{T}, dims::NTuple{2, Integer}, ::Type{<:SecondFinDiffPlan}) where T
     D = length(f(zero(T), zero(T)))
     nx, ny = dims
     N = nx * ny
@@ -209,4 +209,4 @@ function getsimpweight(::Type{T}, x, y, (nx, ny)) where T
     return T(_sw(x, nx) * _sw(y, ny)) / (9 * (nx - 1) * (ny - 1))
 end
 
-end  # FiniteDifferences
+end  # SecondFinDiffPlans

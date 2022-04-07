@@ -1,4 +1,4 @@
-using PoincareInvariants.SecondPoincareInvariants.Chebyshev.PaduaTransforms
+using PoincareInvariants.SecondChebyshevPlans.PaduaTransforms
 
 module ChebyshevTestUtils
     using LinearAlgebra: UpperTriangular

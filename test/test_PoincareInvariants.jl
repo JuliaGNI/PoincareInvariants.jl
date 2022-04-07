@@ -1,9 +1,3 @@
-@safetestset "Chebyshev Implementation" begin include("test_Chebyshev.jl") end
-
-@safetestset "FiniteDifferences Implementation" begin
-    include("test_FiniteDifferences.jl")
-end
-
 @safetestset "Interface" begin
     @safetestset "Basic properties" begin
         using PoincareInvariants
@@ -21,8 +15,6 @@ end
 
 @safetestset "One by One Square" begin
     using PoincareInvariants
-    using PoincareInvariants.SecondPoincareInvariants.Chebyshev: ChebyshevPlan
-    using PoincareInvariants.SecondPoincareInvariants.FiniteDifferences: FiniteDiffPlan
 
     D = 2
     Ω(z, t, p) = CanonicalSymplecticMatrix(D)
@@ -32,12 +24,12 @@ end
         @test abs(1 - I) / eps() < 10
     end
 
-    let pinv = SecondPoincareInvariant{Float64, D}(Ω, 567, ChebyshevPlan)
+    let pinv = SecondPoincareInvariant{Float64, D}(Ω, 567, SecondChebyshevPlan)
         I = compute!(pinv, getpoints(pinv), 0, nothing)
         @test abs(1 - I) / eps() < 10
     end
 
-    let pinv = SecondPoincareInvariant{Float64, D}(Ω, (35, 75), FiniteDiffPlan)
+    let pinv = SecondPoincareInvariant{Float64, D}(Ω, (35, 75), SecondFinDiffPlan)
         I = compute!(pinv, getpoints(pinv), 0, nothing)
         @test abs(1 - I) / eps() < 10
     end
@@ -45,8 +37,6 @@ end
 
 @safetestset "Consistency Between Implementations" begin
     using PoincareInvariants
-    using PoincareInvariants.SecondPoincareInvariants: ChebyshevPlan
-    using PoincareInvariants.SecondPoincareInvariants: FiniteDiffPlan
 
     D = 6
     Ω(z, t, p) = [
@@ -71,11 +61,11 @@ end
         compute!(pinv, getpoints(f, pinv), 5, 11)
     end
 
-    Icheb = let pinv = PI2{Float64, D}(Ω, 1_000, ChebyshevPlan)
+    Icheb = let pinv = PI2{Float64, D}(Ω, 1_000, SecondChebyshevPlan)
         compute!(pinv, getpoints(f, pinv), 5, 11)
     end
 
-    Ifindiff = let pinv = PI2{Float64, D}(Ω, (31, 33), FiniteDiffPlan)
+    Ifindiff = let pinv = PI2{Float64, D}(Ω, (31, 33), SecondFinDiffPlan)
         compute!(pinv, getpoints(f, pinv), 5, 11)
     end
 
@@ -86,11 +76,10 @@ end
 @safetestset "Linear Symplectic Maps" begin
     @safetestset "In 2D" begin
         using PoincareInvariants
-        using PoincareInvariants.SecondPoincareInvariants: FiniteDiffPlan
 
         Ω(z, t, p) = CanonicalSymplecticMatrix(2)
         chebpi = PI2{Float64, 2}(Ω, 1_000)
-        diffpi = PI2{Float64, 2}(Ω, 1_000, FiniteDiffPlan)
+        diffpi = PI2{Float64, 2}(Ω, 1_000, SecondFinDiffPlan)
 
         A = [1 5;
              0 1]
@@ -105,11 +94,10 @@ end
 
     @safetestset "In 8D" begin
         using PoincareInvariants
-        using PoincareInvariants.SecondPoincareInvariants: FiniteDiffPlan
 
         Ω(z, t, p) = CanonicalSymplecticMatrix(8)
         chebpi = PI2{Float64, 8}(Ω, 1_000)
-        diffpi = PI2{Float64, 8}(Ω, 1_000, FiniteDiffPlan)
+        diffpi = PI2{Float64, 8}(Ω, 1_000, SecondFinDiffPlan)
 
         A = CanonicalSymplecticMatrix(8)
 
@@ -141,7 +129,6 @@ end
 
 @safetestset "Henon Map" begin
     using PoincareInvariants
-    using PoincareInvariants.SecondPoincareInvariants: FiniteDiffPlan
 
     init(x, y) = 2 .* (x - 0.5, -x + 0.5, y - 0.5, -y + 0.5)
     I = 2^2 * 2
@@ -164,7 +151,7 @@ end
 
     Ω(z, t, p) = CanonicalSymplecticMatrix(4)
     chebpi = PI2{Float64, 4}(Ω, 1_000)
-    diffpi = PI2{Float64, 4}(Ω, 1_000, FiniteDiffPlan)
+    diffpi = PI2{Float64, 4}(Ω, 1_000, SecondFinDiffPlan)
 
     f1(x, y) = init(x, y) |> f
     @test abs(I - compute!(chebpi, getpoints(f1, chebpi), 0, nothing)) < 1e-14
@@ -180,7 +167,6 @@ end
 
 @safetestset "Wavy Map" begin
     using PoincareInvariants
-    using PoincareInvariants.SecondPoincareInvariants: FiniteDiffPlan
 
     function wavy(x, y)
         x, y = x, y + sinpi(x)
@@ -201,7 +187,7 @@ end
 
     Ω(z, t, p) = CanonicalSymplecticMatrix(6)
     chebpi = PI2{Float64, 6}(Ω, 1_000)
-    diffpi = PI2{Float64, 6}(Ω, 1_000, FiniteDiffPlan)
+    diffpi = PI2{Float64, 6}(Ω, 1_000, SecondFinDiffPlan)
 
     f1(x, y) = init(x, y) |> f
     @test abs(I - compute!(chebpi, getpoints(f1, chebpi), 0, nothing)) < 1e-14
