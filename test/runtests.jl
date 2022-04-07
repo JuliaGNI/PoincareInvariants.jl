@@ -1,8 +1,6 @@
 using SafeTestsets, Test
 
-@safetestset "CanonicalSymplecticStructures" begin
-    include("test_CanonicalSymplecticStructures.jl")
-end
+@safetestset "CanonicalSymplecticForms" begin include("test_CanonicalSymplecticForms.jl") end
 
 @safetestset "Plan Unit Tests" begin
     @safetestset "FirstFinDiffPlans" begin include("test_FirstFinDiffPlans.jl") end

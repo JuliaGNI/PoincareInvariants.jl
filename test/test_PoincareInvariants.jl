@@ -3,7 +3,7 @@
         using PoincareInvariants
 
         D = 6; N = 123
-        Ω(z, t, p) = CanonicalSymplecticMatrix(D)
+        Ω(z, t, p) = CanonicalSymplecticTwoForm(D)
         pinv = SecondPoincareInvariant{Float64, D}(Ω, N)
 
         @test getdim(pinv) == 6
@@ -17,7 +17,7 @@ end
     using PoincareInvariants
 
     D = 2
-    Ω(z, t, p) = CanonicalSymplecticMatrix(D)
+    Ω(z, t, p) = CanonicalSymplecticTwoForm(D)
 
     let pinv = SecondPoincareInvariant{Float64, D}(Ω, 432)
         I = compute!(pinv, getpoints(pinv), 0, nothing)
@@ -77,7 +77,7 @@ end
     @safetestset "In 2D" begin
         using PoincareInvariants
 
-        Ω(z, t, p) = CanonicalSymplecticMatrix(2)
+        Ω(z, t, p) = CanonicalSymplecticTwoForm(2)
         chebpi = PI2{Float64, 2}(Ω, 1_000)
         diffpi = PI2{Float64, 2}(Ω, 1_000, SecondFinDiffPlan)
 
@@ -95,11 +95,11 @@ end
     @safetestset "In 8D" begin
         using PoincareInvariants
 
-        Ω(z, t, p) = CanonicalSymplecticMatrix(8)
+        Ω(z, t, p) = CanonicalSymplecticTwoForm(8)
         chebpi = PI2{Float64, 8}(Ω, 1_000)
         diffpi = PI2{Float64, 8}(Ω, 1_000, SecondFinDiffPlan)
 
-        A = CanonicalSymplecticMatrix(8)
+        A = CanonicalSymplecticTwoForm(8)
 
         B = [1 0 0 0 1 5 8 1;
              0 1 0 0 5 2 6 9;
@@ -149,7 +149,7 @@ end
         return (q1, q2, p1 - q2, p2 - q1)
     end
 
-    Ω(z, t, p) = CanonicalSymplecticMatrix(4)
+    Ω(z, t, p) = CanonicalSymplecticTwoForm(4)
     chebpi = PI2{Float64, 4}(Ω, 1_000)
     diffpi = PI2{Float64, 4}(Ω, 1_000, SecondFinDiffPlan)
 
@@ -185,7 +185,7 @@ end
     init(x, y) = (2x, 2x-1, 2x-2, 2y-1, 2y-1, 2y-1)
     I = 3 * 2^2
 
-    Ω(z, t, p) = CanonicalSymplecticMatrix(6)
+    Ω(z, t, p) = CanonicalSymplecticTwoForm(6)
     chebpi = PI2{Float64, 6}(Ω, 1_000)
     diffpi = PI2{Float64, 6}(Ω, 1_000, SecondFinDiffPlan)
 

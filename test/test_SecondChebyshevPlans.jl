@@ -71,7 +71,7 @@ end
 @safetestset "getintegrand! with CallIntPlan" begin
     using ..SecondChebyshevPlans.PaduaTransforms
     using ..SecondChebyshevPlans: DiffPlan, differentiate!, CallIntPlan, getintegrand!
-    using PoincareInvariants.CanonicalSymplecticStructures
+    using PoincareInvariants
 
     @testset "6 Points in 2 Dimensions" begin
         degree = 2
@@ -126,7 +126,7 @@ end
         iplan = InvPaduaTransformPlan{Float64}(degree)
         invpaduatransform!(phasepoints, iplan, phasecoeffs)
 
-        Ω(v, t, p) = CanonicalSymplecticMatrix(D)
+        Ω(v, t, p) = CanonicalSymplecticTwoForm(D)
 
         plan = CallIntPlan{Float64, D}(degree)
 
@@ -148,7 +148,7 @@ end
 
     D = 12
     N = 200
-    Ω(v, t, p) = CanonicalSymplecticMatrix(D)
+    Ω(v, t, p) = CanonicalSymplecticTwoForm(D)
     pointnum = nextpaduanum(N)
     degree = getdegree(pointnum)
     plan = SecondChebyshevPlan{Float64, D}(Ω, pointnum)

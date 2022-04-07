@@ -15,7 +15,7 @@ export SecondPoincareInvariant, PI2, SecondChebyshevPlan, SecondFinDiffPlan
 export getpoints, getpointspec, getpointnum
 export getdim, getform
 
-export CanonicalSymplecticMatrix
+export CanonicalSymplecticTwoForm
 
 """
     AbstractPoincareInvariant
@@ -73,9 +73,9 @@ function getform end
 ## Utils ##
 
 include("utils.jl")
-include("CanonicalSymplecticStructures.jl")
+include("CanonicalSymplecticForms.jl")
 
-using .CanonicalSymplecticStructures: CanonicalSymplecticMatrix
+using .CanonicalSymplecticForms: CanonicalSymplecticTwoForm
 
 
 ## FirstPoincareInvariant ##

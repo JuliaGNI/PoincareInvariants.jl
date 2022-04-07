@@ -17,7 +17,7 @@ julia> D = 2; N = 500;
 To calculate the second poincare invariant, we will need to define the two-form ``\Omega``, the integral invariant.
 
 ```jldoctest usage
-julia> Ω(z, t, p) = CanonicalSymplecticMatrix(D);
+julia> Ω(z, t, p) = CanonicalSymplecticTwoForm(D);
 ```
 
 The two-form is just a `D x D` matrix. In this case it is the canonical symplectic matrix.

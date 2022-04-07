@@ -1,11 +1,11 @@
-@safetestset "CanonicalSymplecticMatrix" begin
-    using PoincareInvariants: CanonicalSymplecticMatrix
+@safetestset "CanonicalSymplecticTwoForm" begin
+    using PoincareInvariants: CanonicalSymplecticTwoForm
     using LinearAlgebra: dot
     using Random: rand
 
-    @test CanonicalSymplecticMatrix{Int}(2) == [0 -1; 1 0]
-    @test CanonicalSymplecticMatrix{Int}(4) == [0 0 -1 0; 0 0 0 -1; 1 0 0 0; 0 1 0 0]
-    @test CanonicalSymplecticMatrix{Int}(6) == [0  0  0 -1  0  0;
+    @test CanonicalSymplecticTwoForm{Int}(2) == [0 -1; 1 0]
+    @test CanonicalSymplecticTwoForm{Int}(4) == [0 0 -1 0; 0 0 0 -1; 1 0 0 0; 0 1 0 0]
+    @test CanonicalSymplecticTwoForm{Int}(6) == [0  0  0 -1  0  0;
                                                 0  0  0  0 -1  0;
                                                 0  0  0  0  0 -1;
                                                 1  0  0  0  0  0;
@@ -28,10 +28,10 @@
         return true
     end
 
-    @testset "CanonicalSymplecticMatrix{$T}($n)" for T in [Int, Float64], n in [10, 64, 1002]
-        @test CanonicalSymplecticMatrix(n) === CanonicalSymplecticMatrix{Int}(n)
+    @testset "CanonicalSymplecticTwoForm{$T}($n)" for T in [Int, Float64], n in [10, 64, 1002]
+        @test CanonicalSymplecticTwoForm(n) === CanonicalSymplecticTwoForm{Int}(n)
 
-        C = CanonicalSymplecticMatrix{T}(n)
+        C = CanonicalSymplecticTwoForm{T}(n)
         @test size(C) == (n, n)
         @test eltype(C) == T
 
@@ -49,6 +49,6 @@
         @test vCw ≈ dot(v[mid+1:end], w[1:mid]) - dot(v[1:mid], w[mid+1:end])
         @test vCw ≈ dot(v, C * w)
 
-        @test_throws ArgumentError CanonicalSymplecticMatrix{T}(n + 1)
+        @test_throws ArgumentError CanonicalSymplecticTwoForm{T}(n + 1)
     end
 end
