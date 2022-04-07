@@ -16,7 +16,7 @@ end
 
 function compute!(
     pinv::SecondPoincareInvariant{T, D, ΩT, <:Any, P}, vals, t, p
-) where {T, D, ΩT<:Callable, P <: SecondFinDiffPlan}
+) where {T, D, ΩT, P <: SecondFinDiffPlan}
     nx, ny = pinv.pointspec
     @argcheck size(vals) == (nx * ny, D) "Expected points mtarix to have size $((nx * ny, D))"
 
@@ -34,11 +34,17 @@ function compute!(
                 ∂xi[d], ∂yi[d] = differentiate(colviews[d], ix, iy, (nx, ny))
             end
 
-            pnti = view(vals, i, :)
+            # This if statement should hopefully get optimised away by the compiler
+            if ΩT <: Callable
+                pnti = view(vals, i, :)
+                Ωi = pinv.Ω(pnti, t, p)
+            elseif ΩT <: AbstractMatrix
+                Ωi = pinv.Ω
+            end
 
             w = getsimpweight(T, ix, iy, (nx, ny))
 
-            I += w * dot(∂yi, pinv.Ω(pnti, t, p), ∂xi)
+            I += w * dot(∂yi, Ωi, ∂xi)
 
             i += 1
         end

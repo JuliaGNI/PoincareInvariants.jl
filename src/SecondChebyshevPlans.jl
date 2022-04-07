@@ -95,17 +95,24 @@ function CallIntPlan{T, D}(degree) where {T, D}
 end
 
 function getintegrand!(
-    intcoeffs::AbstractMatrix, plan::CallIntPlan{T, D}, Ω::Callable,
+    intcoeffs::AbstractMatrix, plan::CallIntPlan{T, D}, Ω::ΩT,
     phasepoints, t, p, ∂xcoeffs, ∂ycoeffs
-) where {T, D}
+) where {T, D, ΩT}
     invpaduatransform!(plan.∂xvals, plan.invpaduaplan, ∂xcoeffs)
     invpaduatransform!(plan.∂yvals, plan.invpaduaplan, ∂ycoeffs)
 
     for i in axes(plan.intvals, 1)
-        pnti = view(phasepoints, i, :)
+        # This if statement should hopefully get optimised away by the compiler
+        if ΩT <: Callable
+            pnti = view(phasepoints, i, :)
+            Ωi = Ω(pnti, t, p)
+        elseif ΩT <: AbstractMatrix
+            Ωi = Ω
+        end
+
         ∂xi = view(plan.∂xvals, i, :)
         ∂yi = view(plan.∂yvals, i, :)
-        plan.intvals[i] = dot(∂yi, Ω(pnti, t, p), ∂xi)
+        plan.intvals[i] = dot(∂yi, Ωi, ∂xi)
     end
 
     paduatransform!(intcoeffs, plan.paduaplan, plan.intvals)
@@ -115,7 +122,11 @@ end
 
 ## SecondChebyshevPlan and compute! ##
 
-getintplan(::Type{T}, ::Callable, ::Val{D}, degree) where {T, D} = CallIntPlan{T, D}(degree)
+function getintplan(
+    ::Type{T}, ::Union{Callable, AbstractMatrix}, ::Val{D}, degree
+) where {T, D}
+    CallIntPlan{T, D}(degree)
+end
 # getintplan(::Type{T}, Ω::AbstractMatrix, D, degree) where T = ConstIntPlan{T}(Ω, D, degree)
 
 struct SecondChebyshevPlan{T, D, IP, PP<:PaduaTransformPlan}
@@ -130,7 +141,7 @@ struct SecondChebyshevPlan{T, D, IP, PP<:PaduaTransformPlan}
     intweights::Vector{T}
 end
 
-function SecondChebyshevPlan{T, D}(Ω::Callable, N::Integer) where {T, D}
+function SecondChebyshevPlan{T, D}(Ω, N::Integer) where {T, D}
     degree = getdegree(nextpaduanum(N))
 
     paduaplan = PaduaTransformPlan{T}(degree)
@@ -148,8 +159,8 @@ function SecondChebyshevPlan{T, D}(Ω::Callable, N::Integer) where {T, D}
 end
 
 function compute!(
-    pinv::SecondPoincareInvariant{<:Any, <:Any, ΩT, <:Any, P}, phasepoints, t, p
-) where {ΩT <: Callable, P <: SecondChebyshevPlan}
+    pinv::SecondPoincareInvariant{<:Any, <:Any, <:Any, <:Any, P}, phasepoints, t, p
+) where P <: SecondChebyshevPlan
     plan = pinv.plan
     paduatransform!(plan.phasecoeffs, plan.paduaplan, phasepoints)
     differentiate!(plan.∂x, plan.∂y, plan.diffplan, plan.phasecoeffs)

@@ -9,11 +9,14 @@ module PoincareInvariants
 using Base: Callable
 
 export AbstractPoincareInvariant, compute!
-export FirstPoincareInvariant, PI1, FirstFinDiffPlan
-export SecondPoincareInvariant, PI2, SecondChebyshevPlan, SecondFinDiffPlan
+export FirstPoincareInvariant, FirstPI
+export SecondPoincareInvariant, CanonicalSecondPI, SecondPI
 
 export getpoints, getpointspec, getpointnum
 export getdim, getform
+
+export FirstFinDiffPlan
+export SecondChebyshevPlan, SecondFinDiffPlan
 
 export CanonicalSymplecticTwoForm
 
@@ -97,7 +100,10 @@ end
 FirstPoincareInvariant{T, D}(θ::θT, N::Integer, plan::P) where {T, D, θT, P} =
     FirstPoincareInvariant{T, D, θT, P}(θ, N, plan)
 
-const PI1 = FirstPoincareInvariant
+# FirstCanonicalPI{T, D}(N::Integer, P=DEFAULT_FIRST_PLAN) where {T, D} =
+#     FirstPoincareInvariant{T, D}(θ, N, plan)
+
+const FirstPI = FirstPoincareInvariant
 
 # Interface
 
@@ -138,7 +144,15 @@ function SecondPoincareInvariant{T, D}(Ω::ΩT, ps::PS, plan::P) where {T, D, Ω
     SecondPoincareInvariant{T, D, ΩT, PS, P}(Ω, ps, plan)
 end
 
-const PI2 = SecondPoincareInvariant
+function SecondPoincareInvariant{T, D, CanonicalSymplecticTwoForm{T}}(
+    N, P=DEFAULT_SECOND_PLAN
+) where {T, D}
+    Ω = CanonicalSymplecticTwoForm{T}(D)
+    SecondPoincareInvariant{T, D}(Ω, N, P)
+end
+
+const SecondPI = SecondPoincareInvariant
+const CanonicalSecondPI{T, D} = SecondPoincareInvariant{T, D, CanonicalSymplecticTwoForm{T}}
 
 # Interface
 

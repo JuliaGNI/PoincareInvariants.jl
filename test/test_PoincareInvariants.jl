@@ -57,15 +57,15 @@ end
         x + y
     )
 
-    Idefault = let pinv = PI2{Float64, D}(Ω, 1_000)
+    Idefault = let pinv = SecondPI{Float64, D}(Ω, 1_000)
         compute!(pinv, getpoints(f, pinv), 5, 11)
     end
 
-    Icheb = let pinv = PI2{Float64, D}(Ω, 1_000, SecondChebyshevPlan)
+    Icheb = let pinv = SecondPI{Float64, D}(Ω, 1_000, SecondChebyshevPlan)
         compute!(pinv, getpoints(f, pinv), 5, 11)
     end
 
-    Ifindiff = let pinv = PI2{Float64, D}(Ω, (31, 33), SecondFinDiffPlan)
+    Ifindiff = let pinv = SecondPI{Float64, D}(Ω, (31, 33), SecondFinDiffPlan)
         compute!(pinv, getpoints(f, pinv), 5, 11)
     end
 
@@ -78,8 +78,8 @@ end
         using PoincareInvariants
 
         Ω(z, t, p) = CanonicalSymplecticTwoForm(2)
-        chebpi = PI2{Float64, 2}(Ω, 1_000)
-        diffpi = PI2{Float64, 2}(Ω, 1_000, SecondFinDiffPlan)
+        chebpi = SecondPI{Float64, 2}(Ω, 1_000)
+        diffpi = SecondPI{Float64, 2}(Ω, 1_000, SecondFinDiffPlan)
 
         A = [1 5;
              0 1]
@@ -96,8 +96,8 @@ end
         using PoincareInvariants
 
         Ω(z, t, p) = CanonicalSymplecticTwoForm(8)
-        chebpi = PI2{Float64, 8}(Ω, 1_000)
-        diffpi = PI2{Float64, 8}(Ω, 1_000, SecondFinDiffPlan)
+        chebpi = SecondPI{Float64, 8}(Ω, 1_000)
+        diffpi = SecondPI{Float64, 8}(Ω, 1_000, SecondFinDiffPlan)
 
         A = CanonicalSymplecticTwoForm(8)
 
@@ -150,8 +150,8 @@ end
     end
 
     Ω(z, t, p) = CanonicalSymplecticTwoForm(4)
-    chebpi = PI2{Float64, 4}(Ω, 1_000)
-    diffpi = PI2{Float64, 4}(Ω, 1_000, SecondFinDiffPlan)
+    chebpi = SecondPI{Float64, 4}(Ω, 1_000)
+    diffpi = SecondPI{Float64, 4}(Ω, 1_000, SecondFinDiffPlan)
 
     f1(x, y) = init(x, y) |> f
     @test abs(I - compute!(chebpi, getpoints(f1, chebpi), 0, nothing)) < 1e-14
@@ -185,9 +185,8 @@ end
     init(x, y) = (2x, 2x-1, 2x-2, 2y-1, 2y-1, 2y-1)
     I = 3 * 2^2
 
-    Ω(z, t, p) = CanonicalSymplecticTwoForm(6)
-    chebpi = PI2{Float64, 6}(Ω, 1_000)
-    diffpi = PI2{Float64, 6}(Ω, 1_000, SecondFinDiffPlan)
+    chebpi = CanonicalSecondPI{Float64, 6}(1_000)
+    diffpi = CanonicalSecondPI{Float64, 6}(1_000, SecondFinDiffPlan)
 
     f1(x, y) = init(x, y) |> f
     @test abs(I - compute!(chebpi, getpoints(f1, chebpi), 0, nothing)) < 1e-14
