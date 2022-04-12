@@ -7,8 +7,8 @@ DocTestSetup = quote
 end
 ```
 
-This module currently contains the type [`CanonicalSymplecticTwoForm`](@ref), which satisifes the `AbstractMatrix` interface and has an optimised `LinearAlgebra.dot` method to compute the vector matrix vector product.
+This module currently contains the type [`canonical_two_form`](@ref), which satisifes the `AbstractMatrix` interface and has an optimised `LinearAlgebra.dot` method to compute the vector matrix vector product.
 
 ```@docs
-CanonicalSymplecticTwoForm
+canonical_two_form
 ```

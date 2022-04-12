@@ -3,7 +3,7 @@ module CanonicalSymplecticForms
 import Base
 import LinearAlgebra
 
-export CanonicalSymplecticOneForm, CanonicalSymplecticMatrix, CanonicalSymplecticTwoForm
+export canonical_one_form, CanonicalSymplecticMatrix, canonical_two_form
 
 function checkn(T, n::Integer)
     n > 0 || throw(ArgumentError("$T must have positive size"))
@@ -54,7 +54,7 @@ end
 
 # LinearAlgebra.dot(x::AbstractVector, C::CanonicalSymplecticVector) = LinearAlgebra.dot(C, x)
 
-function CanonicalSymplecticOneForm(z, t, p)
+function canonical_one_form(z, t, p)
     n = length(z)
     iseven(n) || throw(ArgumentError("z must have even length"))
     mid = n ÷ 2
@@ -129,6 +129,6 @@ function LinearAlgebra.dot(x::AbstractVector, C::CanonicalSymplecticMatrix, y::A
     s
 end
 
-CanonicalSymplecticTwoForm(z, t, p) = CanonicalSymplecticMatrix{eltype(z)}(length(z))
+canonical_two_form(z, t, p) = CanonicalSymplecticMatrix{eltype(z)}(length(z))
 
 end  # module

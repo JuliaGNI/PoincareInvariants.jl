@@ -15,7 +15,7 @@ export getdim, getform
 export FirstFinDiffPlan
 export SecondChebyshevPlan, SecondFinDiffPlan
 
-export CanonicalSymplecticOneForm, CanonicalSymplecticMatrix, CanonicalSymplecticTwoForm
+export canonical_one_form, CanonicalSymplecticMatrix, canonical_two_form
 
 """
     AbstractPoincareInvariant{T, D}
@@ -85,8 +85,8 @@ function getform end
 include("utils.jl")
 include("CanonicalSymplecticForms.jl")
 
-using .CanonicalSymplecticForms: CanonicalSymplecticOneForm, CanonicalSymplecticMatrix,
-    CanonicalSymplecticTwoForm
+using .CanonicalSymplecticForms: canonical_one_form, CanonicalSymplecticMatrix,
+    canonical_two_form
 
 
 ## FirstPoincareInvariant ##
@@ -108,14 +108,14 @@ end
 FirstPoincareInvariant{T, D}(θ::θT, N::Integer, plan::P) where {T, D, θT, P} =
     FirstPoincareInvariant{T, D, θT, P}(θ, N, plan)
 
-function FirstPoincareInvariant{T, D, typeof(CanonicalSymplecticOneForm)}(
+function FirstPoincareInvariant{T, D, typeof(canonical_one_form)}(
     N, P=DEFAULT_FIRST_PLAN
 ) where {T, D}
-    FirstPoincareInvariant{T, D}(CanonicalSymplecticOneForm, N, P)
+    FirstPoincareInvariant{T, D}(canonical_one_form, N, P)
 end
 
 const FirstPI = FirstPoincareInvariant
-const CanonicalFirstPI{T, D} = FirstPoincareInvariant{T, D, typeof(CanonicalSymplecticOneForm)}
+const CanonicalFirstPI{T, D} = FirstPoincareInvariant{T, D, typeof(canonical_one_form)}
 
 # Interface
 

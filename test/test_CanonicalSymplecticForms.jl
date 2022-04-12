@@ -1,10 +1,10 @@
-@safetestset "CanonicalSymplecticOneForm" begin
-    using PoincareInvariants: CanonicalSymplecticOneForm
+@safetestset "canonical_one_form" begin
+    using PoincareInvariants: canonical_one_form
     using LinearAlgebra: dot
     using Random: rand
 
-    @test_throws ArgumentError CanonicalSymplecticOneForm([1, 2, 3], 0.5, nothing)
-    @test_throws ArgumentError CanonicalSymplecticOneForm([0.3], 3.4, nothing)
+    @test_throws ArgumentError canonical_one_form([1, 2, 3], 0.5, nothing)
+    @test_throws ArgumentError canonical_one_form([0.3], 3.4, nothing)
 
     for mid in [3, 9, 22]
         n = mid * 2
@@ -13,9 +13,9 @@
         p = rand(mid)
         z = [q; p]
 
-        @inferred CanonicalSymplecticOneForm(z, 0.1, nothing)
+        @inferred canonical_one_form(z, 0.1, nothing)
 
-        θ = CanonicalSymplecticOneForm(z, 1.3, nothing)
+        θ = canonical_one_form(z, 1.3, nothing)
 
         @test θ[1:mid] == p
         @test θ[mid+1:end] == zeros(mid)
@@ -27,8 +27,8 @@
     end
 end
 
-@safetestset "CanonicalSymplecticTwoForm" begin
-    using PoincareInvariants: CanonicalSymplecticMatrix, CanonicalSymplecticTwoForm
+@safetestset "canonical_two_form" begin
+    using PoincareInvariants: CanonicalSymplecticMatrix, canonical_two_form
     using LinearAlgebra: dot
     using Random: rand
 
@@ -88,8 +88,8 @@ end
 
         @test_throws ArgumentError CanonicalSymplecticMatrix{T}(n + 1)
 
-        @inferred CanonicalSymplecticMatrix{Float64} CanonicalSymplecticTwoForm(v, 0.1, nothing)
+        @inferred CanonicalSymplecticMatrix{Float64} canonical_two_form(v, 0.1, nothing)
 
-        @test CanonicalSymplecticTwoForm(v, 0.1, nothing) == CanonicalSymplecticMatrix(n)
+        @test canonical_two_form(v, 0.1, nothing) == CanonicalSymplecticMatrix(n)
     end
 end

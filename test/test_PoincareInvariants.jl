@@ -3,7 +3,7 @@
         using PoincareInvariants
 
         D = 6; N = 123
-        ω(z, t, p) = CanonicalSymplecticTwoForm(D)
+        ω(z, t, p) = canonical_two_form(D)
         pinv = SecondPoincareInvariant{Float64, D}(ω, N)
 
         @test getdim(pinv) == 6
@@ -20,12 +20,12 @@ end
     D = 2
 
     first_pinvs = [
-        FirstPoincareInvariant{Float64, D}(CanonicalSymplecticOneForm, 500)
-        FirstPoincareInvariant{Float64, D}(CanonicalSymplecticOneForm, 501, FirstFinDiffPlan)
-        FirstPoincareInvariant{Double64, D}(CanonicalSymplecticOneForm, 518, FirstFinDiffPlan)
+        FirstPoincareInvariant{Float64, D}(canonical_one_form, 500)
+        FirstPoincareInvariant{Float64, D}(canonical_one_form, 501, FirstFinDiffPlan)
+        FirstPoincareInvariant{Double64, D}(canonical_one_form, 518, FirstFinDiffPlan)
 
-        FirstPI{Float64, D}(CanonicalSymplecticOneForm, 541)
-        FirstPI{Double64, D}(CanonicalSymplecticOneForm, 542, FirstFinDiffPlan)
+        FirstPI{Float64, D}(canonical_one_form, 541)
+        FirstPI{Double64, D}(canonical_one_form, 542, FirstFinDiffPlan)
 
         CanonicalFirstPI{Double64, D}(566)
         CanonicalFirstPI{Float64, D}(567, FirstFinDiffPlan)
@@ -47,15 +47,15 @@ end
     D = 2
 
     second_pinvs = [
-        SecondPoincareInvariant{Float64, D}(CanonicalSymplecticTwoForm, 244)
-        SecondPoincareInvariant{Float64, D}(CanonicalSymplecticTwoForm, 222, SecondChebyshevPlan)
-        SecondPoincareInvariant{Double64, D}(CanonicalSymplecticTwoForm, 123, SecondChebyshevPlan)
-        SecondPoincareInvariant{Float64, D}(CanonicalSymplecticTwoForm, (15, 13), SecondFinDiffPlan)
-        SecondPoincareInvariant{Double64, D}(CanonicalSymplecticTwoForm, 188, SecondFinDiffPlan)
+        SecondPoincareInvariant{Float64, D}(canonical_two_form, 244)
+        SecondPoincareInvariant{Float64, D}(canonical_two_form, 222, SecondChebyshevPlan)
+        SecondPoincareInvariant{Double64, D}(canonical_two_form, 123, SecondChebyshevPlan)
+        SecondPoincareInvariant{Float64, D}(canonical_two_form, (15, 13), SecondFinDiffPlan)
+        SecondPoincareInvariant{Double64, D}(canonical_two_form, 188, SecondFinDiffPlan)
 
-        SecondPI{Float64, D}(CanonicalSymplecticTwoForm, 345)
-        SecondPI{Float64, D}(CanonicalSymplecticTwoForm, 366, SecondChebyshevPlan)
-        SecondPI{Double64, D}(CanonicalSymplecticTwoForm, 124, SecondFinDiffPlan)
+        SecondPI{Float64, D}(canonical_two_form, 345)
+        SecondPI{Float64, D}(canonical_two_form, 366, SecondChebyshevPlan)
+        SecondPI{Double64, D}(canonical_two_form, 124, SecondFinDiffPlan)
 
         SecondPI{Float64, D}(CanonicalSymplecticMatrix{Float64}(D), 195)
         SecondPI{Float64, D}(CanonicalSymplecticMatrix{Double64}(D), 264, SecondChebyshevPlan)
@@ -187,7 +187,7 @@ end
         return (q1, q2, p1 - q2, p2 - q1)
     end
 
-    ω = CanonicalSymplecticTwoForm
+    ω = canonical_two_form
     chebpi = SecondPI{Float64, 4}(ω, 1_000)
     diffpi = SecondPI{Float64, 4}(ω, 1_000, SecondFinDiffPlan)
 
