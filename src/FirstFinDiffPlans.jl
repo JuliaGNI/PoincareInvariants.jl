@@ -1,7 +1,6 @@
 module FirstFinDiffPlans
 
 using LinearAlgebra: dot
-using Base: Callable
 using StaticArrays: SVector
 
 using ..PoincareInvariants: FirstPoincareInvariant, getpointnum, getform
@@ -11,7 +10,7 @@ import ..PoincareInvariants: compute!, getpoints, getpointspec
 struct FirstFinDiffPlan end
 
 function compute!(
-    pinv::FirstPoincareInvariant{T, D, <:Callable, <:FirstFinDiffPlan}, zs, t, p
+    pinv::FirstPoincareInvariant{T, D, <:Any, <:FirstFinDiffPlan}, zs, t, p
 ) where {T, D}
 
     N = getpointnum(pinv)

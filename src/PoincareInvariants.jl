@@ -5,9 +5,6 @@ A Julia library for the computation of Poincaré integral invariants.
 """
 module PoincareInvariants
 
-# Callable is Union{Function, Type}
-using Base: Callable
-
 export AbstractPoincareInvariant, compute!
 export FirstPoincareInvariant, FirstPI
 export SecondPoincareInvariant, CanonicalSecondPI, SecondPI
@@ -123,7 +120,7 @@ const DEFAULT_FIRST_PLAN = FirstFinDiffPlan
 struct SecondPoincareInvariant{
     T,  # phase space and return type
     D,  # dimension of phase space
-    ωT <: Union{Callable, AbstractMatrix},
+    ωT,
     PS,
     P
 } <: AbstractPoincareInvariant

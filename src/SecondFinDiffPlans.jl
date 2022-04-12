@@ -6,7 +6,6 @@ import ..PoincareInvariants: SecondPoincareInvariant
 using ..PoincareInvariants: @argcheck
 
 using LinearAlgebra: dot
-using Base: Callable
 
 struct SecondFinDiffPlan{T, D} end
 
@@ -35,11 +34,11 @@ function compute!(
             end
 
             # This if statement should hopefully get optimised away by the compiler
-            if ωT <: Callable
+            if ωT <: AbstractMatrix
+                ωi = pinv.ω
+            else
                 pnti = view(vals, i, :)
                 ωi = pinv.ω(pnti, t, p)
-            elseif ωT <: AbstractMatrix
-                ωi = pinv.ω
             end
 
             w = getsimpweight(T, ix, iy, (nx, ny))

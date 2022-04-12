@@ -10,7 +10,6 @@ import ..PoincareInvariants: compute!, getpoints, getpointspec
 
 using ..PoincareInvariants: SecondPoincareInvariant, @argcheck
 
-using Base: Callable
 using LinearAlgebra
 
 include("PaduaTransforms.jl")
@@ -103,11 +102,11 @@ function getintegrand!(
 
     for i in axes(plan.intvals, 1)
         # This if statement should hopefully get optimised away by the compiler
-        if ωT <: Callable
+        if ωT <: AbstractMatrix
+            ωi = ω
+        else
             pnti = view(phasepoints, i, :)
             ωi = ω(pnti, t, p)
-        elseif ωT <: AbstractMatrix
-            ωi = ω
         end
 
         ∂xi = view(plan.∂xvals, i, :)
@@ -122,11 +121,7 @@ end
 
 ## SecondChebyshevPlan and compute! ##
 
-function getintplan(
-    ::Type{T}, ::Union{Callable, AbstractMatrix}, ::Val{D}, degree
-) where {T, D}
-    CallIntPlan{T, D}(degree)
-end
+getintplan(::Type{T}, ::Any, ::Val{D}, degree) where {T, D} = CallIntPlan{T, D}(degree)
 # getintplan(::Type{T}, ω::AbstractMatrix, D, degree) where T = ConstIntPlan{T}(ω, D, degree)
 
 struct SecondChebyshevPlan{T, D, IP, PP<:PaduaTransformPlan}
