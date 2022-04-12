@@ -10,13 +10,13 @@ using Base: Callable
 
 struct SecondFinDiffPlan{T, D} end
 
-function SecondFinDiffPlan{T, D}(Ω, ps::NTuple{2, Int}) where {T, D}
+function SecondFinDiffPlan{T, D}(ω, ps::NTuple{2, Int}) where {T, D}
     SecondFinDiffPlan{T, D}()
 end
 
 function compute!(
-    pinv::SecondPoincareInvariant{T, D, ΩT, <:Any, P}, vals, t, p
-) where {T, D, ΩT, P <: SecondFinDiffPlan}
+    pinv::SecondPoincareInvariant{T, D, ωT, <:Any, P}, vals, t, p
+) where {T, D, ωT, P <: SecondFinDiffPlan}
     nx, ny = pinv.pointspec
     @argcheck size(vals) == (nx * ny, D) "Expected points mtarix to have size $((nx * ny, D))"
 
@@ -35,16 +35,16 @@ function compute!(
             end
 
             # This if statement should hopefully get optimised away by the compiler
-            if ΩT <: Callable
+            if ωT <: Callable
                 pnti = view(vals, i, :)
-                Ωi = pinv.Ω(pnti, t, p)
-            elseif ΩT <: AbstractMatrix
-                Ωi = pinv.Ω
+                ωi = pinv.ω(pnti, t, p)
+            elseif ωT <: AbstractMatrix
+                ωi = pinv.ω
             end
 
             w = getsimpweight(T, ix, iy, (nx, ny))
 
-            I += w * dot(∂yi, Ωi, ∂xi)
+            I += w * dot(∂yi, ωi, ∂xi)
 
             i += 1
         end

@@ -93,13 +93,13 @@ end
         iplan = InvPaduaTransformPlan{Float64}(degree)
         invpaduatransform!(phasepoints, iplan, phasecoeffs)
 
-        Ω(v, t, p) = [0 -1; 1  0]
+        ω(v, t, p) = [0 -1; 1  0]
 
         plan = CallIntPlan{Float64, D}(degree)
 
         intcoeffs = zeros(degree+1, degree+1)
 
-        getintegrand!(intcoeffs, plan, Ω, phasepoints, 0, nothing, ∂xcoeffs, ∂ycoeffs)
+        getintegrand!(intcoeffs, plan, ω, phasepoints, 0, nothing, ∂xcoeffs, ∂ycoeffs)
 
         @test intcoeffs ≈ [-72   -82  -30;
                            -82  -432    0;
@@ -126,13 +126,13 @@ end
         iplan = InvPaduaTransformPlan{Float64}(degree)
         invpaduatransform!(phasepoints, iplan, phasecoeffs)
 
-        Ω(v, t, p) = CanonicalSymplecticTwoForm(D)
+        ω(v, t, p) = CanonicalSymplecticTwoForm(D)
 
         plan = CallIntPlan{Float64, D}(degree)
 
         intcoeffs = zeros(degree+1, degree+1)
 
-        getintegrand!(intcoeffs, plan, Ω, phasepoints, 0, nothing, ∂xcoeffs, ∂ycoeffs)
+        getintegrand!(intcoeffs, plan, ω, phasepoints, 0, nothing, ∂xcoeffs, ∂ycoeffs)
 
         testcoeffs = zeros(degree+1, degree+1)
         testcoeffs[1, 1] = 0.25
@@ -148,10 +148,10 @@ end
 
     D = 12
     N = 200
-    Ω(v, t, p) = CanonicalSymplecticTwoForm(D)
+    ω(v, t, p) = CanonicalSymplecticTwoForm(D)
     pointnum = nextpaduanum(N)
     degree = getdegree(pointnum)
-    plan = SecondChebyshevPlan{Float64, D}(Ω, pointnum)
+    plan = SecondChebyshevPlan{Float64, D}(ω, pointnum)
 
     testphasecoeffs = [zeros(degree+1, degree+1) for _ in 1:D]
     test∂x = [zeros(degree+1, degree+1) for _ in 1:D]
@@ -166,7 +166,7 @@ end
         end
     end
 
-    pinv = SecondPoincareInvariant{Float64, D}(Ω, pointnum, plan)
+    pinv = SecondPoincareInvariant{Float64, D}(ω, pointnum, plan)
     @test compute!(pinv, phasepoints, 0, nothing) ≈ 4 atol=20eps()
 
     testphasecoeffs[1][1, 2] = 1  # 1 x

@@ -184,16 +184,16 @@ end
         15 + 17*x + 36*y,
         21 + 23*x + 48*y]
 
-    Ω(z, ::Any, ::Any) = [0 0 z[1] z[2]; 0 0 z[3] z[4]; -z[1] -z[3] 0 0; -z[2] -z[4] 0 0]
+    ω(z, ::Any, ::Any) = [0 0 z[1] z[2]; 0 0 z[3] z[4]; -z[1] -z[3] 0 0; -z[2] -z[4] 0 0]
     nx, ny = 11, 17
     integrand = getpoints(Float64, (nx, ny), SecondFinDiffPlan) do x, y
-        dot(fy(x, y), Ω(f(x, y), 0, nothing), fx(x, y))
+        dot(fy(x, y), ω(f(x, y), 0, nothing), fx(x, y))
     end
 
     ws = [getsimpweight(Float64, ix, iy, (nx, ny)) for iy in 1:ny, ix in 1:nx] |> vec
     testI = dot(ws, integrand)
 
-    pinv = SecondPoincareInvariant{Float64, 4}(Ω, (nx, ny), SecondFinDiffPlan)
+    pinv = SecondPoincareInvariant{Float64, 4}(ω, (nx, ny), SecondFinDiffPlan)
 
     @test pinv.plan isa SecondFinDiffPlan
 

@@ -94,7 +94,7 @@ function FirstPoincareInvariant{T, D}(
 ) where {T, D, θT}
     ps = getpointspec(N, P)
     plan = P{T, D}(θ, N)
-    FirstPoincareInvariant{T, D, θT, typeof(plan)}(Ω, ps, plan)
+    FirstPoincareInvariant{T, D, θT, typeof(plan)}(ω, ps, plan)
 end
 
 FirstPoincareInvariant{T, D}(θ::θT, N::Integer, plan::P) where {T, D, θT, P} =
@@ -123,32 +123,32 @@ const DEFAULT_FIRST_PLAN = FirstFinDiffPlan
 struct SecondPoincareInvariant{
     T,  # phase space and return type
     D,  # dimension of phase space
-    ΩT <: Union{Callable, AbstractMatrix},
+    ωT <: Union{Callable, AbstractMatrix},
     PS,
     P
 } <: AbstractPoincareInvariant
-    Ω::ΩT  # symplectic matrix or function returning one
+    ω::ωT  # symplectic matrix or function returning one
     pointspec::PS  # specifies how many points
     plan::P  # plan for chebyshev transform, differentiation, etc...
 end
 
 function SecondPoincareInvariant{T, D}(
-    Ω::ΩT, N, P::Type=DEFAULT_SECOND_PLAN
-) where {T, D, ΩT}
+    ω::ωT, N, P::Type=DEFAULT_SECOND_PLAN
+) where {T, D, ωT}
     ps = getpointspec(N, P)
-    plan = P{T, D}(Ω, ps)
-    SecondPoincareInvariant{T, D, ΩT, typeof(ps), typeof(plan)}(Ω, ps, plan)
+    plan = P{T, D}(ω, ps)
+    SecondPoincareInvariant{T, D, ωT, typeof(ps), typeof(plan)}(ω, ps, plan)
 end
 
-function SecondPoincareInvariant{T, D}(Ω::ΩT, ps::PS, plan::P) where {T, D, ΩT, PS, P}
-    SecondPoincareInvariant{T, D, ΩT, PS, P}(Ω, ps, plan)
+function SecondPoincareInvariant{T, D}(ω::ωT, ps::PS, plan::P) where {T, D, ωT, PS, P}
+    SecondPoincareInvariant{T, D, ωT, PS, P}(ω, ps, plan)
 end
 
 function SecondPoincareInvariant{T, D, CanonicalSymplecticTwoForm{T}}(
     N, P=DEFAULT_SECOND_PLAN
 ) where {T, D}
-    Ω = CanonicalSymplecticTwoForm{T}(D)
-    SecondPoincareInvariant{T, D}(Ω, N, P)
+    ω = CanonicalSymplecticTwoForm{T}(D)
+    SecondPoincareInvariant{T, D}(ω, N, P)
 end
 
 const SecondPI = SecondPoincareInvariant
@@ -157,13 +157,13 @@ const CanonicalSecondPI{T, D} = SecondPoincareInvariant{T, D, CanonicalSymplecti
 # Interface
 
 getdim(::SecondPoincareInvariant{<:Any, D, <:Any, <:Any, <:Any}) where D = D
-getform(pinv::SecondPoincareInvariant) = pinv.Ω
+getform(pinv::SecondPoincareInvariant) = pinv.ω
 
 # Interface should define getpoints(f, T, N, P) method
 function getpoints(
     f::Function,
-    pinv::SecondPoincareInvariant{T, D, ΩT, PS, P}
-) where {T, D, ΩT, PS, P}
+    pinv::SecondPoincareInvariant{T, D, ωT, PS, P}
+) where {T, D, ωT, PS, P}
     getpoints(f, T, pinv.pointspec, P)
 end
 

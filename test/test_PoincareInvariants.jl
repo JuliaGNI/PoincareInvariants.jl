@@ -3,13 +3,13 @@
         using PoincareInvariants
 
         D = 6; N = 123
-        Ω(z, t, p) = CanonicalSymplecticTwoForm(D)
-        pinv = SecondPoincareInvariant{Float64, D}(Ω, N)
+        ω(z, t, p) = CanonicalSymplecticTwoForm(D)
+        pinv = SecondPoincareInvariant{Float64, D}(ω, N)
 
         @test getdim(pinv) == 6
         @test N <= getpointnum(pinv) <= 2N
         @test getpointspec(pinv) == getpointspec(N, typeof(pinv.plan)) == pinv.pointspec
-        @test getform(pinv) === pinv.Ω === Ω
+        @test getform(pinv) === pinv.ω === ω
     end
 end
 
@@ -17,19 +17,19 @@ end
     using PoincareInvariants
 
     D = 2
-    Ω(z, t, p) = CanonicalSymplecticTwoForm(D)
+    ω(z, t, p) = CanonicalSymplecticTwoForm(D)
 
-    let pinv = SecondPoincareInvariant{Float64, D}(Ω, 432)
+    let pinv = SecondPoincareInvariant{Float64, D}(ω, 432)
         I = compute!(pinv, getpoints(pinv), 0, nothing)
         @test abs(1 - I) / eps() < 10
     end
 
-    let pinv = SecondPoincareInvariant{Float64, D}(Ω, 567, SecondChebyshevPlan)
+    let pinv = SecondPoincareInvariant{Float64, D}(ω, 567, SecondChebyshevPlan)
         I = compute!(pinv, getpoints(pinv), 0, nothing)
         @test abs(1 - I) / eps() < 10
     end
 
-    let pinv = SecondPoincareInvariant{Float64, D}(Ω, (35, 75), SecondFinDiffPlan)
+    let pinv = SecondPoincareInvariant{Float64, D}(ω, (35, 75), SecondFinDiffPlan)
         I = compute!(pinv, getpoints(pinv), 0, nothing)
         @test abs(1 - I) / eps() < 10
     end
@@ -39,7 +39,7 @@ end
     using PoincareInvariants
 
     D = 6
-    Ω(z, t, p) = [
+    ω(z, t, p) = [
             0     0     0  z[1]  z[2]  z[3]
             0     0     0  z[4]  z[5]  z[6]
             0     0     0     t     p     1
@@ -57,15 +57,15 @@ end
         x + y
     )
 
-    Idefault = let pinv = SecondPI{Float64, D}(Ω, 1_000)
+    Idefault = let pinv = SecondPI{Float64, D}(ω, 1_000)
         compute!(pinv, getpoints(f, pinv), 5, 11)
     end
 
-    Icheb = let pinv = SecondPI{Float64, D}(Ω, 1_000, SecondChebyshevPlan)
+    Icheb = let pinv = SecondPI{Float64, D}(ω, 1_000, SecondChebyshevPlan)
         compute!(pinv, getpoints(f, pinv), 5, 11)
     end
 
-    Ifindiff = let pinv = SecondPI{Float64, D}(Ω, (31, 33), SecondFinDiffPlan)
+    Ifindiff = let pinv = SecondPI{Float64, D}(ω, (31, 33), SecondFinDiffPlan)
         compute!(pinv, getpoints(f, pinv), 5, 11)
     end
 
@@ -77,9 +77,9 @@ end
     @safetestset "In 2D" begin
         using PoincareInvariants
 
-        Ω(z, t, p) = CanonicalSymplecticTwoForm(2)
-        chebpi = SecondPI{Float64, 2}(Ω, 1_000)
-        diffpi = SecondPI{Float64, 2}(Ω, 1_000, SecondFinDiffPlan)
+        ω(z, t, p) = CanonicalSymplecticTwoForm(2)
+        chebpi = SecondPI{Float64, 2}(ω, 1_000)
+        diffpi = SecondPI{Float64, 2}(ω, 1_000, SecondFinDiffPlan)
 
         A = [1 5;
              0 1]
@@ -95,9 +95,9 @@ end
     @safetestset "In 8D" begin
         using PoincareInvariants
 
-        Ω(z, t, p) = CanonicalSymplecticTwoForm(8)
-        chebpi = SecondPI{Float64, 8}(Ω, 1_000)
-        diffpi = SecondPI{Float64, 8}(Ω, 1_000, SecondFinDiffPlan)
+        ω(z, t, p) = CanonicalSymplecticTwoForm(8)
+        chebpi = SecondPI{Float64, 8}(ω, 1_000)
+        diffpi = SecondPI{Float64, 8}(ω, 1_000, SecondFinDiffPlan)
 
         A = CanonicalSymplecticTwoForm(8)
 
@@ -149,9 +149,9 @@ end
         return (q1, q2, p1 - q2, p2 - q1)
     end
 
-    Ω(z, t, p) = CanonicalSymplecticTwoForm(4)
-    chebpi = SecondPI{Float64, 4}(Ω, 1_000)
-    diffpi = SecondPI{Float64, 4}(Ω, 1_000, SecondFinDiffPlan)
+    ω(z, t, p) = CanonicalSymplecticTwoForm(4)
+    chebpi = SecondPI{Float64, 4}(ω, 1_000)
+    diffpi = SecondPI{Float64, 4}(ω, 1_000, SecondFinDiffPlan)
 
     f1(x, y) = init(x, y) |> f
     @test abs(I - compute!(chebpi, getpoints(f1, chebpi), 0, nothing)) < 1e-14

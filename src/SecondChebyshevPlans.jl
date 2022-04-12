@@ -72,7 +72,7 @@ getintweights(n) = getintweights(Float64, n)
 
 integrate(coeffs, intweights) = dot(intweights, coeffs, intweights)
 
-## getintegrand for Ω Callable and out-of-place ##
+## getintegrand for ω Callable and out-of-place ##
 
 struct CallIntPlan{T, D, IP, P}
     invpaduaplan::IP
@@ -95,24 +95,24 @@ function CallIntPlan{T, D}(degree) where {T, D}
 end
 
 function getintegrand!(
-    intcoeffs::AbstractMatrix, plan::CallIntPlan{T, D}, Ω::ΩT,
+    intcoeffs::AbstractMatrix, plan::CallIntPlan{T, D}, ω::ωT,
     phasepoints, t, p, ∂xcoeffs, ∂ycoeffs
-) where {T, D, ΩT}
+) where {T, D, ωT}
     invpaduatransform!(plan.∂xvals, plan.invpaduaplan, ∂xcoeffs)
     invpaduatransform!(plan.∂yvals, plan.invpaduaplan, ∂ycoeffs)
 
     for i in axes(plan.intvals, 1)
         # This if statement should hopefully get optimised away by the compiler
-        if ΩT <: Callable
+        if ωT <: Callable
             pnti = view(phasepoints, i, :)
-            Ωi = Ω(pnti, t, p)
-        elseif ΩT <: AbstractMatrix
-            Ωi = Ω
+            ωi = ω(pnti, t, p)
+        elseif ωT <: AbstractMatrix
+            ωi = ω
         end
 
         ∂xi = view(plan.∂xvals, i, :)
         ∂yi = view(plan.∂yvals, i, :)
-        plan.intvals[i] = dot(∂yi, Ωi, ∂xi)
+        plan.intvals[i] = dot(∂yi, ωi, ∂xi)
     end
 
     paduatransform!(intcoeffs, plan.paduaplan, plan.intvals)
@@ -127,7 +127,7 @@ function getintplan(
 ) where {T, D}
     CallIntPlan{T, D}(degree)
 end
-# getintplan(::Type{T}, Ω::AbstractMatrix, D, degree) where T = ConstIntPlan{T}(Ω, D, degree)
+# getintplan(::Type{T}, ω::AbstractMatrix, D, degree) where T = ConstIntPlan{T}(ω, D, degree)
 
 struct SecondChebyshevPlan{T, D, IP, PP<:PaduaTransformPlan}
     degree::Int
@@ -141,7 +141,7 @@ struct SecondChebyshevPlan{T, D, IP, PP<:PaduaTransformPlan}
     intweights::Vector{T}
 end
 
-function SecondChebyshevPlan{T, D}(Ω, N::Integer) where {T, D}
+function SecondChebyshevPlan{T, D}(ω, N::Integer) where {T, D}
     degree = getdegree(nextpaduanum(N))
 
     paduaplan = PaduaTransformPlan{T}(degree)
@@ -149,7 +149,7 @@ function SecondChebyshevPlan{T, D}(Ω, N::Integer) where {T, D}
     diffplan = DiffPlan{T}(degree)
     ∂x = ntuple(_ -> Matrix{T}(undef, degree+1, degree+1), D)
     ∂y = ntuple(_ -> Matrix{T}(undef, degree+1, degree+1), D)
-    intplan = getintplan(T, Ω, Val(D), degree)
+    intplan = getintplan(T, ω, Val(D), degree)
     intcoeffs = zeros(T, degree+1, degree+1)
     intweights = getintweights(T, degree)
 
@@ -164,14 +164,14 @@ function compute!(
     plan = pinv.plan
     paduatransform!(plan.phasecoeffs, plan.paduaplan, phasepoints)
     differentiate!(plan.∂x, plan.∂y, plan.diffplan, plan.phasecoeffs)
-    getintegrand!(plan.intcoeffs, plan.intplan, pinv.Ω, phasepoints, t, p, plan.∂x, plan.∂y)
+    getintegrand!(plan.intcoeffs, plan.intplan, pinv.ω, phasepoints, t, p, plan.∂x, plan.∂y)
     integrate(plan.intcoeffs, plan.intweights)
 end
 
-# function _compute!(plan::SecondChebyshevPlan, Ω::AbstractMatrix, D, phasepoints)
+# function _compute!(plan::SecondChebyshevPlan, ω::AbstractMatrix, D, phasepoints)
 #     paduatransform!(plan.phasecoeffs, plan.paduaplan, phasepoints)
 #     differentiate!(plan.∂x, plan.∂y, plan.diffplan, plan.phasecoeffs)
-#     getintegrand!(plan.intcoeffs, plan.intplan, Ω, plan.∂x, plan.∂y)
+#     getintegrand!(plan.intcoeffs, plan.intplan, ω, plan.∂x, plan.∂y)
 #     integrate(plan.intcoeffs, plan.intplan)
 # end
 
