@@ -6,7 +6,7 @@ A Julia library for the computation of Poincaré integral invariants.
 module PoincareInvariants
 
 export AbstractPoincareInvariant, compute!
-export FirstPoincareInvariant, FirstPI
+export FirstPoincareInvariant, CanonicalFirstPI, FirstPI
 export SecondPoincareInvariant, CanonicalSecondPI, SecondPI
 
 export getpoints, getpointspec, getpointnum
@@ -18,11 +18,12 @@ export SecondChebyshevPlan, SecondFinDiffPlan
 export CanonicalSymplecticOneForm, CanonicalSymplecticMatrix, CanonicalSymplecticTwoForm
 
 """
-    AbstractPoincareInvariant
+    AbstractPoincareInvariant{T, D}
 
-supertype of `FirstPoincareInvariant` and `SecondPoincareInvariant`.
+represents a Poincare integral invariant in a phase space of dimension D using numeric type
+T for calculations.
 """
-abstract type AbstractPoincareInvariant end
+abstract type AbstractPoincareInvariant{T, D} end
 
 """
     compute!(pinv::AbstractPoincareInvariant, args...)
@@ -32,12 +33,21 @@ computes a Poincaré invariant.
 function compute! end
 
 """
+    getplan(pinv::AbstractPoincareInvariant)
+
+returns plan that will be used to `compute!` `pinv`.
+"""
+function getplan end
+
+"""
     getpoints(pinv::AbstractPoincareInvariant)
 
 returns points on which to evaluate the phase space line or surface parameterisation
 so as to `compute!` `pinv`.
 """
-function getpoints end
+function getpoints(f::Function, pinv::AbstractPoincareInvariant{T, D}) where {T, D}
+    getpoints(f, T, getpointspec(pinv), typeof(getplan(pinv)))
+end
 
 """
     getpointspec(pinv::AbstractPoincareInvariant)
@@ -81,7 +91,7 @@ using .CanonicalSymplecticForms: CanonicalSymplecticOneForm, CanonicalSymplectic
 
 ## FirstPoincareInvariant ##
 
-struct FirstPoincareInvariant{T, D, θT, P} <: AbstractPoincareInvariant
+struct FirstPoincareInvariant{T, D, θT, P} <: AbstractPoincareInvariant{T, D}
     θ::θT
     N::Int
     plan::P
@@ -92,21 +102,26 @@ function FirstPoincareInvariant{T, D}(
 ) where {T, D, θT}
     ps = getpointspec(N, P)
     plan = P{T, D}(θ, N)
-    FirstPoincareInvariant{T, D, θT, typeof(plan)}(ω, ps, plan)
+    FirstPoincareInvariant{T, D, θT, typeof(plan)}(θ, ps, plan)
 end
 
 FirstPoincareInvariant{T, D}(θ::θT, N::Integer, plan::P) where {T, D, θT, P} =
     FirstPoincareInvariant{T, D, θT, P}(θ, N, plan)
 
-# FirstCanonicalPI{T, D}(N::Integer, P=DEFAULT_FIRST_PLAN) where {T, D} =
-#     FirstPoincareInvariant{T, D}(θ, N, plan)
+function FirstPoincareInvariant{T, D, typeof(CanonicalSymplecticOneForm)}(
+    N, P=DEFAULT_FIRST_PLAN
+) where {T, D}
+    FirstPoincareInvariant{T, D}(CanonicalSymplecticOneForm, N, P)
+end
 
 const FirstPI = FirstPoincareInvariant
+const CanonicalFirstPI{T, D} = FirstPoincareInvariant{T, D, typeof(CanonicalSymplecticOneForm)}
 
 # Interface
 
 getpointspec(pinv::FirstPoincareInvariant) = pinv.N
 getform(pinv::FirstPoincareInvariant) = pinv.θ
+getplan(pinv::FirstPoincareInvariant) = pinv.plan
 
 # Implementations
 
@@ -124,7 +139,7 @@ struct SecondPoincareInvariant{
     ωT,
     PS,
     P
-} <: AbstractPoincareInvariant
+} <: AbstractPoincareInvariant{T, D}
     ω::ωT  # symplectic matrix or function returning one
     pointspec::PS  # specifies how many points
     plan::P  # plan for chebyshev transform, differentiation, etc...
@@ -156,14 +171,7 @@ const CanonicalSecondPI{T, D} = SecondPoincareInvariant{T, D, CanonicalSymplecti
 
 getdim(::SecondPoincareInvariant{<:Any, D, <:Any, <:Any, <:Any}) where D = D
 getform(pinv::SecondPoincareInvariant) = pinv.ω
-
-# Interface should define getpoints(f, T, N, P) method
-function getpoints(
-    f::Function,
-    pinv::SecondPoincareInvariant{T, D, ωT, PS, P}
-) where {T, D, ωT, PS, P}
-    getpoints(f, T, pinv.pointspec, P)
-end
+getplan(pinv::SecondPoincareInvariant) = pinv.plan
 
 getpoints(pinv::SecondPoincareInvariant) = getpoints((x, y) -> (x, y), pinv)
 

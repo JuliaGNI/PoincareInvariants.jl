@@ -82,11 +82,11 @@ struct CallIntPlan{T, D, IP, P}
 end
 
 function CallIntPlan{T, D}(degree) where {T, D}
-    invpaduaplan = InvPaduaTransformPlan{T}(degree)
+    invpaduaplan = InvPaduaTransformPlan{Float64}(degree)
     ∂xvals = Matrix{T}(undef, getpaduanum(degree), D)
     ∂yvals = Matrix{T}(undef, getpaduanum(degree), D)
     intvals = Vector{T}(undef, getpaduanum(degree))
-    paduaplan = PaduaTransformPlan{T}(degree)
+    paduaplan = PaduaTransformPlan{Float64}(degree)
 
     CallIntPlan{T, D, typeof(invpaduaplan), typeof(paduaplan)}(
         invpaduaplan, ∂xvals, ∂yvals, intvals, paduaplan
@@ -137,9 +137,9 @@ struct SecondChebyshevPlan{T, D, IP, PP<:PaduaTransformPlan}
 end
 
 function SecondChebyshevPlan{T, D}(ω, N::Integer) where {T, D}
-    degree = getdegree(nextpaduanum(N))
+    degree = nextdegree(N)
 
-    paduaplan = PaduaTransformPlan{T}(degree)
+    paduaplan = PaduaTransformPlan{Float64}(degree)
     phasecoeffs = ntuple(_ -> zeros(T, degree+1, degree+1), D)
     diffplan = DiffPlan{T}(degree)
     ∂x = ntuple(_ -> Matrix{T}(undef, degree+1, degree+1), D)
@@ -173,7 +173,6 @@ end
 ## getpoints, getpointspec and getpointnum ##
 
 getpointspec(N::Integer, ::Type{<:SecondChebyshevPlan}) = nextpaduanum(N)
-getpointspec((nx, ny)::NTuple{2, Integer}, ::Type{<:SecondChebyshevPlan}) = nextpaduanum(nx * ny)
 
 function getpoints(f, ::Type{T}, N, ::Type{<:SecondChebyshevPlan}) where T
     degree = getdegree(getpointspec(N, SecondChebyshevPlan))

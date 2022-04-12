@@ -13,24 +13,64 @@
     end
 end
 
-@safetestset "One by One Square" begin
+@safetestset "Basic Usage FirstPoincareInvariant" begin
     using PoincareInvariants
+    using DoubleFloats
 
     D = 2
-    ωm = CanonicalSymplecticMatrix{Float64}(D)
 
-    let pinv = SecondPoincareInvariant{Float64, D}(CanonicalSymplecticTwoForm, 432)
-        I = compute!(pinv, getpoints(pinv), 0, nothing)
-        @test abs(1 - I) / eps() < 10
+    first_pinvs = [
+        FirstPoincareInvariant{Float64, D}(CanonicalSymplecticOneForm, 500)
+        FirstPoincareInvariant{Float64, D}(CanonicalSymplecticOneForm, 501, FirstFinDiffPlan)
+        FirstPoincareInvariant{Double64, D}(CanonicalSymplecticOneForm, 518, FirstFinDiffPlan)
+
+        FirstPI{Float64, D}(CanonicalSymplecticOneForm, 541)
+        FirstPI{Double64, D}(CanonicalSymplecticOneForm, 542, FirstFinDiffPlan)
+
+        CanonicalFirstPI{Double64, D}(566)
+        CanonicalFirstPI{Float64, D}(567, FirstFinDiffPlan)
+    ]
+
+    to_circle_line(θ) = (cospi(-2θ), sinpi(-2θ))
+
+    @testset "FirstPoincareInvariant $i" for (i, pinv) in enumerate(first_pinvs)
+        pnts = getpoints(to_circle_line, pinv)
+        I = compute!(pinv, pnts, 0.1, nothing)
+        @test abs(π - I) < 1e-4
     end
+end
 
-    let pinv = SecondPoincareInvariant{Float64, D}(CanonicalSymplecticTwoForm, 567, SecondChebyshevPlan)
-        I = compute!(pinv, getpoints(pinv), 0, nothing)
-        @test abs(1 - I) / eps() < 10
-    end
+@safetestset "Basic Usage SecondPoincareInvariant" begin
+    using PoincareInvariants
+    using DoubleFloats
 
-    let pinv = SecondPoincareInvariant{Float64, D}(ωm, (35, 75), SecondFinDiffPlan)
-        I = compute!(pinv, getpoints(pinv), 0, nothing)
+    D = 2
+
+    second_pinvs = [
+        SecondPoincareInvariant{Float64, D}(CanonicalSymplecticTwoForm, 244)
+        SecondPoincareInvariant{Float64, D}(CanonicalSymplecticTwoForm, 222, SecondChebyshevPlan)
+        SecondPoincareInvariant{Double64, D}(CanonicalSymplecticTwoForm, 123, SecondChebyshevPlan)
+        SecondPoincareInvariant{Float64, D}(CanonicalSymplecticTwoForm, (15, 13), SecondFinDiffPlan)
+        SecondPoincareInvariant{Double64, D}(CanonicalSymplecticTwoForm, 188, SecondFinDiffPlan)
+
+        SecondPI{Float64, D}(CanonicalSymplecticTwoForm, 345)
+        SecondPI{Float64, D}(CanonicalSymplecticTwoForm, 366, SecondChebyshevPlan)
+        SecondPI{Double64, D}(CanonicalSymplecticTwoForm, 124, SecondFinDiffPlan)
+
+        SecondPI{Float64, D}(CanonicalSymplecticMatrix{Float64}(D), 195)
+        SecondPI{Float64, D}(CanonicalSymplecticMatrix{Double64}(D), 264, SecondChebyshevPlan)
+        SecondPI{Double64, D}(CanonicalSymplecticMatrix{Double64}(D), 308, SecondFinDiffPlan)
+
+        CanonicalSecondPI{Float64, D}(284)
+        CanonicalSecondPI{Double64, D}(213, SecondChebyshevPlan)
+        CanonicalSecondPI{Float64, D}((14, 18), SecondFinDiffPlan)
+    ]
+
+    to_wavy_area(x, y) = (x, y + sinpi(2x))
+
+    @testset "SecondPoincareInvariant $i" for (i, pinv) in enumerate(second_pinvs)
+        pnts = getpoints(to_wavy_area, pinv)
+        I = compute!(pinv, pnts, 0.1, nothing)
         @test abs(1 - I) / eps() < 10
     end
 end

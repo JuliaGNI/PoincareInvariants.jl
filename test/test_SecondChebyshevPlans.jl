@@ -192,7 +192,6 @@ end
 
     for N in [10, 321, 2178], T in [Float32, Float64]
         @test getpointspec(N, SecondChebyshevPlan) == nextpaduanum(N)
-        @test getpointspec((N, 2N), SecondChebyshevPlan) == nextpaduanum(N * 2N)
 
         @inferred Vector{T} getpoints((x, y) -> x, T, N, SecondChebyshevPlan)
         @inferred Matrix{T} getpoints((x, y) -> (x, y), T, N, SecondChebyshevPlan)

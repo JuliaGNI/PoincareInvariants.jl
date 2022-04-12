@@ -32,9 +32,14 @@ end
     using StaticArrays: SVector
     using LinearAlgebra: dot
 
+    T = Float64
+    D = 3
+
     θ(z, t, p) = SVector{3}(p * z[2], -t * z[1], z[3])
     f(x) = ((s, c) = sincospi(2x); SVector{3}(2c,  5s, c + s))
 
+    T = Float64
+    D = 3
     N = 6
     fvals = getpoints(f, Float64, N, FirstFinDiffPlan)
     Δx = 1 / N
@@ -49,11 +54,11 @@ end
                 return (fvals[d][i+1] - fvals[d][i-1]) / (2 * Δx)
             end
         end |> SVector{3}
-        w = iseven(i) ? Δx * 4 / 3 : Δx * 2 / 3
+
         fi = SVector{3}(ntuple(d -> fvals[d][i], 3))
-        return w * dot(θ(fi, 2, 3), dfi)
+        return Δx * dot(θ(fi, 2, 3), dfi)
     end
 
-    pinv = FirstPoincareInvariant{Float64, 3}(θ, N, FirstFinDiffPlan())
+    pinv = FirstPoincareInvariant{T, D}(θ, N, FirstFinDiffPlan{T, D}())
     @test compute!(pinv, fvals, 2, 3) ≈ testI atol=500eps()
 end

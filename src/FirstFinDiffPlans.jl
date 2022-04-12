@@ -7,7 +7,9 @@ using ..PoincareInvariants: FirstPoincareInvariant, getpointnum, getform
 
 import ..PoincareInvariants: compute!, getpoints, getpointspec
 
-struct FirstFinDiffPlan end
+struct FirstFinDiffPlan{T, D} end
+
+FirstFinDiffPlan{T, D}(θ, N) where {T, D} = FirstFinDiffPlan{T, D}()
 
 function compute!(
     pinv::FirstPoincareInvariant{T, D, <:Any, <:FirstFinDiffPlan}, zs, t, p
@@ -20,29 +22,27 @@ function compute!(
     for i in 2:N-1
         zi = SVector{D}(ntuple(d -> zs[d][i], D))
         dzi = ntuple(D) do d
-            (zs[d][i+1] - zs[d][i-1])
+            (zs[d][i+1] - zs[d][i-1]) / 2
         end |> SVector{D}
 
-        # simpson weights with factor 2 absorbed in derivative
-        w = isodd(i) ? T(1) / 3 : T(2) / 3
-        I += w * dot(θ(zi, t, p), dzi)
+        I += dot(θ(zi, t, p), dzi)
     end
 
     # special cases i = 1
     z1 = SVector{D}(ntuple(d -> zs[d][1], D))
     dz1 = ntuple(D) do d
-        (zs[d][2] - zs[d][N])
+        (zs[d][2] - zs[d][N]) / 2
     end |> SVector{D}
 
-    I += dot(θ(z1, t, p), dz1) * T(1) / 3
+    I += dot(θ(z1, t, p), dz1)
 
     # special cases i = N
     zN = SVector{D}(ntuple(d -> zs[d][N], D))
     dzN = ntuple(D) do d
-        (zs[d][1] - zs[d][N-1])
+        (zs[d][1] - zs[d][N-1]) / 2
     end |> SVector{D}
 
-    I += dot(θ(zN, t, p), dzN) * T(2) / 3
+    I += dot(θ(zN, t, p), dzN)
 
     return I
 end
