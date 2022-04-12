@@ -17,19 +17,19 @@ end
     using PoincareInvariants
 
     D = 2
-    ω(z, t, p) = CanonicalSymplecticTwoForm(D)
+    ωm = CanonicalSymplecticMatrix{Float64}(D)
 
-    let pinv = SecondPoincareInvariant{Float64, D}(ω, 432)
+    let pinv = SecondPoincareInvariant{Float64, D}(CanonicalSymplecticTwoForm, 432)
         I = compute!(pinv, getpoints(pinv), 0, nothing)
         @test abs(1 - I) / eps() < 10
     end
 
-    let pinv = SecondPoincareInvariant{Float64, D}(ω, 567, SecondChebyshevPlan)
+    let pinv = SecondPoincareInvariant{Float64, D}(CanonicalSymplecticTwoForm, 567, SecondChebyshevPlan)
         I = compute!(pinv, getpoints(pinv), 0, nothing)
         @test abs(1 - I) / eps() < 10
     end
 
-    let pinv = SecondPoincareInvariant{Float64, D}(ω, (35, 75), SecondFinDiffPlan)
+    let pinv = SecondPoincareInvariant{Float64, D}(ωm, (35, 75), SecondFinDiffPlan)
         I = compute!(pinv, getpoints(pinv), 0, nothing)
         @test abs(1 - I) / eps() < 10
     end
@@ -77,9 +77,8 @@ end
     @safetestset "In 2D" begin
         using PoincareInvariants
 
-        ω(z, t, p) = CanonicalSymplecticTwoForm(2)
-        chebpi = SecondPI{Float64, 2}(ω, 1_000)
-        diffpi = SecondPI{Float64, 2}(ω, 1_000, SecondFinDiffPlan)
+        chebpi = CanonicalSecondPI{Float64, 2}(1_000, SecondChebyshevPlan)
+        diffpi = CanonicalSecondPI{Float64, 2}(1_000, SecondFinDiffPlan)
 
         A = [1 5;
              0 1]
@@ -95,11 +94,10 @@ end
     @safetestset "In 8D" begin
         using PoincareInvariants
 
-        ω(z, t, p) = CanonicalSymplecticTwoForm(8)
-        chebpi = SecondPI{Float64, 8}(ω, 1_000)
-        diffpi = SecondPI{Float64, 8}(ω, 1_000, SecondFinDiffPlan)
+        chebpi = CanonicalSecondPI{Float64, 8}(1_000)
+        diffpi = CanonicalSecondPI{Float64, 8}(1_000, SecondFinDiffPlan)
 
-        A = CanonicalSymplecticTwoForm(8)
+        A = CanonicalSymplecticMatrix(8)
 
         B = [1 0 0 0 1 5 8 1;
              0 1 0 0 5 2 6 9;
@@ -149,7 +147,7 @@ end
         return (q1, q2, p1 - q2, p2 - q1)
     end
 
-    ω(z, t, p) = CanonicalSymplecticTwoForm(4)
+    ω = CanonicalSymplecticTwoForm
     chebpi = SecondPI{Float64, 4}(ω, 1_000)
     diffpi = SecondPI{Float64, 4}(ω, 1_000, SecondFinDiffPlan)
 

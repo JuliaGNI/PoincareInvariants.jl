@@ -1,39 +1,48 @@
 @safetestset "CanonicalSymplecticOneForm" begin
     using PoincareInvariants: CanonicalSymplecticOneForm
+    using LinearAlgebra: dot
     using Random: rand
 
-    @test_throws ArgumentError CanonicalSymplecticOneForm(-2)
-    @test_throws ArgumentError CanonicalSymplecticOneForm(0)
-    @test_throws ArgumentError CanonicalSymplecticOneForm(5)
+    @test_throws ArgumentError CanonicalSymplecticOneForm([1, 2, 3], 0.5, nothing)
+    @test_throws ArgumentError CanonicalSymplecticOneForm([0.3], 3.4, nothing)
 
     for mid in [3, 9, 22]
         n = mid * 2
 
-        C = CanonicalSymplecticOneForm(n)
-
         q = rand(mid)
         p = rand(mid)
         z = [q; p]
-        @test C(z, 0.1, nothing) == p
+
+        @inferred CanonicalSymplecticOneForm(z, 0.1, nothing)
+
+        θ = CanonicalSymplecticOneForm(z, 1.3, nothing)
+
+        @test θ[1:mid] == p
+        @test θ[mid+1:end] == zeros(mid)
+
+        @test dot(θ, z) ≈ dot(z, θ) ≈ dot(p, q)
+
+        v = rand(n)
+        @test dot(θ, v) ≈ dot(v, θ) ≈ dot(p, v[1:mid])
     end
 end
 
 @safetestset "CanonicalSymplecticTwoForm" begin
-    using PoincareInvariants: CanonicalSymplecticTwoForm
+    using PoincareInvariants: CanonicalSymplecticMatrix, CanonicalSymplecticTwoForm
     using LinearAlgebra: dot
     using Random: rand
 
-    @test CanonicalSymplecticTwoForm{Int}(2) == [0 -1; 1 0]
-    @test CanonicalSymplecticTwoForm{Int}(4) == [0 0 -1 0; 0 0 0 -1; 1 0 0 0; 0 1 0 0]
-    @test CanonicalSymplecticTwoForm{Int}(6) == [0  0  0 -1  0  0;
-                                                 0  0  0  0 -1  0;
-                                                 0  0  0  0  0 -1;
-                                                 1  0  0  0  0  0;
-                                                 0  1  0  0  0  0;
-                                                 0  0  1  0  0  0]
+    @test CanonicalSymplecticMatrix{Int}(2) == [0 -1; 1 0]
+    @test CanonicalSymplecticMatrix{Int}(4) == [0 0 -1 0; 0 0 0 -1; 1 0 0 0; 0 1 0 0]
+    @test CanonicalSymplecticMatrix{Int}(6) == [0  0  0 -1  0  0;
+                                                0  0  0  0 -1  0;
+                                                0  0  0  0  0 -1;
+                                                1  0  0  0  0  0;
+                                                0  1  0  0  0  0;
+                                                0  0  1  0  0  0]
 
-    @test_throws ArgumentError CanonicalSymplecticTwoForm{Float64}(-2)
-    @test_throws ArgumentError CanonicalSymplecticTwoForm{Int}(0)
+    @test_throws ArgumentError CanonicalSymplecticMatrix{Float64}(-2)
+    @test_throws ArgumentError CanonicalSymplecticMatrix{Int}(0)
 
     function test_canonicalmatrix(mat, n, ::Type{T}) where T
         mid = n ÷ 2
@@ -51,10 +60,10 @@ end
         return true
     end
 
-    @testset "CanonicalSymplecticTwoForm{$T}($n)" for T in [Int, Float64], n in [10, 64, 1002]
-        @test CanonicalSymplecticTwoForm(n) === CanonicalSymplecticTwoForm{Int}(n)
+    @testset "CanonicalSymplecticMatrix{$T}($n)" for T in [Int, Float64], n in [10, 64, 1002]
+        @test CanonicalSymplecticMatrix(n) === CanonicalSymplecticMatrix{Int}(n)
 
-        C = CanonicalSymplecticTwoForm{T}(n)
+        C = CanonicalSymplecticMatrix{T}(n)
         @test size(C) == (n, n)
         @test eltype(C) == T
 
@@ -67,8 +76,6 @@ end
         @test_throws BoundsError C[2    , n + 1]
         @test_throws BoundsError C[n + 1,     3]
 
-        @test C(zeros(n), 0.5, nothing) == C
-
         @test C * collect(1:n) == [(-mid-1:-1:-n)..., 1:mid...]
 
         @test dot(ones(n), C, ones(n)) == 0
@@ -79,6 +86,10 @@ end
         @test vCw ≈ dot(v[mid+1:end], w[1:mid]) - dot(v[1:mid], w[mid+1:end])
         @test vCw ≈ dot(v, C * w)
 
-        @test_throws ArgumentError CanonicalSymplecticTwoForm{T}(n + 1)
+        @test_throws ArgumentError CanonicalSymplecticMatrix{T}(n + 1)
+
+        @inferred CanonicalSymplecticMatrix{Float64} CanonicalSymplecticTwoForm(v, 0.1, nothing)
+
+        @test CanonicalSymplecticTwoForm(v, 0.1, nothing) == CanonicalSymplecticMatrix(n)
     end
 end

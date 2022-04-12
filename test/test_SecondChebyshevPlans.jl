@@ -126,7 +126,7 @@ end
         iplan = InvPaduaTransformPlan{Float64}(degree)
         invpaduatransform!(phasepoints, iplan, phasecoeffs)
 
-        ω(v, t, p) = CanonicalSymplecticTwoForm(D)
+        ω = CanonicalSymplecticTwoForm
 
         plan = CallIntPlan{Float64, D}(degree)
 
@@ -148,7 +148,7 @@ end
 
     D = 12
     N = 200
-    ω(v, t, p) = CanonicalSymplecticTwoForm(D)
+    ω = CanonicalSymplecticTwoForm
     pointnum = nextpaduanum(N)
     degree = getdegree(pointnum)
     plan = SecondChebyshevPlan{Float64, D}(ω, pointnum)
