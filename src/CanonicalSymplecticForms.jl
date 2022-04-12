@@ -3,7 +3,18 @@ module CanonicalSymplecticForms
 import Base
 import LinearAlgebra
 
-export CanonicalSymplecticTwoForm
+export CanonicalSymplecticOneForm, CanonicalSymplecticTwoForm
+
+struct CanonicalSymplecticOneForm
+    mid::Int
+    function CanonicalSymplecticOneForm(n::Integer)
+        n > 0 || throw(ArgumentError("CanonicalSymplecticOneForm must have positive length"))
+        iseven(n) || throw(ArgumentError("CanonicalSymplecticOneForm must have even length"))
+        new(n ÷ 2)
+    end
+end
+
+(θ::CanonicalSymplecticOneForm)(z, t, p) = view(z, θ.mid+1:θ.mid*2)
 
 """
     CanonicalSymplecticTwoForm{T}(n::Integer)
@@ -35,6 +46,7 @@ julia> CanonicalSymplecticTwoForm{Int32}(6)
 struct CanonicalSymplecticTwoForm{T} <: AbstractMatrix{T}
     mid::Int
     function CanonicalSymplecticTwoForm{T}(n::Integer) where T
+        n > 0 || throw(ArgumentError("CanonicalSymplecticTwoForm must have positive size"))
         iseven(n) || throw(ArgumentError("CanonicalSymplecticTwoForm must have even size"))
         new{T}(n ÷ 2)
     end
@@ -42,9 +54,18 @@ end
 
 CanonicalSymplecticTwoForm(n::Integer) = CanonicalSymplecticTwoForm{Int}(n)
 
+(ω::CanonicalSymplecticTwoForm)(z, t, p) = ω
+
 Base.size(C::CanonicalSymplecticTwoForm) = (sz = C.mid * 2; (sz, sz))
 
 function Base.getindex(C::CanonicalSymplecticTwoForm{T}, i1::Int, i2::Int) where T
+    @boundscheck let n = C.mid * 2
+        if !(1 ≤ i1 ≤ n && 1 ≤ i2 ≤ n)
+            msg = "attempt to access $n-element CanonicalSymplecticTwoForm{$T} at index [$i1, $i2]"
+            throw(BoundsError(msg))
+        end
+    end
+
     if i2 - C.mid == i1
         return T(-1)
     elseif i1 - C.mid == i2

@@ -18,7 +18,7 @@ export getdim, getform
 export FirstFinDiffPlan
 export SecondChebyshevPlan, SecondFinDiffPlan
 
-export CanonicalSymplecticTwoForm
+export CanonicalSymplecticOneForm, CanonicalSymplecticTwoForm
 
 """
     AbstractPoincareInvariant
@@ -78,7 +78,7 @@ function getform end
 include("utils.jl")
 include("CanonicalSymplecticForms.jl")
 
-using .CanonicalSymplecticForms: CanonicalSymplecticTwoForm
+using .CanonicalSymplecticForms: CanonicalSymplecticOneForm, CanonicalSymplecticTwoForm
 
 
 ## FirstPoincareInvariant ##
