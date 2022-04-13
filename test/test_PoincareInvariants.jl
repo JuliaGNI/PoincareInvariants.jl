@@ -75,7 +75,7 @@ end
     end
 end
 
-@safetestset "Consistency Between Implementations" begin
+@safetestset "Consistency Between SecondPoincareInvariant Implementations" begin
     using PoincareInvariants
 
     D = 6
@@ -117,25 +117,35 @@ end
     @safetestset "In 2D" begin
         using PoincareInvariants
 
-        chebpi = CanonicalSecondPI{Float64, 2}(1_000, SecondChebyshevPlan)
-        diffpi = CanonicalSecondPI{Float64, 2}(1_000, SecondFinDiffPlan)
+        diffpi1 = CanonicalFirstPI{Float64, 2}(1_000, FirstFinDiffPlan)
+
+        chebpi2 = CanonicalSecondPI{Float64, 2}(1_000, SecondChebyshevPlan)
+        diffpi2 = CanonicalSecondPI{Float64, 2}(1_000, SecondFinDiffPlan)
 
         A = [1 5;
              0 1]
         B = [2   0;
              0 0.5]
-        f(r, θ) = A * B * [r*cospi(θ), r*sinpi(θ)]
-        # half circle with radius one
 
-        @test abs(π/2 - compute!(chebpi, getpoints(f, chebpi), 0, nothing)) / eps() < 10
-        @test abs(π/2 - compute!(diffpi, getpoints(f, diffpi), 0, nothing)) < 5e-3
+        # circle (negative orientation)
+        f1(θ) = A * B * [cospi(2θ), sinpi(2θ)]
+
+        # half circle with radius one
+        f2(r, θ) = A * B * [r*cospi(θ), r*sinpi(θ)]
+
+        @test abs(-π - compute!(diffpi1, getpoints(f1, diffpi1), 0, nothing)) < 5e-5
+
+        @test abs(π/2 - compute!(chebpi2, getpoints(f2, chebpi2), 0, nothing)) / eps() < 10
+        @test abs(π/2 - compute!(diffpi2, getpoints(f2, diffpi2), 0, nothing)) < 5e-3
     end
 
     @safetestset "In 8D" begin
         using PoincareInvariants
 
-        chebpi = CanonicalSecondPI{Float64, 8}(1_000)
-        diffpi = CanonicalSecondPI{Float64, 8}(1_000, SecondFinDiffPlan)
+        diffpi1 = CanonicalFirstPI{Float64, 8}(1_000, FirstFinDiffPlan)
+
+        chebpi2 = CanonicalSecondPI{Float64, 8}(1_000, SecondChebyshevPlan)
+        diffpi2 = CanonicalSecondPI{Float64, 8}(1_000, SecondFinDiffPlan)
 
         A = CanonicalSymplecticMatrix(8)
 
@@ -154,22 +164,33 @@ end
              2.0   0 -1.0    0   0   0    0    0;
                0   0    0    0 0.2   0  0.4    0;
                0   0    0    0   0 0.4    0  0.2;
-               0   0    0    0 0.2   0    0 -0.4;
+               0   0    0    0   0 0.2    0 -0.4;
                0   0    0    0 0.4   0 -0.2    0]
 
-        f(r, θ) = A * B * C * [r*sinpi(θ), 0, 0, 0, r*cospi(θ), 0, 0, 0]
-        # half circle with radius one and negative orientation
+        # test if symplectic
+        @test transpose(A * B * C) * (-A) * (A * B * C) ≈ -A
 
-        @test abs(-π/2 - compute!(chebpi, getpoints(f, chebpi), 0, nothing)) / eps() < 10
-        @test abs(-π/2 - compute!(diffpi, getpoints(f, diffpi), 0, nothing)) < 5e-3
+        # half circle with positive orientation
+        f1(θ) = A * B * C * [0, cospi(-θ), 0, 0, 0, sinpi(-θ), 0, 0]
+
+        # half circle with radius one and negative orientation
+        f2(r, θ) = A * B * C * [0, r*cospi(θ), 0, 0, 0, -r*sinpi(θ), 0, 0]
+
+        @test π/2 ≈ compute!(diffpi1, getpoints(f1, diffpi1), 0, nothing) atol=1e-2
+
+        @test -π/2 ≈ compute!(chebpi2, getpoints(f2, chebpi2), 0, nothing) atol=10eps()
+        @test -π/2 ≈ compute!(diffpi2, getpoints(f2, diffpi2), 0, nothing) atol=5e-3
     end
 end
 
 @safetestset "Henon Map" begin
     using PoincareInvariants
 
-    init(x, y) = 2 .* (x - 0.5, -x + 0.5, y - 0.5, -y + 0.5)
-    I = 2^2 * 2
+    init1(θ) = (cospi(2θ), cospi(2θ), 0, -sinpi(2θ))
+    I1 = π
+
+    init2(x, y) = 2 .* (x - 0.5, -x + 0.5, y - 0.5, -y + 0.5)
+    I2 = 2^2 * 2
 
     # Area preserving Henon map
     function henon(q, p)
@@ -187,27 +208,34 @@ end
         return (q1, q2, p1 - q2, p2 - q1)
     end
 
-    ω = canonical_two_form
-    chebpi = SecondPI{Float64, 4}(ω, 1_000)
-    diffpi = SecondPI{Float64, 4}(ω, 1_000, SecondFinDiffPlan)
+    diffpi1 = CanonicalFirstPI{Float64, 4}(1_000, FirstFinDiffPlan)
 
-    f1(x, y) = init(x, y) |> f
-    @test abs(I - compute!(chebpi, getpoints(f1, chebpi), 0, nothing)) < 1e-14
-    @test abs(I - compute!(diffpi, getpoints(f1, diffpi), 0, nothing)) < 5e-13
+    chebpi2 = CanonicalSecondPI{Float64, 4}(1_000, SecondChebyshevPlan)
+    diffpi2 = CanonicalSecondPI{Float64, 4}(1_000, SecondFinDiffPlan)
 
-    f2(x, y) = init(x, y) |> f |> f
-    @test abs(I - compute!(chebpi, getpoints(f2, chebpi), 0, nothing)) < 1e-11
-    @test abs(I - compute!(diffpi, getpoints(f2, diffpi), 0, nothing)) < 5e-12
+    f1(x) = init1(x) |> f
+    @test I1 ≈ compute!(diffpi1, getpoints(f1, diffpi1), 0, nothing) atol=5e-5
 
-    f3(x, y) = init(x, y) |> f |> f |> f
-    @test abs(I - compute!(chebpi, getpoints(f3, chebpi), 0, nothing)) < 5e-6
+    g1(x, y) = init2(x, y) |> f
+    @test I2 ≈ compute!(chebpi2, getpoints(g1, chebpi2), 0, nothing) atol=1e-14
+    @test I2 ≈ compute!(diffpi2, getpoints(g1, diffpi2), 0, nothing) atol=5e-13
+
+    f2(x) = init1(x) |> f |> f
+    @test I1 ≈ compute!(diffpi1, getpoints(f2, diffpi1), 0, nothing) atol=5e-5
+
+    g2(x, y) = init2(x, y) |> f |> f
+    @test I2 ≈ compute!(chebpi2, getpoints(g2, chebpi2), 0, nothing) atol=1e-11
+    @test I2 ≈ compute!(diffpi2, getpoints(g2, diffpi2), 0, nothing) atol=5e-12
+
+    g3(x, y) = init2(x, y) |> f |> f |> f
+    @test I2 ≈ compute!(chebpi2, getpoints(g3, chebpi2), 0, nothing) atol=5e-6
 end
 
 @safetestset "Wavy Map" begin
     using PoincareInvariants
 
     function wavy(x, y)
-        x, y = x, y + sinpi(x)
+        x, y = x, y + 2 * sinpi(x)
         x, y = -y, x
         return x, y
     end
@@ -220,20 +248,34 @@ end
         return (x1 + y2, x2 + y1 + y3, x3 + y2, y1, y2, y3)
     end
 
-    init(x, y) = (2x, 2x-1, 2x-2, 2y-1, 2y-1, 2y-1)
-    I = 3 * 2^2
+    init1(θ) = (cospi(2θ), sinpi(2θ), cospi(2θ), sinpi(2θ), 1, sinpi(2θ))
+    I1 = -2π
 
-    chebpi = CanonicalSecondPI{Float64, 6}(1_000)
-    diffpi = CanonicalSecondPI{Float64, 6}(1_000, SecondFinDiffPlan)
+    init2(x, y) = (2x, 2x-1, 2x-2, 2y-1, 2y-1, 2y-1)
+    I2 = 3 * 2^2
 
-    f1(x, y) = init(x, y) |> f
-    @test abs(I - compute!(chebpi, getpoints(f1, chebpi), 0, nothing)) < 1e-14
-    @test abs(I - compute!(diffpi, getpoints(f1, diffpi), 0, nothing)) < 5e-15
+    diffpi1 = CanonicalFirstPI{Float64, 6}(1_000, FirstFinDiffPlan)
 
-    f2(x, y) = init(x, y) |> f |> f
-    @test abs(I - compute!(chebpi, getpoints(f2, chebpi), 0, nothing)) < 5e-6
-    @test abs(I - compute!(diffpi, getpoints(f2, diffpi), 0, nothing)) < 1e-4
+    chebpi2 = CanonicalSecondPI{Float64, 6}(1_000, SecondChebyshevPlan)
+    diffpi2 = CanonicalSecondPI{Float64, 6}(1_000, SecondFinDiffPlan)
 
-    f3(x, y) = init(x, y) |> f |> f |> f
-    @test abs(I - compute!(chebpi, getpoints(f3, chebpi), 0, nothing)) < 1
+    f1(x) = init1(x) |> f
+    @test I1 ≈ compute!(diffpi1, getpoints(f1, diffpi1), 0, nothing) atol=5e-5
+
+    g1(x, y) = init2(x, y) |> f
+    @test I2 ≈ compute!(chebpi2, getpoints(g1, chebpi2), 0, nothing) atol=1e-14
+    @test I2 ≈ compute!(diffpi2, getpoints(g1, diffpi2), 0, nothing) atol=5e-15
+
+    f2(x) = init1(x) |> f |> f
+    @test I1 ≈ compute!(diffpi1, getpoints(f2, diffpi1), 0, nothing) atol=1e-3
+
+    g2(x, y) = init2(x, y) |> f |> f
+    @test I2 ≈ compute!(chebpi2, getpoints(g2, chebpi2), 0, nothing) atol=5e-3
+    @test I2 ≈ compute!(diffpi2, getpoints(g2, diffpi2), 0, nothing) atol=1e-3
+
+    f3(x) = init1(x) |> f |> f |> f
+    @test I1 ≈ compute!(diffpi1, getpoints(f3, diffpi1), 0, nothing) atol=5e-2
+
+    g3(x, y) = init2(x, y) |> f |> f |> f
+    # neither of the two methods manage this
 end
