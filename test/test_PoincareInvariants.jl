@@ -46,27 +46,31 @@ end
         D = 2
 
         Ts = [
-            Float64, Float64, Double64,
-            Float64, Double64,
-            Double64, Float64
+            Float64, Float64, Double64, Float64, Double64,
+            Float64, Double64, Double64,
+            Double64, Float64, Float64
         ]
 
         Ns = [
-            500, 501, 518,
-            541, 542,
-            566, 567
+            500, 501, 518, 519, 520,
+            541, 542, 543,
+            566, 567, 568
         ]
 
         first_pinvs = [
             FirstPoincareInvariant{Ts[1], D}(canonical_one_form, Ns[1]),
             FirstPoincareInvariant{Ts[2], D}(canonical_one_form, Ns[2], FirstFinDiffPlan),
             FirstPoincareInvariant{Ts[3], D}(canonical_one_form, Ns[3], FirstFinDiffPlan),
+            FirstPoincareInvariant{Ts[4], D}(canonical_one_form, Ns[4], FirstFourierPlan),
+            FirstPoincareInvariant{Ts[5], D}(canonical_one_form, Ns[5], FirstFourierPlan),
 
-            FirstPI{Ts[4], D}(canonical_one_form, Ns[4]),
-            FirstPI{Ts[5], D}(canonical_one_form, Ns[5], FirstFinDiffPlan),
+            FirstPI{Ts[6], D}(canonical_one_form, Ns[6]),
+            FirstPI{Ts[7], D}(canonical_one_form, Ns[7], FirstFinDiffPlan),
+            FirstPI{Ts[8], D}(canonical_one_form, Ns[8], FirstFourierPlan),
 
-            CanonicalFirstPI{Ts[6], D}(Ns[6]),
-            CanonicalFirstPI{Ts[7], D}(Ns[7], FirstFinDiffPlan),
+            CanonicalFirstPI{Ts[9], D}(Ns[9]),
+            CanonicalFirstPI{Ts[10], D}(Ns[10], FirstFinDiffPlan),
+            CanonicalFirstPI{Ts[11], D}(Ns[11], FirstFourierPlan),
         ]
 
         to_circle_line(θ) = (cospi(-2θ), sinpi(-2θ))
@@ -147,42 +151,71 @@ end
     end
 end
 
-@safetestset "Consistency Between SecondPoincareInvariant Implementations" begin
-    using PoincareInvariants
+@safetestset "Consistency Between Implementations" begin
+    @safetestset "FirstPoincareInvariant" begin
+        using PoincareInvariants
 
-    D = 6
-    ω(z, t, p) = [
-            0     0     0  z[1]  z[2]  z[3]
-            0     0     0  z[4]  z[5]  z[6]
-            0     0     0     t     p     1
-        -z[1] -z[4]    -t     0     0     0
-        -z[2] -z[5]    -p     0     0     0
-        -z[3] -z[6]    -1     0     0     0
-    ]
+        D = 6
+        θ(z, t, p) = [-z[4], -z[5], -p * z[6], t * z[1], p * z[2], z[3]]
 
-    f(x, y) = (
-        exp(x) * y,
-        cospi(x * y),
-        x^2 - y^3 + x*y,
-        5.0,
-        exp(-(x^2 + y^2)),
-        x + y
-    )
+        function f(ϕ)
+            y, x = sincospi(2ϕ)
+            return 0.5 * x, x, 3 * x, 0.1 * y, 0.85 * y, 2 * y
+        end
 
-    Idefault = let pinv = SecondPI{Float64, D}(ω, 1_000)
-        compute!(pinv, getpoints(f, pinv), 5, 11)
+        Idefault = let pinv = FirstPI{Float64, D}(θ, 1_000)
+            compute!(pinv, getpoints(f, pinv), 0.3, 0.1)
+        end
+
+        Idiff = let pinv = FirstPI{Float64, D}(θ, 1_000, FirstFinDiffPlan)
+            compute!(pinv, getpoints(f, pinv), 0.3, 0.1)
+        end
+
+        Ifreq = let pinv = FirstPI{Float64, D}(θ, 1_000, FirstFourierPlan)
+            compute!(pinv, getpoints(f, pinv), 0.3, 0.1)
+        end
+
+        @test Ifreq ≈ Idefault atol=10eps()
+        @test Ifreq ≈ Idiff atol=5e-4
     end
 
-    Icheb = let pinv = SecondPI{Float64, D}(ω, 1_000, SecondChebyshevPlan)
-        compute!(pinv, getpoints(f, pinv), 5, 11)
-    end
+    @safetestset "SecondPoincareInvariant" begin
+        using PoincareInvariants
 
-    Ifindiff = let pinv = SecondPI{Float64, D}(ω, (31, 33), SecondFinDiffPlan)
-        compute!(pinv, getpoints(f, pinv), 5, 11)
-    end
+        D = 6
+        ω(z, t, p) = [
+                0     0     0  z[1]  z[2]  z[3]
+                0     0     0  z[4]  z[5]  z[6]
+                0     0     0     t     p     1
+            -z[1] -z[4]    -t     0     0     0
+            -z[2] -z[5]    -p     0     0     0
+            -z[3] -z[6]    -1     0     0     0
+        ]
 
-    @test Icheb ≈ Idefault atol=10eps()
-    @test Icheb ≈ Ifindiff atol=5e-3
+        f(x, y) = (
+            exp(x) * y,
+            cospi(x * y),
+            x^2 - y^3 + x*y,
+            5.0,
+            exp(-(x^2 + y^2)),
+            x + y
+        )
+
+        Idefault = let pinv = SecondPI{Float64, D}(ω, 1_000)
+            compute!(pinv, getpoints(f, pinv), 5, 11)
+        end
+
+        Icheb = let pinv = SecondPI{Float64, D}(ω, 1_000, SecondChebyshevPlan)
+            compute!(pinv, getpoints(f, pinv), 5, 11)
+        end
+
+        Ifindiff = let pinv = SecondPI{Float64, D}(ω, (31, 33), SecondFinDiffPlan)
+            compute!(pinv, getpoints(f, pinv), 5, 11)
+        end
+
+        @test Icheb ≈ Idefault atol=10eps()
+        @test Icheb ≈ Ifindiff atol=5e-3
+    end
 end
 
 @safetestset "Linear Symplectic Maps" begin
@@ -190,6 +223,7 @@ end
         using PoincareInvariants
 
         diffpi1 = CanonicalFirstPI{Float64, 2}(1_000, FirstFinDiffPlan)
+        freqpi1 = CanonicalFirstPI{Float64, 2}(1_000, FirstFourierPlan)
 
         chebpi2 = CanonicalSecondPI{Float64, 2}(1_000, SecondChebyshevPlan)
         diffpi2 = CanonicalSecondPI{Float64, 2}(1_000, SecondFinDiffPlan)
@@ -205,16 +239,18 @@ end
         # half circle with radius one
         f2(r, θ) = A * B * [r*cospi(θ), r*sinpi(θ)]
 
-        @test abs(-π - compute!(diffpi1, getpoints(f1, diffpi1), 0, nothing)) < 5e-5
+        @test -π ≈ compute!(diffpi1, getpoints(f1, diffpi1), 0, nothing) atol=5e-5
+        @test -π ≈ compute!(freqpi1, getpoints(f1, freqpi1), 0, nothing) atol=10eps()
 
-        @test abs(π/2 - compute!(chebpi2, getpoints(f2, chebpi2), 0, nothing)) / eps() < 10
-        @test abs(π/2 - compute!(diffpi2, getpoints(f2, diffpi2), 0, nothing)) < 5e-3
+        @test π/2 ≈ compute!(chebpi2, getpoints(f2, chebpi2), 0, nothing) atol=10eps()
+        @test π/2 ≈ compute!(diffpi2, getpoints(f2, diffpi2), 0, nothing) atol=5e-3
     end
 
     @safetestset "In 8D" begin
         using PoincareInvariants
 
         diffpi1 = CanonicalFirstPI{Float64, 8}(1_000, FirstFinDiffPlan)
+        freqpi1 = CanonicalFirstPI{Float64, 8}(1_000, FirstFourierPlan)
 
         chebpi2 = CanonicalSecondPI{Float64, 8}(1_000, SecondChebyshevPlan)
         diffpi2 = CanonicalSecondPI{Float64, 8}(1_000, SecondFinDiffPlan)
@@ -249,6 +285,7 @@ end
         f2(r, θ) = A * B * C * [0, r*cospi(θ), 0, 0, 0, -r*sinpi(θ), 0, 0]
 
         @test π/2 ≈ compute!(diffpi1, getpoints(f1, diffpi1), 0, nothing) atol=1e-2
+        @test π/2 ≈ compute!(freqpi1, getpoints(f1, freqpi1), 0, nothing) atol=5e-3
 
         @test -π/2 ≈ compute!(chebpi2, getpoints(f2, chebpi2), 0, nothing) atol=10eps()
         @test -π/2 ≈ compute!(diffpi2, getpoints(f2, diffpi2), 0, nothing) atol=5e-3
@@ -281,12 +318,14 @@ end
     end
 
     diffpi1 = CanonicalFirstPI{Float64, 4}(1_000, FirstFinDiffPlan)
+    freqpi1 = CanonicalFirstPI{Float64, 4}(1_000, FirstFourierPlan)
 
     chebpi2 = CanonicalSecondPI{Float64, 4}(1_000, SecondChebyshevPlan)
     diffpi2 = CanonicalSecondPI{Float64, 4}(1_000, SecondFinDiffPlan)
 
     f1(x) = init1(x) |> f
     @test I1 ≈ compute!(diffpi1, getpoints(f1, diffpi1), 0, nothing) atol=5e-5
+    @test I1 ≈ compute!(freqpi1, getpoints(f1, freqpi1), 0, nothing) atol=5e-15
 
     g1(x, y) = init2(x, y) |> f
     @test I2 ≈ compute!(chebpi2, getpoints(g1, chebpi2), 0, nothing) atol=1e-14
@@ -294,10 +333,14 @@ end
 
     f2(x) = init1(x) |> f |> f
     @test I1 ≈ compute!(diffpi1, getpoints(f2, diffpi1), 0, nothing) atol=5e-5
+    @test I1 ≈ compute!(freqpi1, getpoints(f2, freqpi1), 0, nothing) atol=1e-13
 
     g2(x, y) = init2(x, y) |> f |> f
     @test I2 ≈ compute!(chebpi2, getpoints(g2, chebpi2), 0, nothing) atol=1e-11
     @test I2 ≈ compute!(diffpi2, getpoints(g2, diffpi2), 0, nothing) atol=5e-12
+
+    f3(x) = init1(x) |> f |> f |> f
+    @test I1 ≈ compute!(freqpi1, getpoints(f3, freqpi1), 0, nothing) atol=1e-7
 
     g3(x, y) = init2(x, y) |> f |> f |> f
     @test I2 ≈ compute!(chebpi2, getpoints(g3, chebpi2), 0, nothing) atol=5e-6
@@ -327,12 +370,14 @@ end
     I2 = 3 * 2^2
 
     diffpi1 = CanonicalFirstPI{Float64, 6}(1_000, FirstFinDiffPlan)
+    freqpi1 = CanonicalFirstPI{Float64, 6}(1_000, FirstFourierPlan)
 
     chebpi2 = CanonicalSecondPI{Float64, 6}(1_000, SecondChebyshevPlan)
     diffpi2 = CanonicalSecondPI{Float64, 6}(1_000, SecondFinDiffPlan)
 
     f1(x) = init1(x) |> f
     @test I1 ≈ compute!(diffpi1, getpoints(f1, diffpi1), 0, nothing) atol=5e-5
+    @test I1 ≈ compute!(freqpi1, getpoints(f1, freqpi1), 0, nothing) atol=1e-15
 
     g1(x, y) = init2(x, y) |> f
     @test I2 ≈ compute!(chebpi2, getpoints(g1, chebpi2), 0, nothing) atol=1e-14
@@ -340,6 +385,7 @@ end
 
     f2(x) = init1(x) |> f |> f
     @test I1 ≈ compute!(diffpi1, getpoints(f2, diffpi1), 0, nothing) atol=1e-3
+    @test I1 ≈ compute!(freqpi1, getpoints(f2, freqpi1), 0, nothing) atol=5e-14
 
     g2(x, y) = init2(x, y) |> f |> f
     @test I2 ≈ compute!(chebpi2, getpoints(g2, chebpi2), 0, nothing) atol=5e-3
@@ -347,6 +393,7 @@ end
 
     f3(x) = init1(x) |> f |> f |> f
     @test I1 ≈ compute!(diffpi1, getpoints(f3, diffpi1), 0, nothing) atol=5e-2
+    @test I1 ≈ compute!(freqpi1, getpoints(f3, freqpi1), 0, nothing) atol=1e-13
 
     g3(x, y) = init2(x, y) |> f |> f |> f
     # neither of the two methods manage this

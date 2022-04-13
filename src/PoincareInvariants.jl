@@ -12,7 +12,7 @@ export SecondPoincareInvariant, CanonicalSecondPI, SecondPI
 export getpoints, getpointspec, getpointnum
 export getdim, getform, getplan
 
-export FirstFinDiffPlan
+export FirstFinDiffPlan, FirstFourierPlan
 export SecondChebyshevPlan, SecondFinDiffPlan
 
 export canonical_one_form, CanonicalSymplecticMatrix, canonical_two_form
@@ -128,10 +128,12 @@ getdim(::FirstPoincareInvariant{<:Any, D}) where D = D
 # Implementations
 
 include("FirstFinDiffPlans.jl")
+include("FirstFourierPlans.jl")
 
 using .FirstFinDiffPlans: FirstFinDiffPlan
+using .FirstFourierPlans: FirstFourierPlan
 
-const DEFAULT_FIRST_PLAN = FirstFinDiffPlan
+const DEFAULT_FIRST_PLAN = FirstFourierPlan
 
 ## SecondPoincareInvariant ##
 
