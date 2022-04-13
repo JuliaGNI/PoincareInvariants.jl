@@ -10,7 +10,7 @@ export FirstPoincareInvariant, CanonicalFirstPI, FirstPI
 export SecondPoincareInvariant, CanonicalSecondPI, SecondPI
 
 export getpoints, getpointspec, getpointnum
-export getdim, getform
+export getdim, getform, getplan
 
 export FirstFinDiffPlan
 export SecondChebyshevPlan, SecondFinDiffPlan
@@ -40,6 +40,14 @@ returns plan that will be used to `compute!` `pinv`.
 function getplan end
 
 """
+    getpointspec(pinv::AbstractPoincareInvariant)
+
+get point specification, which may, for example, be a tuple specifying a grid or
+a number giving the number of points used to sample in phase space.
+"""
+function getpointspec end
+
+"""
     getpoints(pinv::AbstractPoincareInvariant)
 
 returns points on which to evaluate the phase space line or surface parameterisation
@@ -48,14 +56,6 @@ so as to `compute!` `pinv`.
 function getpoints(f::Function, pinv::AbstractPoincareInvariant{T, D}) where {T, D}
     getpoints(f, T, getpointspec(pinv), typeof(getplan(pinv)))
 end
-
-"""
-    getpointspec(pinv::AbstractPoincareInvariant)
-
-get point specification, which may, for example, be a tuple specifying a grid or
-a number giving the number of points used to sample in phase space.
-"""
-function getpointspec end
 
 """
     getpointnum(pinv::AbstractPoincareInvariant)
@@ -120,8 +120,10 @@ const CanonicalFirstPI{T, D} = FirstPoincareInvariant{T, D, typeof(canonical_one
 # Interface
 
 getpointspec(pinv::FirstPoincareInvariant) = pinv.N
+getpoints(pinv::FirstPoincareInvariant) = getpoints(identity, pinv)
 getform(pinv::FirstPoincareInvariant) = pinv.θ
 getplan(pinv::FirstPoincareInvariant) = pinv.plan
+getdim(::FirstPoincareInvariant{<:Any, D}) where D = D
 
 # Implementations
 

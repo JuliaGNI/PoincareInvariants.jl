@@ -1,77 +1,149 @@
-@safetestset "Interface" begin
-    @safetestset "Basic properties" begin
+@safetestset "Properties and Basic Interface" begin
+    @safetestset "FirstPoincareInvariant" begin
         using PoincareInvariants
 
-        D = 6; N = 123
-        ω(z, t, p) = canonical_two_form(D)
-        pinv = SecondPoincareInvariant{Float64, D}(ω, N)
+        D = 6; N = 123; θ = canonical_one_form; P = FirstFinDiffPlan
+        pinv = FirstPoincareInvariant{Float64, D}(θ, N, P)
 
-        @test getdim(pinv) == 6
+        @test getdim(pinv) == D
+        @test getplan(pinv) isa P
         @test N <= getpointnum(pinv) <= 2N
-        @test getpointspec(pinv) == getpointspec(N, typeof(pinv.plan)) == pinv.pointspec
-        @test getform(pinv) === pinv.ω === ω
+        @test getpointspec(pinv) == getpointspec(N, typeof(getplan(pinv)))
+        @test getform(pinv) === θ
+
+        pnts = getpoints(pinv) do x
+            x, x, x, 0, 1, 2
+        end
+        @test pnts isa Matrix{Float64}
+        @test size(pnts) == (getpointnum(pinv), D)
+    end
+
+    @safetestset "SecondPoincareInvariant" begin
+        using PoincareInvariants
+
+        D = 4; N = 321; ω = canonical_two_form; P = SecondFinDiffPlan
+        pinv = SecondPoincareInvariant{Float64, D}(ω, N, P)
+
+        @test getdim(pinv) == D
+        @test getplan(pinv) isa P
+        @test N <= getpointnum(pinv) <= 2N
+        @test getpointspec(pinv) == getpointspec(N, typeof(getplan(pinv)))
+        @test getform(pinv) === ω
+
+        pnts = getpoints(pinv) do x, y
+            x, x, y, y
+        end
+        @test pnts isa Matrix{Float64}
+        @test size(pnts) == (getpointnum(pinv), D)
     end
 end
 
-@safetestset "Basic Usage FirstPoincareInvariant" begin
-    using PoincareInvariants
-    using DoubleFloats
+@safetestset "Basic Usage" begin
+    @safetestset "FirstPoincareInvariant" begin
+        using PoincareInvariants
+        using DoubleFloats
 
-    D = 2
+        D = 2
 
-    first_pinvs = [
-        FirstPoincareInvariant{Float64, D}(canonical_one_form, 500)
-        FirstPoincareInvariant{Float64, D}(canonical_one_form, 501, FirstFinDiffPlan)
-        FirstPoincareInvariant{Double64, D}(canonical_one_form, 518, FirstFinDiffPlan)
+        Ts = [
+            Float64, Float64, Double64,
+            Float64, Double64,
+            Double64, Float64
+        ]
 
-        FirstPI{Float64, D}(canonical_one_form, 541)
-        FirstPI{Double64, D}(canonical_one_form, 542, FirstFinDiffPlan)
+        Ns = [
+            500, 501, 518,
+            541, 542,
+            566, 567
+        ]
 
-        CanonicalFirstPI{Double64, D}(566)
-        CanonicalFirstPI{Float64, D}(567, FirstFinDiffPlan)
-    ]
+        first_pinvs = [
+            FirstPoincareInvariant{Ts[1], D}(canonical_one_form, Ns[1]),
+            FirstPoincareInvariant{Ts[2], D}(canonical_one_form, Ns[2], FirstFinDiffPlan),
+            FirstPoincareInvariant{Ts[3], D}(canonical_one_form, Ns[3], FirstFinDiffPlan),
 
-    to_circle_line(θ) = (cospi(-2θ), sinpi(-2θ))
+            FirstPI{Ts[4], D}(canonical_one_form, Ns[4]),
+            FirstPI{Ts[5], D}(canonical_one_form, Ns[5], FirstFinDiffPlan),
 
-    @testset "FirstPoincareInvariant $i" for (i, pinv) in enumerate(first_pinvs)
-        pnts = getpoints(to_circle_line, pinv)
-        I = compute!(pinv, pnts, 0.1, nothing)
-        @test abs(π - I) < 1e-4
+            CanonicalFirstPI{Ts[6], D}(Ns[6]),
+            CanonicalFirstPI{Ts[7], D}(Ns[7], FirstFinDiffPlan),
+        ]
+
+        to_circle_line(θ) = (cospi(-2θ), sinpi(-2θ))
+
+        @testset "FirstPoincareInvariant $i" for (i, pinv) in enumerate(first_pinvs)
+            T = Ts[i]
+            N = Ns[i]
+
+            pnts = getpoints(to_circle_line, pinv)
+            @test pnts isa Matrix{T}
+            @test size(pnts, 2) == D
+            @test size(pnts, 1) == getpointnum(pinv)
+            @test N ≤ getpointnum(pinv) ≤ 2N
+
+            I = compute!(pinv, pnts, 0.1, nothing)
+            @test I isa T
+            @test π ≈ I atol=1e-4
+        end
     end
-end
 
-@safetestset "Basic Usage SecondPoincareInvariant" begin
-    using PoincareInvariants
-    using DoubleFloats
+    @safetestset "SecondPoincareInvariant" begin
+        using PoincareInvariants
+        using DoubleFloats
 
-    D = 2
+        D = 2
 
-    second_pinvs = [
-        SecondPoincareInvariant{Float64, D}(canonical_two_form, 244)
-        SecondPoincareInvariant{Float64, D}(canonical_two_form, 222, SecondChebyshevPlan)
-        SecondPoincareInvariant{Double64, D}(canonical_two_form, 123, SecondChebyshevPlan)
-        SecondPoincareInvariant{Float64, D}(canonical_two_form, (15, 13), SecondFinDiffPlan)
-        SecondPoincareInvariant{Double64, D}(canonical_two_form, 188, SecondFinDiffPlan)
+        Ts = [
+            Float64, Float64, Double64, Float64, Double64,
+            Float64, Float64, Double64,
+            Float64, Double64, Float64,
+            Double64, Float64, Float64
+        ]
 
-        SecondPI{Float64, D}(canonical_two_form, 345)
-        SecondPI{Float64, D}(canonical_two_form, 366, SecondChebyshevPlan)
-        SecondPI{Double64, D}(canonical_two_form, 124, SecondFinDiffPlan)
+        ps = [
+            100, 101, 118, (11, 12), 140,
+            162, 173, 196,
+            222, 230, 244,
+            253, 289, (19, 16)
+        ]
 
-        SecondPI{Float64, D}(CanonicalSymplecticMatrix{Float64}(D), 195)
-        SecondPI{Float64, D}(CanonicalSymplecticMatrix{Double64}(D), 264, SecondChebyshevPlan)
-        SecondPI{Double64, D}(CanonicalSymplecticMatrix{Double64}(D), 308, SecondFinDiffPlan)
+        second_pinvs = [
+            SecondPoincareInvariant{Ts[1], D}(canonical_two_form, ps[1]),
+            SecondPoincareInvariant{Ts[2], D}(canonical_two_form, ps[2], SecondChebyshevPlan),
+            SecondPoincareInvariant{Ts[3], D}(canonical_two_form, ps[3], SecondChebyshevPlan),
+            SecondPoincareInvariant{Ts[4], D}(canonical_two_form, ps[4], SecondFinDiffPlan),
+            SecondPoincareInvariant{Ts[5], D}(canonical_two_form, ps[5], SecondFinDiffPlan),
 
-        CanonicalSecondPI{Float64, D}(284)
-        CanonicalSecondPI{Double64, D}(213, SecondChebyshevPlan)
-        CanonicalSecondPI{Float64, D}((14, 18), SecondFinDiffPlan)
-    ]
+            SecondPI{Ts[6], D}(canonical_two_form, ps[6]),
+            SecondPI{Ts[7], D}(canonical_two_form, ps[7], SecondChebyshevPlan),
+            SecondPI{Ts[8], D}(canonical_two_form, ps[8], SecondFinDiffPlan),
 
-    to_wavy_area(x, y) = (x, y + sinpi(2x))
+            SecondPI{Ts[9], D}(CanonicalSymplecticMatrix{Float64}(D), ps[9]),
+            SecondPI{Ts[10], D}(CanonicalSymplecticMatrix{Double64}(D), ps[10], SecondChebyshevPlan),
+            SecondPI{Ts[11], D}(CanonicalSymplecticMatrix{Double64}(D), ps[11], SecondFinDiffPlan),
 
-    @testset "SecondPoincareInvariant $i" for (i, pinv) in enumerate(second_pinvs)
-        pnts = getpoints(to_wavy_area, pinv)
-        I = compute!(pinv, pnts, 0.1, nothing)
-        @test abs(1 - I) / eps() < 10
+            CanonicalSecondPI{Ts[12], D}(ps[12]),
+            CanonicalSecondPI{Ts[13], D}(ps[13], SecondChebyshevPlan),
+            CanonicalSecondPI{Ts[14], D}(ps[14], SecondFinDiffPlan)
+        ]
+
+        to_wavy_area(x, y) = (x, y + sinpi(2x))
+
+        @testset "SecondPoincareInvariant $i" for (i, pinv) in enumerate(second_pinvs)
+            T = Ts[i]
+            psi = ps[i]
+            N = getpointnum(psi)
+
+            pnts = getpoints(to_wavy_area, pinv)
+            @test pnts isa Matrix{T}
+            @test size(pnts, 2) == D
+            @test size(pnts, 1) == getpointnum(pinv)
+            @test N ≤ getpointnum(pinv) ≤ 2N
+
+            I = compute!(pinv, pnts, 0.1, nothing)
+            @test I isa T
+            @test 1 ≈ I atol=50eps()
+        end
     end
 end
 
