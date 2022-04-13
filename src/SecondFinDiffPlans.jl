@@ -146,57 +146,6 @@ function differentiate(
     return fx * invΔx / 2, fy * invΔy / 2
 end
 
-function differentiate!(
-    ∂x::AbstractVector, ∂y::AbstractVector, vals::AbstractVector{T},
-    dims::NTuple{2, Integer}
-) where T
-    nx, ny = dims
-    Base.require_one_based_indexing(∂x, ∂y, vals)
-    @argcheck nx >= 3 && ny >= 3 "must have at least 3×3 points to calculate both derivatives"
-    @argcheck axes(∂x, 1) == axes(∂y, 1) == axes(vals, 1) "axes of derivatives and " *
-        "values must match"
-    @argcheck length(vals) == nx * ny "length of vals and length implied by dims must match"
-
-    _li(x, y) = _tolin(x, y, ny)
-
-    # corners
-    ∂x[_li(1 ,  1)], ∂y[_li(1 ,  1)] = _diff(vals,    2,    2, -1, -1, nx, ny, Val(true))
-    ∂x[_li(nx,  1)], ∂y[_li(nx,  1)] = _diff(vals, nx-1,    2, +1, -1, nx, ny, Val(true))
-    ∂x[_li(nx, ny)], ∂y[_li(nx, ny)] = _diff(vals, nx-1, ny-1, +1, +1, nx, ny, Val(true))
-    ∂x[_li(1 , ny)], ∂y[_li(1 , ny)] = _diff(vals,    2, ny-1, -1, +1, nx, ny, Val(true))
-
-    # edges
-    @inbounds for y in 2:ny-1
-        ∂x[_li(1 ,  y)], ∂y[_li(1 ,  y)] = _diff(vals,    2, y, -1, 0, nx, ny, Val(true))
-        ∂x[_li(nx,  y)], ∂y[_li(nx,  y)] = _diff(vals, nx-1, y, +1, 0, nx, ny, Val(true))
-    end
-
-    @inbounds for x in 2:nx-1
-        ∂x[_li(x,  1)], ∂y[_li(x,  1)] = _diff(vals, x,    2, 0, -1, nx, ny, Val(true))
-        ∂x[_li(x, ny)], ∂y[_li(x, ny)] = _diff(vals, x, ny-1, 0, +1, nx, ny, Val(true))
-    end
-
-    # interior (uses central differences)
-    @inbounds for x in 2:nx-1
-        for y in 2:ny-1
-            ∂x[_li(x, y)], ∂y[_li(x, y)] = _diff(vals, x, y, 0, 0, nx, ny, Val(false))
-        end
-    end
-
-    return ∂x, ∂y
-end
-
-function differentiate!(∂x, ∂y, vals, dims::NTuple{2, Integer})
-    @argcheck length(∂x) == length(∂y) == length(vals) "number of derivative and vals " *
-        "vectors must match"
-
-    for (∂xi, ∂yi, valsi) in zip(∂x, ∂y, vals)
-        differentiate!(∂xi, ∂yi, valsi, dims)
-    end
-
-    return ∂x, ∂y
-end
-
 ## Integration ##
 
 function _sw(i, n)
