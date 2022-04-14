@@ -1,9 +1,9 @@
 @safetestset "PaduaTransforms" begin include("test_PaduaTransforms.jl") end
 
-using PoincareInvariants.SecondPoincareInvariants.Chebyshev
+using PoincareInvariants.SecondChebyshevPlans
 
 @safetestset "Differentiation" begin
-    using ..Chebyshev: DiffPlan, differentiate!
+    using ..SecondChebyshevPlans: DiffPlan, differentiate!
 
     @test DiffPlan{Float64}(5).D == [0  1  0  3  0   5;
                                      0  0  4  0  8   0;
@@ -54,7 +54,7 @@ using PoincareInvariants.SecondPoincareInvariants.Chebyshev
 end
 
 @safetestset "Integration" begin
-    using ..Chebyshev: getintweights, integrate
+    using ..SecondChebyshevPlans: getintweights, integrate
 
     # integrating odd polynomials over symmetric boundary conditions gives 0
     @test all(getintweights(100)[2:2:end] .== 0)
@@ -69,9 +69,9 @@ end
 end
 
 @safetestset "getintegrand! with CallIntPlan" begin
-    using ..Chebyshev.PaduaTransforms
-    using ..Chebyshev: DiffPlan, differentiate!, CallIntPlan, getintegrand!
-    using PoincareInvariants.CanonicalSymplecticStructures
+    using ..SecondChebyshevPlans.PaduaTransforms
+    using ..SecondChebyshevPlans: DiffPlan, differentiate!, CallIntPlan, getintegrand!
+    using PoincareInvariants
 
     @testset "6 Points in 2 Dimensions" begin
         degree = 2
@@ -89,17 +89,17 @@ end
         ∂ycoeffs = ntuple(_ -> zeros(degree+1, degree+1), D)
         differentiate!(∂xcoeffs, ∂ycoeffs, DiffPlan{Float64}(degree), phasecoeffs)
 
-        phasepoints = ntuple(_ -> Vector{Float64}(undef, getpaduanum(degree)), D)
+        phasepoints = Matrix{Float64}(undef, getpaduanum(degree), D)
         iplan = InvPaduaTransformPlan{Float64}(degree)
         invpaduatransform!(phasepoints, iplan, phasecoeffs)
 
-        Ω(v, t, p) = [0 -1; 1  0]
+        ω(v, t, p) = [0 -1; 1  0]
 
         plan = CallIntPlan{Float64, D}(degree)
 
         intcoeffs = zeros(degree+1, degree+1)
 
-        getintegrand!(intcoeffs, plan, Ω, phasepoints, 0, nothing, ∂xcoeffs, ∂ycoeffs)
+        getintegrand!(intcoeffs, plan, ω, phasepoints, 0, nothing, ∂xcoeffs, ∂ycoeffs)
 
         @test intcoeffs ≈ [-72   -82  -30;
                            -82  -432    0;
@@ -122,17 +122,17 @@ end
         ∂ycoeffs = ntuple(_ -> zeros(degree+1, degree+1), D)
         differentiate!(∂xcoeffs, ∂ycoeffs, DiffPlan{Float64}(degree), phasecoeffs)
 
-        phasepoints = [Vector{Float64}(undef, getpaduanum(degree)) for _ in 1:D]
+        phasepoints = Matrix{Float64}(undef, getpaduanum(degree), D)
         iplan = InvPaduaTransformPlan{Float64}(degree)
         invpaduatransform!(phasepoints, iplan, phasecoeffs)
 
-        Ω(v, t, p) = CanonicalSymplecticMatrix(D)
+        ω = canonical_two_form
 
         plan = CallIntPlan{Float64, D}(degree)
 
         intcoeffs = zeros(degree+1, degree+1)
 
-        getintegrand!(intcoeffs, plan, Ω, phasepoints, 0, nothing, ∂xcoeffs, ∂ycoeffs)
+        getintegrand!(intcoeffs, plan, ω, phasepoints, 0, nothing, ∂xcoeffs, ∂ycoeffs)
 
         testcoeffs = zeros(degree+1, degree+1)
         testcoeffs[1, 1] = 0.25
@@ -141,18 +141,17 @@ end
     end
 end
 
-@safetestset "compute! with ChebyshevPlan (OOP)" begin
-    using ..Chebyshev.PaduaTransforms
-    using ..Chebyshev: ChebyshevPlan, compute!, DiffPlan
-    using PoincareInvariants.SecondPoincareInvariants
-    using PoincareInvariants.CanonicalSymplecticStructures
+@safetestset "compute! with SecondChebyshevPlan (OOP)" begin
+    using ..SecondChebyshevPlans.PaduaTransforms
+    using ..SecondChebyshevPlans: SecondChebyshevPlan, compute!, DiffPlan
+    using PoincareInvariants
 
     D = 12
     N = 200
-    Ω(v, t, p) = CanonicalSymplecticMatrix(D)
+    ω = canonical_two_form
     pointnum = nextpaduanum(N)
     degree = getdegree(pointnum)
-    plan = ChebyshevPlan{Float64, D}(Ω, pointnum)
+    plan = SecondChebyshevPlan{Float64, D}(ω, pointnum)
 
     testphasecoeffs = [zeros(degree+1, degree+1) for _ in 1:D]
     test∂x = [zeros(degree+1, degree+1) for _ in 1:D]
@@ -167,7 +166,7 @@ end
         end
     end
 
-    pinv = SecondPoincareInvariant{Float64, D}(Ω, pointnum, plan)
+    pinv = SecondPoincareInvariant{Float64, D}(ω, pointnum, plan)
     @test compute!(pinv, phasepoints, 0, nothing) ≈ 4 atol=20eps()
 
     testphasecoeffs[1][1, 2] = 1  # 1 x
@@ -188,24 +187,26 @@ end
 end
 
 @safetestset "getpoints, getpointspec and getpointnum" begin
-    using ..Chebyshev.PaduaTransforms
-    using ..Chebyshev: ChebyshevPlan, getpointspec, getpoints
+    using ..SecondChebyshevPlans.PaduaTransforms
+    using ..SecondChebyshevPlans: SecondChebyshevPlan, getpointspec, getpoints
 
     for N in [10, 321, 2178], T in [Float32, Float64]
-        @test getpointspec(N, ChebyshevPlan) == nextpaduanum(N)
-        @test getpointspec((N, 2N), ChebyshevPlan) == nextpaduanum(N * 2N)
+        @test getpointspec(N, SecondChebyshevPlan) == nextpaduanum(N)
+
+        @inferred Vector{T} getpoints((x, y) -> x, T, N, SecondChebyshevPlan)
+        @inferred Matrix{T} getpoints((x, y) -> (x, y), T, N, SecondChebyshevPlan)
 
         f(x, y) = 5 * x, cos(x*y), x+y
         rescale(x, y) = ((x, y) .+ 1) ./ 2
 
-        pnts = getpoints(f, T, N, ChebyshevPlan)
+        pnts = getpoints(f, T, N, SecondChebyshevPlan)
         testpnts = getpaduapoints(T, nextdegree(N)) do x, y
             px, py = rescale(x, y)
             return f(px, py)
         end
 
-        for i in 1:3
-            @test pnts[i] ≈ testpnts[i]
-        end
+        @test pnts isa Matrix{T}
+        @test size(pnts) == (nextpaduanum(N), 3)
+        @test pnts ≈ testpnts
     end
 end

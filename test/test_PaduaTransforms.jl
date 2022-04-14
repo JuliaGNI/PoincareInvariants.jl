@@ -1,4 +1,4 @@
-using PoincareInvariants.SecondPoincareInvariants.Chebyshev.PaduaTransforms
+using PoincareInvariants.SecondChebyshevPlans.PaduaTransforms
 
 module ChebyshevTestUtils
     using LinearAlgebra: UpperTriangular
@@ -102,54 +102,62 @@ end
 @safetestset "getpaduapoints" begin
     using ..PaduaTransforms
 
-    @test getpaduapoints(1) isa NTuple{2, Vector{Float64}}
-    @test getpaduapoints(Float32, 2) isa NTuple{2, Vector{Float32}}
-    @test getpaduapoints(Float64, 3) isa NTuple{2, Vector{Float64}}
+    @inferred Vector{Float64} getpaduapoints(3)
+    @inferred Matrix{Float64} getpaduapoints((x, y) -> x + y, 4)
+    @inferred Matrix{Float32} getpaduapoints((x, y) -> (x, y, x * x + y), Float32, 5)
 
-    @test getpaduapoints(1)[1] ≈ [1, 1, -1]
-    @test getpaduapoints(1)[2] ≈ [1, -1, 0]
+    @test getpaduapoints(1) ≈ [
+         1  1;
+         1 -1;
+        -1  0]
 
-    @test getpaduapoints(Float32, 2)[1] ≈
-        [cospi(0/2), cospi(0/2), cospi(1/2), cospi(1/2), cospi(2/2), cospi(2/2)]
-    @test getpaduapoints(Float32, 2)[2] ≈
-        [cospi(0/3), cospi(2/3), cospi(1/3), cospi(3/3), cospi(0/3), cospi(2/3)]
+    @test getpaduapoints(Float32, 2) ≈ [
+        cospi(0/2) cospi(0/3);
+        cospi(0/2) cospi(2/3);
+        cospi(1/2) cospi(1/3);
+        cospi(1/2) cospi(3/3);
+        cospi(2/2) cospi(0/3);
+        cospi(2/2) cospi(2/3)]
 
+    @test getpaduapoints(Float32, 4) ≈ [
+        cospi(0/4) cospi(0/5);
+        cospi(0/4) cospi(2/5);
+        cospi(0/4) cospi(4/5);
+        cospi(1/4) cospi(1/5);
+        cospi(1/4) cospi(3/5);
+        cospi(1/4) cospi(5/5);
+        cospi(2/4) cospi(0/5);
+        cospi(2/4) cospi(2/5);
+        cospi(2/4) cospi(4/5);
+        cospi(3/4) cospi(1/5);
+        cospi(3/4) cospi(3/5);
+        cospi(3/4) cospi(5/5);
+        cospi(4/4) cospi(0/5);
+        cospi(4/4) cospi(2/5);
+        cospi(4/4) cospi(4/5)]
 
-    @test getpaduapoints(Float32, 4)[1] ≈ [
-        cospi(0/4), cospi(0/4), cospi(0/4),
-        cospi(1/4), cospi(1/4), cospi(1/4),
-        cospi(2/4), cospi(2/4), cospi(2/4),
-        cospi(3/4), cospi(3/4), cospi(3/4),
-        cospi(4/4), cospi(4/4), cospi(4/4),
-    ]
-    @test getpaduapoints(Float32, 4)[2] ≈ [
-        cospi(0/5), cospi(2/5), cospi(4/5),
-        cospi(1/5), cospi(3/5), cospi(5/5),
-        cospi(0/5), cospi(2/5), cospi(4/5),
-        cospi(1/5), cospi(3/5), cospi(5/5),
-        cospi(0/5), cospi(2/5), cospi(4/5),
-    ]
-
-    @test getpaduapoints(Float32, 5)[1] ≈ [
-        cospi(0/5), cospi(0/5), cospi(0/5), cospi(0/5),
-        cospi(1/5), cospi(1/5), cospi(1/5),
-        cospi(2/5), cospi(2/5), cospi(2/5), cospi(2/5),
-        cospi(3/5), cospi(3/5), cospi(3/5),
-        cospi(4/5), cospi(4/5), cospi(4/5), cospi(4/5),
-        cospi(5/5), cospi(5/5), cospi(5/5),
-    ]
-    @test getpaduapoints(Float32, 5)[2] ≈ [
-        cospi(0/6), cospi(2/6), cospi(4/6), cospi(6/6),
-        cospi(1/6), cospi(3/6), cospi(5/6),
-        cospi(0/6), cospi(2/6), cospi(4/6), cospi(6/6),
-        cospi(1/6), cospi(3/6), cospi(5/6),
-        cospi(0/6), cospi(2/6), cospi(4/6), cospi(6/6),
-        cospi(1/6), cospi(3/6), cospi(5/6),
-    ]
-
-    @inferred getpaduapoints(3)
-    @inferred getpaduapoints((x, y) -> x + y, 4)
-    @inferred getpaduapoints((x, y) -> (x, y, x * x + y), 5)
+    @test getpaduapoints(Float32, 5) ≈ [
+        cospi(0/5) cospi(0/6);
+        cospi(0/5) cospi(2/6);
+        cospi(0/5) cospi(4/6);
+        cospi(0/5) cospi(6/6);
+        cospi(1/5) cospi(1/6);
+        cospi(1/5) cospi(3/6);
+        cospi(1/5) cospi(5/6);
+        cospi(2/5) cospi(0/6);
+        cospi(2/5) cospi(2/6);
+        cospi(2/5) cospi(4/6);
+        cospi(2/5) cospi(6/6);
+        cospi(3/5) cospi(1/6);
+        cospi(3/5) cospi(3/6);
+        cospi(3/5) cospi(5/6);
+        cospi(4/5) cospi(0/6);
+        cospi(4/5) cospi(2/6);
+        cospi(4/5) cospi(4/6);
+        cospi(4/5) cospi(6/6);
+        cospi(5/5) cospi(1/6);
+        cospi(5/5) cospi(3/6);
+        cospi(5/5) cospi(5/6)]
 
     dopoints1 = getpaduapoints(11) do x, y
         x * y
@@ -157,21 +165,19 @@ end
 
     @test dopoints1 isa Vector{Float64}
     @test length(dopoints1) == getpaduanum(11)
-    @test dopoints1 ≈ getpaduapoints(11)[1] .* getpaduapoints(11)[2]
+    @test dopoints1 ≈ getpaduapoints(11)[:, 1] .* getpaduapoints(11)[:, 2]
 
     dopoints4 = getpaduapoints(Float32, 5) do x, y
         x, y, x * y, x + y
     end
 
-    @test dopoints4 isa NTuple{4, Vector{Float32}}
-    @test all(dopoints4) do v
-        length(v) == getpaduanum(5)
-    end
+    @test dopoints4 isa Matrix{Float32}
+    @test size(dopoints4) == (getpaduanum(5), 4)
 
-    @test dopoints4[1] ≈ getpaduapoints(5)[1]
-    @test dopoints4[2] ≈ getpaduapoints(5)[2]
-    @test dopoints4[3] ≈ getpaduapoints(5)[1] .* getpaduapoints(5)[2]
-    @test dopoints4[4] ≈ getpaduapoints(5)[1] .+ getpaduapoints(5)[2]
+    @test dopoints4[:, 1] ≈ getpaduapoints(5)[:, 1]
+    @test dopoints4[:, 2] ≈ getpaduapoints(5)[:, 2]
+    @test dopoints4[:, 3] ≈ getpaduapoints(5)[:, 1] .* getpaduapoints(5)[:, 2]
+    @test dopoints4[:, 4] ≈ getpaduapoints(5)[:, 1] .+ getpaduapoints(5)[:, 2]
 end
 
 @safetestset "weight! and invweight!" begin
@@ -409,12 +415,21 @@ end
     plan = PaduaTransformPlan{Float64}(n)
     invplan = InvPaduaTransformPlan{Float64}(n)
 
-    ndtestvals = ntuple(_ -> rand(getpaduanum(n)), D)
+    testvals = rand(getpaduanum(n), D)
+
+    ndtestvals = [copy(col) for col in eachcol(testvals)]
     ndcoeffs = [zeros(n+1, n+1) for _ in 1:D]
     paduatransform!(ndcoeffs, plan, ndtestvals)
 
+    ndtestvals2 = testvals
+    ndcoeffs2 = [zeros(n+1, n+1) for _ in 1:D]
+    paduatransform!(ndcoeffs2, plan, ndtestvals2)
+
     ndvals = ntuple(_ -> Vector{Float64}(undef, getpaduanum(n)), D)
     invpaduatransform!(ndvals, invplan, ndcoeffs)
+
+    ndvals2 = Matrix{Float64}(undef, getpaduanum(n), D)
+    invpaduatransform!(ndvals2, invplan, ndcoeffs)
 
     for d in 1:D
         @test maximum(abs, ndvals[d] .- ndtestvals[d]) / eps() < 100
@@ -424,5 +439,8 @@ end
 
         vals = Vector{Float64}(undef, getpaduanum(n))
         @test ndvals[d] == invpaduatransform!(vals, invplan, ndcoeffs[d])
+
+        @test ndcoeffs[d] ≈ ndcoeffs2[d]
+        @test ndvals[d] ≈ ndvals2[:, d]
     end
 end

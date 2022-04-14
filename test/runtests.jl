@@ -1,13 +1,15 @@
 using SafeTestsets, Test
 
-@safetestset "CanonicalSymplecticStructures" begin
-    include("test_CanonicalSymplecticStructures.jl")
+@safetestset "CanonicalSymplecticForms" begin include("test_CanonicalSymplecticForms.jl") end
+
+@safetestset "Plan Unit Tests" begin
+    @safetestset "FirstFinDiffPlans" begin include("test_FirstFinDiffPlans.jl") end
+    @safetestset "FirstFourierPlans" begin include("test_FirstFourierPlans.jl") end
+
+    @safetestset "SecondChebyshevPlans" begin include("test_SecondChebyshevPlans.jl") end
+    @safetestset "SecondFinDiffPlans" begin include("test_SecondFinDiffPlans.jl") end
 end
 
-@safetestset "FirstPoincareInvariants" begin
-    include("FirstPoincareInvariants/test_FirstPoincareInvariants.jl")
-end
-
-@safetestset "SecondPoincareInvariants" begin
-    include("SecondPoincareInvariants/test_SecondPoincareInvariants.jl")
+@safetestset "PoincareInvariants Function Tests" begin
+    include("test_PoincareInvariants.jl")
 end

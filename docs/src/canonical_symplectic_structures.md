@@ -1,9 +1,9 @@
 # Canonical Symplectic Structures
 
 ```@meta
-CurrentModule = PoincareInvariants.CanonicalSymplecticStructures
+CurrentModule = PoincareInvariants.CanonicalSymplecticForms
 DocTestSetup = quote
-    using PoincareInvariants.CanonicalSymplecticStructures
+    using PoincareInvariants.CanonicalSymplecticForms
 end
 ```
 

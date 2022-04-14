@@ -1,9 +1,9 @@
 # Padua Transforms
 
 ```@meta
-CurrentModule = PoincareInvariants.SecondPoincareInvariants.Chebyshev.PaduaTransforms
+CurrentModule = PoincareInvariants.SecondChebyshevPlans.PaduaTransforms
 DocTestSetup = quote
-    using PoincareInvariants.SecondPoincareInvariants.Chebyshev.PaduaTransforms
+    using PoincareInvariants.SecondChebyshevPlans.PaduaTransforms
 end
 ```
 
@@ -96,7 +96,6 @@ To obtain the coefficients ``a_{ij}`` we need to evaluate the function ``f`` at 
 a_{ij} = \sum_{k, l} \; f(x_l, y_k) \; T_i(y_k) \; T_j(x_l)
 ```
 
-Note, that this is not quite exact since we will apply a weighting factor to the coefficients.
 If we let ``x_l = \cos{\frac{lπ}{n}}`` and ``y_k = \cos{\frac{kπ}{m}}``, we have
 
 ```math
@@ -111,6 +110,7 @@ a_{ij} = \sum_{k, l} \; f(\cos{\frac{lπ}{n}}, \cos{\frac{kπ}{m}}) \; \cos{\fra
 
 because of the definition of the Chebyshev polynomials as ``T_n(x) := \cos(n \arccos(x))``.
 The expression above looks like a discrete cosine transform, which is what we will use to implement the Padua transform.
+Note, that the formula above is not quite exact since we need to apply a weighting factor to the coefficients.
 For further reading on the Padua Transform, please see the following:
 
 For details on the Padua points as good nodes for polynomial interpolation:
@@ -132,7 +132,17 @@ To generate the Padua points we can use the function [`getpaduapoints`](@ref) as
 
 ```jldoctest
 julia> getpaduapoints(3)
-([1.0, 1.0, 1.0, 0.5, 0.5, -0.4999999999999999, -0.4999999999999999, -0.4999999999999999, -1.0, -1.0], [1.0, 0.0, -1.0, 0.7071067811865476, -0.7071067811865476, 1.0, 0.0, -1.0, 0.7071067811865476, -0.7071067811865476])
+10×2 Matrix{Float64}:
+  1.0   1.0
+  1.0   0.0
+  1.0  -1.0
+  0.5   0.707107
+  0.5  -0.707107
+ -0.5   1.0
+ -0.5   0.0
+ -0.5  -1.0
+ -1.0   0.707107
+ -1.0  -0.707107
 ```
 
 Using do block syntax we can evaluate a function on the Padua points.
