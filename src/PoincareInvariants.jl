@@ -101,7 +101,7 @@ function FirstPoincareInvariant{T, D}(
     θ::θT, N::Integer, P::Type=DEFAULT_FIRST_PLAN
 ) where {T, D, θT}
     ps = getpointspec(N, P)
-    plan = P{T, D}(θ, N)
+    plan = P{T, D}(θ, ps)
     FirstPoincareInvariant{T, D, θT, typeof(plan)}(θ, ps, plan)
 end
 
