@@ -16,6 +16,8 @@
         end
         @test pnts isa Matrix{Float64}
         @test size(pnts) == (getpointnum(pinv), D)
+
+        @test size(getpoints(pinv)::Vector{Float64}) == (getpointnum(pinv),)
     end
 
     @safetestset "SecondPoincareInvariant" begin
@@ -35,6 +37,8 @@
         end
         @test pnts isa Matrix{Float64}
         @test size(pnts) == (getpointnum(pinv), D)
+
+        @test size(getpoints(pinv)::Matrix{Float64}) == (getpointnum(pinv), 2)
     end
 end
 
