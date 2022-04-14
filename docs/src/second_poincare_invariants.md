@@ -1,7 +1,7 @@
 # Second Poincaré Invariants
 
 ```@meta
-CurrentModule = PoincareInvariants.SecondPoincareInvariants
+CurrentModule = PoincareInvariants
 DocTestSetup = quote
     using PoincareInvariants
 end
@@ -17,7 +17,7 @@ julia> D = 2; N = 500;
 To calculate the second poincare invariant, we will need to define the two-form ``\Omega``, the integral invariant.
 
 ```jldoctest usage
-julia> ω(z, t, p) = canonical_two_form(D);
+julia> ω(z, t, p) = CanonicalSymplecticMatrix(D);
 ```
 
 The two-form is just a `D x D` matrix. In this case it is the canonical symplectic matrix.
@@ -75,9 +75,11 @@ If we now evolve each point forward in time, we should see that the invariant is
 
 ```jldoctest usage
 julia> function free_particle!(points, t)
-           mid = length(points) ÷ 2
-           for i in 1:mid
-               points[i] .+= points[mid+i] .* t
+           mid = size(points, 2) ÷ 2
+           for pnt in eachrow(points)
+               for j in 1:mid
+                   pnt[j] += pnt[mid + j] .* t
+               end
            end
        end
 free_particle! (generic function with 1 method)

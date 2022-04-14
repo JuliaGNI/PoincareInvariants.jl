@@ -1,14 +1,14 @@
 # Canonical Symplectic Structures
 
 ```@meta
-CurrentModule = PoincareInvariants.CanonicalSymplecticStructures
+CurrentModule = PoincareInvariants.CanonicalSymplecticForms
 DocTestSetup = quote
-    using PoincareInvariants.CanonicalSymplecticStructures
+    using PoincareInvariants.CanonicalSymplecticForms
 end
 ```
 
-This module currently contains the type [`canonical_two_form`](@ref), which satisifes the `AbstractMatrix` interface and has an optimised `LinearAlgebra.dot` method to compute the vector matrix vector product.
+This module currently contains the type [`CanonicalSymplecticMatrix`](@ref), which satisifes the `AbstractMatrix` interface and has an optimised `LinearAlgebra.dot` method to compute the vector matrix vector product.
 
 ```@docs
-canonical_two_form
+CanonicalSymplecticMatrix
 ```

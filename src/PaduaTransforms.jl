@@ -146,19 +146,28 @@ ispadua(i, j) = iseven(i - j)
 
 evaluates the function `f` on the Padua points (of type `T`) for degree `n`.
 
-If no function `f` is provided, `getpaduapoints` returns a tuple of two vectors containing
-the x and y components of the paduapoints respectively. If `f` returns a single value,
-`getpaduapoints` returns a `Vector{T}`. If `f` returns a tuple or other indexable iterable,
-`getpaduapoints` returns a tuple of `Vector{T}` where the i-th vector represents the i-th
+If no function `f` is provided, `getpaduapoints` returns a matrix containing
+the x and y components of the paduapoints as columns. If `f` returns a single value,
+`getpaduapoints` returns a `Vector{T}`. If `f` returns a tuple or other iterable,
+`getpaduapoints` returns a `Matrix{T}` where the i-th column represents the i-th
 entry in `f` applied to all the Padua points.
 
 # Examples
 ```jldoctest
 julia> getpaduapoints(2)
-([1.0, 1.0, 0.0, 0.0, -1.0, -1.0], [1.0, -0.4999999999999999, 0.5, -1.0, 1.0, -0.4999999999999999])
+6×2 Matrix{Float64}:
+  1.0   1.0
+  1.0  -0.5
+  0.0   0.5
+  0.0  -1.0
+ -1.0   1.0
+ -1.0  -0.5
 
 julia> getpaduapoints(Float32, 1)
-(Float32[1.0, 1.0, -1.0], Float32[1.0, -1.0, 0.0])
+3×2 Matrix{Float32}:
+  1.0   1.0
+  1.0  -1.0
+ -1.0   0.0
 
 julia> getpaduapoints(Float32, 2) do x, y; x*y; end
 6-element Vector{Float32}:
@@ -170,7 +179,14 @@ julia> getpaduapoints(Float32, 2) do x, y; x*y; end
   0.50000006
 
 julia> getpaduapoints(2) do x, y; x*y, 5*x*y; end
-([1.0, -0.4999999999999999, 0.0, -0.0, -1.0, 0.4999999999999999], [5.0, -2.4999999999999996, 0.0, -0.0, -5.0, 2.4999999999999996])
+6×2 Matrix{Float64}:
+  1.0   5.0
+ -0.5  -2.5
+  0.0   0.0
+ -0.0  -0.0
+ -1.0  -5.0
+  0.5   2.5
+
 ```
 """
 function getpaduapoints(f::Function, ::Type{T}, n) where T
@@ -446,16 +462,16 @@ obtain coefficients of Chebyshev polynomials on 2D via the Padua transform, give
 `vals` evaluated at the Padua points. Coefficients will be written into `coeffs`, which
 should either be a matrix, a vector or an iterable of either.
 
-If an iterable of `vals` vectors and a corresponding iterable of `coeffs` matrixes or
-vectors is given, each `vals` vector will be transformed seperately in a multidimensional
+If a matrix of `vals` and a corresponding iterable of `coeffs` matrixes or
+vectors is given, each `vals` column will be transformed seperately in a multidimensional
 Padua transform.
 
 `lex` determines the order in which coefficients are written into `out` if `out` is a
 vector. See [`fromcoeffsmat!`](@ref) for details.
 
 !!! warning
-    if `coeffs` is a matrix, make sure that all entries in the lower right diagonal are zero as
-    these will not get overwritten.
+    if `coeffs` is a matrix, make sure that all entries in the lower right diagonal are zero
+    as these will not get overwritten.
 
 # Examples
 ```jldoctest
@@ -465,15 +481,21 @@ julia> f(x, y) = 3 + 4x + 5 * x*y, 6 + 7y
 f (generic function with 1 method)
 
 julia> vals = getpaduapoints(f, 2)
-([12.0, 4.5, 3.0, 3.0, -6.0, 1.4999999999999996], [13.0, 2.500000000000001, 9.5, -1.0, 13.0, 2.500000000000001])
+6×2 Matrix{Float64}:
+ 12.0  13.0
+  4.5   2.5
+  3.0   9.5
+  3.0  -1.0
+ -6.0  13.0
+  1.5   2.5
 
-julia> paduatransform!(zeros(3, 3), plan, vals[1])
+julia> paduatransform!(zeros(3, 3), plan, vals[:, 1])
 3×3 Matrix{Float64}:
  3.0  4.0  0.0
  0.0  5.0  0.0
  0.0  0.0  0.0
 
-julia> paduatransform!(zeros(6), plan, vals[2], Val(true))
+julia> paduatransform!(zeros(6), plan, vals[:, 2], Val(true))
 6-element Vector{Float64}:
  6.0
  0.0
@@ -651,8 +673,8 @@ evaluates the polynomial defined by the coefficients of Chebyshev polynomials `c
 the Padua points using the inverse transform plan `IP` and writes the resulting values into
 `vals`.
 
-If an iterable of `vals` vectors and a corresponding iterable of `coeffs` matrixes is given,
-each `coeffs` matrix will be transformed seperately.
+If a `vals` matrix and a corresponding iterable of `coeffs` matrixes is given,
+each `coeffs` matrix will be transformed seperately into a column in `vals`.
 
 # Examples
 ```jldoctest

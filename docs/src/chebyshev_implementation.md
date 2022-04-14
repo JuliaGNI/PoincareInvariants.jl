@@ -1,6 +1,6 @@
 # Chebyshev Implementation
 
-Here, I describe how the second Poincaré invariant is calculated using the `ChebyshevPlan`.
+Here, I describe how the second Poincaré invariant is calculated using the `SecondChebyshevPlan`.
 The code for the `compute!` function in this implementation looks something like:
 
 ```Julia
