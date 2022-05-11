@@ -35,6 +35,8 @@ abstract type AbstractPoincareInvariant{T, D} end
 # the elements of the AbstractVector{AbstractVector} are points
 const PointCollection{T} = Union{AbstractMatrix{T}, AbstractVector{AbstractVector{T}}}
 
+checkpoints(T::Type) = @argcheck T <: PointCollection "Points must be a matrix or vector of vectors"
+
 writepoints!(pinv::AbstractPoincareInvariant, points::AbstractMatrix) = (pinv.points .= points)
 function writepoints!(pinv::AbstractPoincareInvariant, points::AbstractVector{AbstractVector})
     for i in 1:length(points)
@@ -59,9 +61,21 @@ function compute!(
     compute!(pinv, t, p)
 end
 
-function compute!(pinv::AbstractPoincareInvariant, data, times, p)
-    @argcheck eltype(data) <: PointCollection
+function compute!(pinv::AbstractPoincareInvariant, data, times::AbstractVector, p)
+    _compute_iter(pinv, data, times, p, Base.IteratorEltype(data))
+end
+
+function _compute_iter(pinv, data, times, p, ::Base.HasEltype)
+    checkpoints(eltype(data))
     map(enumerate(data)) do (i, points)
+        writepoints!(pinv, points)
+        compute!(pinv, times[i], p)
+    end
+end
+
+function _compute_iter(pinv, data, times, p, ::Base.EltypeUnknown)
+    map(enumerate(data)) do (i, points)
+        checkpoints(typeof(points))
         writepoints!(pinv, points)
         compute!(pinv, times[i], p)
     end
