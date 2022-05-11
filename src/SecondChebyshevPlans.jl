@@ -95,7 +95,7 @@ end
 
 function getintegrand!(
     intcoeffs::AbstractMatrix, plan::CallIntPlan{T, D}, ω::ωT,
-    phasepoints, t, p, ∂xcoeffs, ∂ycoeffs
+    points, t, p, ∂xcoeffs, ∂ycoeffs
 ) where {T, D, ωT}
     invpaduatransform!(plan.∂xvals, plan.invpaduaplan, ∂xcoeffs)
     invpaduatransform!(plan.∂yvals, plan.invpaduaplan, ∂ycoeffs)
@@ -105,7 +105,7 @@ function getintegrand!(
         if ωT <: AbstractMatrix
             ωi = ω
         else
-            pnti = view(phasepoints, i, :)
+            pnti = view(points, i, :)
             ωi = ω(pnti, t, p)
         end
 
@@ -154,17 +154,18 @@ function SecondChebyshevPlan{T, D}(ω, N::Integer) where {T, D}
 end
 
 function compute!(
-    pinv::SecondPoincareInvariant{<:Any, <:Any, <:Any, <:Any, P}, phasepoints, t, p
+    pinv::SecondPoincareInvariant{<:Any, <:Any, <:Any, <:Any, P}, t, p
 ) where P <: SecondChebyshevPlan
     plan = pinv.plan
-    paduatransform!(plan.phasecoeffs, plan.paduaplan, phasepoints)
+    points = pinv.points
+    paduatransform!(plan.phasecoeffs, plan.paduaplan, points)
     differentiate!(plan.∂x, plan.∂y, plan.diffplan, plan.phasecoeffs)
-    getintegrand!(plan.intcoeffs, plan.intplan, pinv.ω, phasepoints, t, p, plan.∂x, plan.∂y)
+    getintegrand!(plan.intcoeffs, plan.intplan, pinv.ω, points, t, p, plan.∂x, plan.∂y)
     integrate(plan.intcoeffs, plan.intweights)
 end
 
-# function _compute!(plan::SecondChebyshevPlan, ω::AbstractMatrix, D, phasepoints)
-#     paduatransform!(plan.phasecoeffs, plan.paduaplan, phasepoints)
+# function _compute!(plan::SecondChebyshevPlan, ω::AbstractMatrix, D, points)
+#     paduatransform!(plan.phasecoeffs, plan.paduaplan, points)
 #     differentiate!(plan.∂x, plan.∂y, plan.diffplan, plan.phasecoeffs)
 #     getintegrand!(plan.intcoeffs, plan.intplan, ω, plan.∂x, plan.∂y)
 #     integrate(plan.intcoeffs, plan.intplan)

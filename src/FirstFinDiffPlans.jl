@@ -12,9 +12,9 @@ struct FirstFinDiffPlan{T, D} end
 FirstFinDiffPlan{T, D}(θ, N) where {T, D} = FirstFinDiffPlan{T, D}()
 
 function compute!(
-    pinv::FirstPoincareInvariant{T, D, <:Any, <:FirstFinDiffPlan}, zs, t, p
+    pinv::FirstPoincareInvariant{T, D, <:Any, <:FirstFinDiffPlan}, t, p
 ) where {T, D}
-
+    zs = pinv.points
     N = getpointnum(pinv)
     θ = getform(pinv)
     I = zero(T)
