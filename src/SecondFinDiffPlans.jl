@@ -14,17 +14,19 @@ function SecondFinDiffPlan{T, D}(ω, ps::NTuple{2, Int}) where {T, D}
 end
 
 function compute!(
-    pinv::SecondPoincareInvariant{T, D, ωT, <:Any, P}, vals, t, p
+    pinv::SecondPoincareInvariant{T, D, ωT, <:Any, P}, t, p
 ) where {T, D, ωT, P <: SecondFinDiffPlan}
     nx, ny = pinv.pointspec
-    @argcheck size(vals) == (nx * ny, D) "Expected points mtarix to have size $((nx * ny, D))"
+    points = pinv.points
+
+    @argcheck size(points) == (nx * ny, D) "Expected points mtarix to have size $((nx * ny, D))"
 
     I = zero(T)
 
     ∂xi = Vector{T}(undef, D)
     ∂yi = Vector{T}(undef, D)
 
-    colviews = [view(vals, :, d) for d in 1:D]
+    colviews = [view(points, :, d) for d in 1:D]
 
     i = 1
     for ix in 1:nx
@@ -37,7 +39,7 @@ function compute!(
             if ωT <: AbstractMatrix
                 ωi = pinv.ω
             else
-                pnti = view(vals, i, :)
+                pnti = view(points, i, :)
                 ωi = pinv.ω(pnti, t, p)
             end
 

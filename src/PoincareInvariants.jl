@@ -17,6 +17,10 @@ export SecondChebyshevPlan, SecondFinDiffPlan
 
 export canonical_one_form, CanonicalSymplecticMatrix, canonical_two_form
 
+include("utils.jl")
+
+## AbstractPoincareInvariant ##
+
 """
     AbstractPoincareInvariant{T, D}
 
@@ -25,12 +29,84 @@ T for calculations.
 """
 abstract type AbstractPoincareInvariant{T, D} end
 
+# these types will be accepted as a point cloud representing an area or line
+# Any other type will get fed to a PoincareInvariantIter constructor
+# The rows of an AbstractMatrix are points and
+# the elements of the AbstractVector{AbstractVector} are points
+const PointCollection{T} = Union{AbstractMatrix{T}, AbstractVector{AbstractVector{T}}}
+
+checkpoints(T::Type) = @argcheck T <: PointCollection "Points must be a matrix or vector of vectors"
+
+writepoints!(pinv::AbstractPoincareInvariant, points::AbstractMatrix) = (pinv.points .= points)
+function writepoints!(pinv::AbstractPoincareInvariant, points::AbstractVector{AbstractVector})
+    for i in 1:length(points)
+        pinv.points[:, i] .= points[i]
+    end
+end
+
 """
     compute!(pinv::AbstractPoincareInvariant, args...)
 
 computes a Poincaré invariant.
+
+implementations should define a method `compute!(pinv, t, p)`, which acts on the internal
+points storage.
 """
-function compute! end
+function compute!(
+    pinv::AbstractPoincareInvariant,
+    points::PointCollection,
+    t::Real, p
+)
+    writepoints!(pinv, points)
+    compute!(pinv, t, p)
+end
+
+function compute!(pinv::AbstractPoincareInvariant, data, times::AbstractVector, p)
+    _compute_iter(pinv, data, times, p, Base.IteratorEltype(data))
+end
+
+function _compute_iter(pinv, data, times, p, ::Base.HasEltype)
+    checkpoints(eltype(data))
+    map(enumerate(data)) do (i, points)
+        writepoints!(pinv, points)
+        compute!(pinv, times[i], p)
+    end
+end
+
+function _compute_iter(pinv, data, times, p, ::Base.EltypeUnknown)
+    map(enumerate(data)) do (i, points)
+        checkpoints(typeof(points))
+        writepoints!(pinv, points)
+        compute!(pinv, times[i], p)
+    end
+end
+
+#=
+function compute!(picache::ThreadCache{<:AbstractPoincareInvariant{T}}, data, ts, p) where T
+    n = datalength(data)
+    lk = ReentrantLock()
+
+    out = Vector{T}(undef, n)
+    @threads for i in 1:n
+        # each thread gets one pinv
+        pinv = picache[Threads.threadid()]
+
+        # lock in case data has mutable state
+        lock(_ -> writepoints!(pinv, data, i), lk)
+
+        out[i] = compute!(pinv, ts[i], p)
+    end
+
+    out
+end
+
+function compute!(pinv::AbstractPoincareInvariant, data, t, p)
+    iter = PoincareInvariantIter(pinv, pointsiter, args...)
+    map(iter) do (points, t, p)
+        compute!(pinv, points, t, p)
+    end
+end
+=#
 
 """
     getplan(pinv::AbstractPoincareInvariant)
@@ -80,9 +156,8 @@ get invariant one- or two-form.
 function getform end
 
 
-## Utils ##
+## Canonical Forms ##
 
-include("utils.jl")
 include("CanonicalSymplecticForms.jl")
 
 using .CanonicalSymplecticForms: canonical_one_form, CanonicalSymplecticMatrix,
@@ -95,18 +170,21 @@ struct FirstPoincareInvariant{T, D, θT, P} <: AbstractPoincareInvariant{T, D}
     θ::θT
     N::Int
     plan::P
+    points::Matrix{T}
+end
+
+function FirstPoincareInvariant{T, D}(θ::θT, N::Integer, plan::P) where {T, D, θT, P}
+    n = getpointspec(N, P) |> getpointnum
+    points = Matrix{T}(undef, n, D)
+    FirstPoincareInvariant{T, D, θT, P}(θ, n, plan, points)
 end
 
 function FirstPoincareInvariant{T, D}(
     θ::θT, N::Integer, P::Type=DEFAULT_FIRST_PLAN
 ) where {T, D, θT}
-    ps = getpointspec(N, P)
-    plan = P{T, D}(θ, N)
-    FirstPoincareInvariant{T, D, θT, typeof(plan)}(θ, ps, plan)
+    plan = P{T, D}(θ, getpointspec(N, P))
+    FirstPoincareInvariant{T, D}(θ, N, plan)
 end
-
-FirstPoincareInvariant{T, D}(θ::θT, N::Integer, plan::P) where {T, D, θT, P} =
-    FirstPoincareInvariant{T, D, θT, P}(θ, N, plan)
 
 function FirstPoincareInvariant{T, D, typeof(canonical_one_form)}(
     N, P=DEFAULT_FIRST_PLAN
@@ -147,22 +225,24 @@ struct SecondPoincareInvariant{
     ω::ωT  # symplectic matrix or function returning one
     pointspec::PS  # specifies how many points
     plan::P  # plan for chebyshev transform, differentiation, etc...
+    points::Matrix{T}
+end
+
+function SecondPoincareInvariant{T, D}(ω::ωT, N, plan::P) where {T, D, ωT, P}
+    ps = getpointspec(N, P)
+    points = Matrix{T}(undef, getpointnum(ps), D)
+    SecondPoincareInvariant{T, D, ωT, typeof(ps), P}(ω, ps, plan, points)
 end
 
 function SecondPoincareInvariant{T, D}(
-    ω::ωT, N, P::Type=DEFAULT_SECOND_PLAN
-) where {T, D, ωT}
-    ps = getpointspec(N, P)
-    plan = P{T, D}(ω, ps)
-    SecondPoincareInvariant{T, D, ωT, typeof(ps), typeof(plan)}(ω, ps, plan)
-end
-
-function SecondPoincareInvariant{T, D}(ω::ωT, ps::PS, plan::P) where {T, D, ωT, PS, P}
-    SecondPoincareInvariant{T, D, ωT, PS, P}(ω, ps, plan)
+    ω, N, P::Type=DEFAULT_SECOND_PLAN
+) where {T, D}
+    plan = P{T, D}(ω, getpointspec(N, P))
+    SecondPoincareInvariant{T, D}(ω, N, plan)
 end
 
 function SecondPoincareInvariant{T, D, CanonicalSymplecticMatrix{T}}(
-    N, P=DEFAULT_SECOND_PLAN
+    N, P::Type=DEFAULT_SECOND_PLAN
 ) where {T, D}
     ω = CanonicalSymplecticMatrix{T}(D)
     SecondPoincareInvariant{T, D}(ω, N, P)
@@ -181,7 +261,7 @@ getpoints(pinv::SecondPoincareInvariant) = getpoints((x, y) -> (x, y), pinv)
 
 getpointspec(pinv::SecondPoincareInvariant) = pinv.pointspec
 
-## Implementations
+# Implementations
 
 include("SecondChebyshevPlans.jl")
 include("SecondFinDiffPlans.jl")

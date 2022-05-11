@@ -10,6 +10,6 @@ using SafeTestsets, Test
     @safetestset "SecondFinDiffPlans" begin include("test_SecondFinDiffPlans.jl") end
 end
 
-@safetestset "PoincareInvariants Function Tests" begin
+@safetestset "PoincareInvariants" begin
     include("test_PoincareInvariants.jl")
 end

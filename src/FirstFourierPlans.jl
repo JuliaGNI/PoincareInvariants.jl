@@ -31,9 +31,10 @@ function FirstFourierPlan{T, D}(θ, N) where {T, D}
 end
 
 function compute!(
-    pinv::FirstPoincareInvariant{T, D, <:Any, <:FirstFourierPlan}, zs, t, p
+    pinv::FirstPoincareInvariant{T, D, <:Any, <:FirstFourierPlan}, t, p
 ) where {T, D}
 
+    zs = pinv.points
     N = getpointnum(pinv)
     plan = getplan(pinv)
 

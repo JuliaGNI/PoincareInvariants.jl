@@ -16,6 +16,8 @@
         end
         @test pnts isa Matrix{Float64}
         @test size(pnts) == (getpointnum(pinv), D)
+
+        @test size(getpoints(pinv)::Vector{Float64}) == (getpointnum(pinv),)
     end
 
     @safetestset "SecondPoincareInvariant" begin
@@ -35,6 +37,8 @@
         end
         @test pnts isa Matrix{Float64}
         @test size(pnts) == (getpointnum(pinv), D)
+
+        @test size(getpoints(pinv)::Matrix{Float64}) == (getpointnum(pinv), 2)
     end
 end
 
@@ -218,6 +222,47 @@ end
     end
 end
 
+@safetestset "Iterable of Points" begin
+    using PoincareInvariants
+
+    D = 4
+    N = 398
+    Nsteps = 13
+    times = [2.0 + n * 0.15 for n in 0:Nsteps-1]
+
+    f1(z, t, p) = canonical_one_form(z, t, p) .* t
+    pi1 = FirstPI{Float64, D}(f1, N)
+
+    f2(z, t, p) = canonical_two_form(z, t, p) .* t
+    pi2 = SecondPI{Float64, D}(f2, N)
+
+    p1(θ) = (cospi(2θ), cospi(2θ), sinpi(2θ), sinpi(2θ))
+    p2(x, y) = (x, x, y, y)
+
+    testIs1 = [-2π * t for t in times]
+    testIs2 = [2 * t for t in times]
+
+    let data = [getpoints(p1, pi1) for t in times]
+        Is = compute!(pi1, data, times, nothing)
+        @test testIs1 ≈ Is atol=1e-13
+    end
+
+    let data = [getpoints(p2, pi2) for t in times]
+        Is = compute!(pi2, data, times, nothing)
+        @test testIs2 ≈ Is atol=1e-13
+    end
+
+    let data = (getpoints(p1, pi1) for t in times)
+        Is = compute!(pi1, data, times, nothing)
+        @test testIs1 ≈ Is atol=1e-13
+    end
+
+    let data = (getpoints(p2, pi2) for t in times)
+        Is = compute!(pi2, data, times, nothing)
+        @test testIs2 ≈ Is atol=1e-13
+    end
+end
+
 @safetestset "Linear Symplectic Maps" begin
     @safetestset "In 2D" begin
         using PoincareInvariants
@@ -397,4 +442,41 @@ end
 
     g3(x, y) = init2(x, y) |> f |> f |> f
     # neither of the two methods manage this
+end
+
+@safetestset "Pendulum" begin
+    using PoincareInvariants
+
+    # m, g, L = 1
+    function update(points::AbstractMatrix, dt)
+        out = copy(points)
+        for pnt in eachrow(out)
+            pnt[1] += dt * pnt[2]
+            pnt[2] -= dt * sin(pnt[1])
+        end
+        out
+    end
+
+    integrate(initial::AbstractMatrix, dt, n) = accumulate(1:n, init=initial) do points, _
+        update(points, dt)
+    end
+
+    init1(θ) = 2 .* sincospi(2θ)
+    I1 = 4π
+
+    init2(x, y) = (π * x - π/2, 4 * y - 2)
+    I2 = 4π
+
+    pi1 = CanonicalFirstPI{Float64, 2}(1_000)
+    pi2 = CanonicalSecondPI{Float64, 2}(1_00)
+
+    dt = 0.05
+    tmax = 2
+    times = 0:dt:tmax
+
+    data1 = integrate(getpoints(init1, pi1), dt, length(times))
+    data2 = integrate(getpoints(init2, pi2), dt, length(times))
+
+    @test maximum(abs, I1 .- compute!(pi1, data1, times, nothing)) < 1e-14
+    @test maximum(abs, I2 .- compute!(pi2, data2, times, nothing)) < 1e-3
 end
