@@ -1,1 +1,0 @@
-# First Poincaré Invariants

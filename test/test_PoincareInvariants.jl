@@ -90,6 +90,7 @@ end
             @test N ≤ getpointnum(pinv) ≤ 2N
 
             I = compute!(pinv, pnts, 0.1, nothing)
+            I == compute!(pinv, pnts, 0.1)
             @test I isa T
             @test π ≈ I atol=1e-4
         end
@@ -149,6 +150,7 @@ end
             @test N ≤ getpointnum(pinv) ≤ 2N
 
             I = compute!(pinv, pnts, 0.1, nothing)
+            I == compute!(pinv, pnts, 0.1)
             @test I isa T
             @test 1 ≈ I atol=50eps()
         end
@@ -239,28 +241,15 @@ end
     p1(θ) = (cospi(2θ), cospi(2θ), sinpi(2θ), sinpi(2θ))
     p2(x, y) = (x, x, y, y)
 
-    testIs1 = [-2π * t for t in times]
-    testIs2 = [2 * t for t in times]
-
-    let data = [getpoints(p1, pi1) for t in times]
-        Is = compute!(pi1, data, times, nothing)
-        @test testIs1 ≈ Is atol=1e-13
+    data1 = map(eachrow(getpoints(p1, pi1))) do row
+        fill(ntuple(i -> row[i], Val(D)), length(times))
+    end
+    data2 = map(eachrow(getpoints(p2, pi2))) do row
+        fill(ntuple(i -> row[i], Val(D)), length(times))
     end
 
-    let data = [getpoints(p2, pi2) for t in times]
-        Is = compute!(pi2, data, times, nothing)
-        @test testIs2 ≈ Is atol=1e-13
-    end
-
-    let data = (getpoints(p1, pi1) for t in times)
-        Is = compute!(pi1, data, times, nothing)
-        @test testIs1 ≈ Is atol=1e-13
-    end
-
-    let data = (getpoints(p2, pi2) for t in times)
-        Is = compute!(pi2, data, times, nothing)
-        @test testIs2 ≈ Is atol=1e-13
-    end
+    @test [-2π * t for t in times] ≈ compute!(pi1, data1, times) atol=1e-13
+    @test [2 * t for t in times] ≈ compute!(pi2, data2, times, nothing) atol=1e-13
 end
 
 @safetestset "Linear Symplectic Maps" begin
@@ -284,11 +273,11 @@ end
         # half circle with radius one
         f2(r, θ) = A * B * [r*cospi(θ), r*sinpi(θ)]
 
-        @test -π ≈ compute!(diffpi1, getpoints(f1, diffpi1), 0, nothing) atol=5e-5
-        @test -π ≈ compute!(freqpi1, getpoints(f1, freqpi1), 0, nothing) atol=10eps()
+        @test -π ≈ compute!(diffpi1, getpoints(f1, diffpi1)) atol=5e-5
+        @test -π ≈ compute!(freqpi1, getpoints(f1, freqpi1)) atol=10eps()
 
-        @test π/2 ≈ compute!(chebpi2, getpoints(f2, chebpi2), 0, nothing) atol=10eps()
-        @test π/2 ≈ compute!(diffpi2, getpoints(f2, diffpi2), 0, nothing) atol=5e-3
+        @test π/2 ≈ compute!(chebpi2, getpoints(f2, chebpi2)) atol=10eps()
+        @test π/2 ≈ compute!(diffpi2, getpoints(f2, diffpi2)) atol=5e-3
     end
 
     @safetestset "In 8D" begin
@@ -329,11 +318,11 @@ end
         # half circle with radius one and negative orientation
         f2(r, θ) = A * B * C * [0, r*cospi(θ), 0, 0, 0, -r*sinpi(θ), 0, 0]
 
-        @test π/2 ≈ compute!(diffpi1, getpoints(f1, diffpi1), 0, nothing) atol=1e-2
-        @test π/2 ≈ compute!(freqpi1, getpoints(f1, freqpi1), 0, nothing) atol=5e-3
+        @test π/2 ≈ compute!(diffpi1, getpoints(f1, diffpi1)) atol=1e-2
+        @test π/2 ≈ compute!(freqpi1, getpoints(f1, freqpi1)) atol=5e-3
 
-        @test -π/2 ≈ compute!(chebpi2, getpoints(f2, chebpi2), 0, nothing) atol=10eps()
-        @test -π/2 ≈ compute!(diffpi2, getpoints(f2, diffpi2), 0, nothing) atol=5e-3
+        @test -π/2 ≈ compute!(chebpi2, getpoints(f2, chebpi2)) atol=10eps()
+        @test -π/2 ≈ compute!(diffpi2, getpoints(f2, diffpi2)) atol=5e-3
     end
 end
 
@@ -369,26 +358,26 @@ end
     diffpi2 = CanonicalSecondPI{Float64, 4}(1_000, SecondFinDiffPlan)
 
     f1(x) = init1(x) |> f
-    @test I1 ≈ compute!(diffpi1, getpoints(f1, diffpi1), 0, nothing) atol=5e-5
-    @test I1 ≈ compute!(freqpi1, getpoints(f1, freqpi1), 0, nothing) atol=5e-15
+    @test I1 ≈ compute!(diffpi1, getpoints(f1, diffpi1)) atol=5e-5
+    @test I1 ≈ compute!(freqpi1, getpoints(f1, freqpi1)) atol=5e-15
 
     g1(x, y) = init2(x, y) |> f
-    @test I2 ≈ compute!(chebpi2, getpoints(g1, chebpi2), 0, nothing) atol=1e-14
-    @test I2 ≈ compute!(diffpi2, getpoints(g1, diffpi2), 0, nothing) atol=5e-13
+    @test I2 ≈ compute!(chebpi2, getpoints(g1, chebpi2)) atol=1e-14
+    @test I2 ≈ compute!(diffpi2, getpoints(g1, diffpi2)) atol=5e-13
 
     f2(x) = init1(x) |> f |> f
-    @test I1 ≈ compute!(diffpi1, getpoints(f2, diffpi1), 0, nothing) atol=5e-5
-    @test I1 ≈ compute!(freqpi1, getpoints(f2, freqpi1), 0, nothing) atol=1e-13
+    @test I1 ≈ compute!(diffpi1, getpoints(f2, diffpi1)) atol=5e-5
+    @test I1 ≈ compute!(freqpi1, getpoints(f2, freqpi1)) atol=1e-13
 
     g2(x, y) = init2(x, y) |> f |> f
-    @test I2 ≈ compute!(chebpi2, getpoints(g2, chebpi2), 0, nothing) atol=1e-11
-    @test I2 ≈ compute!(diffpi2, getpoints(g2, diffpi2), 0, nothing) atol=5e-12
+    @test I2 ≈ compute!(chebpi2, getpoints(g2, chebpi2)) atol=1e-11
+    @test I2 ≈ compute!(diffpi2, getpoints(g2, diffpi2)) atol=5e-12
 
     f3(x) = init1(x) |> f |> f |> f
-    @test I1 ≈ compute!(freqpi1, getpoints(f3, freqpi1), 0, nothing) atol=1e-7
+    @test I1 ≈ compute!(freqpi1, getpoints(f3, freqpi1)) atol=1e-7
 
     g3(x, y) = init2(x, y) |> f |> f |> f
-    @test I2 ≈ compute!(chebpi2, getpoints(g3, chebpi2), 0, nothing) atol=5e-6
+    @test I2 ≈ compute!(chebpi2, getpoints(g3, chebpi2)) atol=5e-6
 end
 
 @safetestset "Wavy Map" begin
@@ -421,62 +410,49 @@ end
     diffpi2 = CanonicalSecondPI{Float64, 6}(1_000, SecondFinDiffPlan)
 
     f1(x) = init1(x) |> f
-    @test I1 ≈ compute!(diffpi1, getpoints(f1, diffpi1), 0, nothing) atol=5e-5
-    @test I1 ≈ compute!(freqpi1, getpoints(f1, freqpi1), 0, nothing) atol=1e-15
+    @test I1 ≈ compute!(diffpi1, getpoints(f1, diffpi1)) atol=5e-5
+    @test I1 ≈ compute!(freqpi1, getpoints(f1, freqpi1)) atol=1e-15
 
     g1(x, y) = init2(x, y) |> f
-    @test I2 ≈ compute!(chebpi2, getpoints(g1, chebpi2), 0, nothing) atol=1e-14
-    @test I2 ≈ compute!(diffpi2, getpoints(g1, diffpi2), 0, nothing) atol=5e-15
+    @test I2 ≈ compute!(chebpi2, getpoints(g1, chebpi2)) atol=1e-14
+    @test I2 ≈ compute!(diffpi2, getpoints(g1, diffpi2)) atol=5e-15
 
     f2(x) = init1(x) |> f |> f
-    @test I1 ≈ compute!(diffpi1, getpoints(f2, diffpi1), 0, nothing) atol=1e-3
-    @test I1 ≈ compute!(freqpi1, getpoints(f2, freqpi1), 0, nothing) atol=5e-14
+    @test I1 ≈ compute!(diffpi1, getpoints(f2, diffpi1)) atol=1e-3
+    @test I1 ≈ compute!(freqpi1, getpoints(f2, freqpi1)) atol=5e-14
 
     g2(x, y) = init2(x, y) |> f |> f
-    @test I2 ≈ compute!(chebpi2, getpoints(g2, chebpi2), 0, nothing) atol=5e-3
-    @test I2 ≈ compute!(diffpi2, getpoints(g2, diffpi2), 0, nothing) atol=1e-3
+    @test I2 ≈ compute!(chebpi2, getpoints(g2, chebpi2)) atol=5e-3
+    @test I2 ≈ compute!(diffpi2, getpoints(g2, diffpi2)) atol=1e-3
 
     f3(x) = init1(x) |> f |> f |> f
-    @test I1 ≈ compute!(diffpi1, getpoints(f3, diffpi1), 0, nothing) atol=5e-2
-    @test I1 ≈ compute!(freqpi1, getpoints(f3, freqpi1), 0, nothing) atol=1e-13
+    @test I1 ≈ compute!(diffpi1, getpoints(f3, diffpi1)) atol=5e-2
+    @test I1 ≈ compute!(freqpi1, getpoints(f3, freqpi1)) atol=1e-13
 
     g3(x, y) = init2(x, y) |> f |> f |> f
     # neither of the two methods manage this
 end
 
 @safetestset "Pendulum" begin
+    using OrdinaryDiffEq
+    using RecursiveArrayTools: ArrayPartition
     using PoincareInvariants
 
-    # m, g, L = 1
-    function update(points::AbstractMatrix, dt)
-        out = copy(points)
-        for pnt in eachrow(out)
-            pnt[1] += dt * pnt[2]
-            pnt[2] -= dt * sin(pnt[1])
-        end
-        out
-    end
+    # ArrayPartition is a pain to work with!
+    prob = SecondOrderODEProblem((p, θ, params, t) -> [-sin(θ[1])], 0.0, 0.0, (0.0, 2.0))
+    dt = 0.1
+    pf(prob, i, repeat) = remake(prob; u0 = ArrayPartition((prob.u0[1:1], prob.u0[2:2])))
 
-    integrate(initial::AbstractMatrix, dt, n) = accumulate(1:n, init=initial) do points, _
-        update(points, dt)
-    end
-
-    init1(θ) = 2 .* sincospi(2θ)
-    I1 = 4π
-
-    init2(x, y) = (π * x - π/2, 4 * y - 2)
-    I2 = 4π
-
+    I1 = 3π
     pi1 = CanonicalFirstPI{Float64, 2}(1_000)
-    pi2 = CanonicalSecondPI{Float64, 2}(1_00)
+    prob1 = PIEnsembleProblem(ϕ -> (sinpi(2ϕ), 3 * cospi(2ϕ)), prob, pi1; prob_func=pf)
+    sol1 = solve(prob1, SymplecticEuler(), EnsembleSerial(); adaptive=false, dt=dt)
 
-    dt = 0.05
-    tmax = 2
-    times = 0:dt:tmax
+    I2 = 16
+    pi2 = CanonicalSecondPI{Float64, 2}(1_000)
+    prob2 = PIEnsembleProblem((x, y) -> 4 .* (x, y) .- 2, prob, pi2; prob_func=pf)
+    sol2 = solve(prob2, SymplecticEuler(), EnsembleSerial(); adaptive=false, dt=dt)
 
-    data1 = integrate(getpoints(init1, pi1), dt, length(times))
-    data2 = integrate(getpoints(init2, pi2), dt, length(times))
-
-    @test maximum(abs, I1 .- compute!(pi1, data1, times, nothing)) < 1e-14
-    @test maximum(abs, I2 .- compute!(pi2, data2, times, nothing)) < 1e-3
+    @test maximum(abs, I1 .- compute!(pi1, sol1)) < 1e-14
+    @test maximum(abs, I2 .- compute!(pi2, sol2)) < 1e-10
 end

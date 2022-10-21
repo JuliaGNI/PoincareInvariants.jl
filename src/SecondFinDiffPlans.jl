@@ -14,7 +14,7 @@ function SecondFinDiffPlan{T, D}(ω, ps::NTuple{2, Int}) where {T, D}
 end
 
 function compute!(
-    pinv::SecondPoincareInvariant{T, D, ωT, <:Any, P}, t, p
+    pinv::SecondPoincareInvariant{T, D, ωT, <:Any, P}, t::Real, p
 ) where {T, D, ωT, P <: SecondFinDiffPlan}
     nx, ny = pinv.pointspec
     points = pinv.points

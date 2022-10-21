@@ -12,8 +12,7 @@ using ..PoincareInvariants: SecondPoincareInvariant, @argcheck
 
 using LinearAlgebra
 
-include("PaduaTransforms.jl")
-using .PaduaTransforms
+using ChebyshevTransforms
 
 ## Differentiation ##
 
@@ -154,7 +153,7 @@ function SecondChebyshevPlan{T, D}(ω, N::Integer) where {T, D}
 end
 
 function compute!(
-    pinv::SecondPoincareInvariant{<:Any, <:Any, <:Any, <:Any, P}, t, p
+    pinv::SecondPoincareInvariant{<:Any, <:Any, <:Any, <:Any, P}, t::Real, p
 ) where P <: SecondChebyshevPlan
     plan = pinv.plan
     points = pinv.points
