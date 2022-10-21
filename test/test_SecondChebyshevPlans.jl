@@ -1,5 +1,3 @@
-@safetestset "PaduaTransforms" begin include("test_PaduaTransforms.jl") end
-
 using PoincareInvariants.SecondChebyshevPlans
 
 @safetestset "Differentiation" begin
@@ -69,7 +67,7 @@ end
 end
 
 @safetestset "getintegrand! with CallIntPlan" begin
-    using ..SecondChebyshevPlans.PaduaTransforms
+    using ChebyshevTransforms
     using ..SecondChebyshevPlans: DiffPlan, differentiate!, CallIntPlan, getintegrand!
     using PoincareInvariants
 
@@ -142,7 +140,7 @@ end
 end
 
 @safetestset "compute! with SecondChebyshevPlan (OOP)" begin
-    using ..SecondChebyshevPlans.PaduaTransforms
+    using ChebyshevTransforms
     using ..SecondChebyshevPlans: SecondChebyshevPlan, compute!, DiffPlan
     using PoincareInvariants
 
@@ -187,7 +185,7 @@ end
 end
 
 @safetestset "getpoints, getpointspec and getpointnum" begin
-    using ..SecondChebyshevPlans.PaduaTransforms
+    using ChebyshevTransforms
     using ..SecondChebyshevPlans: SecondChebyshevPlan, getpointspec, getpoints
 
     for N in [10, 321, 2178], T in [Float32, Float64]
