@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Charged Particle · PoincareInvariants.jl</title><meta name="title" content="Charged Particle · PoincareInvariants.jl"/><meta property="og:title" content="Charged Particle · PoincareInvariants.jl"/><meta property="twitter:title" content="Charged Particle · PoincareInvariants.jl"/><meta name="description" content="Documentation for PoincareInvariants.jl."/><meta property="og:description" content="Documentation for PoincareInvariants.jl."/><meta property="twitter:description" content="Documentation for PoincareInvariants.jl."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">PoincareInvariants.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><a class="tocitem" href="../../theory/">Theory</a></li><li><span class="tocitem">Guides</span><ul><li><a class="tocitem" href="../pendulum/">Pendulum</a></li><li class="is-active"><a class="tocitem" href>Charged Particle</a><ul class="internal"><li><a class="tocitem" href="#Integration"><span>Integration</span></a></li><li><a class="tocitem" href="#Computing-the-Invariants"><span>Computing the Invariants</span></a></li></ul></li><li><a class="tocitem" href="../diffeq/">DifferentialEquations.jl</a></li><li><a class="tocitem" href="../plans/">Plans</a></li></ul></li><li><a class="tocitem" href="../../reference/">Reference</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Guides</a></li><li class="is-active"><a href>Charged Particle</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Charged Particle</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/JuliaGNI/PoincareInvariants.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/JuliaGNI/PoincareInvariants.jl/blob/main/docs/src/guides/charged_particle.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Charged-Particle"><a class="docs-heading-anchor" href="#Charged-Particle">Charged Particle</a><a id="Charged-Particle-1"></a><a class="docs-heading-anchor-permalink" href="#Charged-Particle" title="Permalink"></a></h1><p>In the second part of the tutorial we will treat a non-canonical system and show how to <a href="../../reference/#PoincareInvariants.compute!"><code>compute!</code></a> Poincaré integral invariants for it. The system consists of a 2D charged particle subject to electromagnetic fields. The equations of motion are</p><p class="math-container">\[\dot{x} = v,\; \dot{v} = E(x) + v × B(x)\]</p><p>where <span>$x$</span> is the position vector, <span>$v$</span> is the velocity, <span>$E$</span> and <span>$B$</span> are the electric and magnetic field and the mass and charge of the particle is set to one. For our example we will use a constant magnetic field of strength <span>$10$</span> pointing in the z-direction and an electric field given by <span>$E(x, y) = (-x, -y^3)$</span>.</p><h2 id="Integration"><a class="docs-heading-anchor" href="#Integration">Integration</a><a id="Integration-1"></a><a class="docs-heading-anchor-permalink" href="#Integration" title="Permalink"></a></h2><p>Again, we&#39;ll quickly implement our own integrators here, namely the <a href="https://en.wikipedia.org/wiki/Runge–Kutta_methods#The_Runge–Kutta_method">Runge-Kutta method (RK4)</a> and a <a href="https://doi.org/10.1016/j.physleta.2016.12.031">second order symplectic splitting method for charged particles in electromagnetic fields</a>.</p><pre><code class="language-julia hljs">using PoincareInvariants
+using StaticArrays
+
+E(x, y) = (-x, -y^3)
+
+A(x, y) = 5 .* (-y, x)
+B(x, y) = 10.0
+Bx(x, y, Δx) = 10 * Δx  # integral in x direction from x to x + Δx
+By(x, y, Δy) = 10 * Δy  # integral in y direction from y to y + Δy
+
+struct Split2 end
+
+function ϕx((x, y, vx, vy), dt)
+    Δx = vx * dt
+    return (x + Δx, y, vx, vy - Bx(x, y, Δx))
+end
+
+function ϕy((x, y, vx, vy), dt)
+    Δy = vy * dt
+    return (x, y + Δy, vx + By(x, y, Δy), vy)
+end
+
+function ϕE((x, y, vx, vy), dt)
+    (Δvx, Δvy) = dt .* E(x, y)
+    return (x, y, vx + Δvx, vy + Δvy)
+end
+
+function timestep(z, dt, ::Split2)
+    hdt = 0.5 * dt
+    z = ϕx(z, hdt)
+    z = ϕy(z, hdt)
+    z = ϕE(z, dt)
+    z = ϕy(z, hdt)
+    z = ϕx(z, hdt)
+    return z
+end
+
+struct RK4 end
+
+function zdot((x, y, vx, vy))
+    ex, ey = E(x, y); b = B(x, y)
+    (vx, vy, ex + b * vy, ey - b * vx)
+end
+
+function timestep(z, dt, ::RK4)
+    hdt = 0.5 .* dt
+    k1 = zdot(z)
+    k2 = zdot(z .+ hdt .* k1)
+    k3 = zdot(z .+ hdt .* k2)
+    k4 = zdot(z .+  dt .* k3)
+    return z .+ dt .* (k1 .+ 2 .* k2 .+ 2 .* k3 .+ k4) .* (1/6)
+end
+
+&quot;&quot;&quot;
+    integrate(z0, dt, nsteps, nt, method)
+
+start at `z0` and integrate the equations of motion using `method`.
+Returns the timeseries as a vector of tuples. `nt` points are saved,
+`nsteps` steps are taken from saved point to saved point and `dt` is the
+size of each time step.
+&quot;&quot;&quot;
+function integrate(z0, dt, nsteps, nt, method)
+    out = Vector{NTuple{4, Float64}}(undef, nt)
+    z = out[1] = z0
+    for i in 2:nt
+        for _ in 1:nsteps
+            z = timestep(z, dt, method)
+        end
+        out[i] = z
+    end
+    return out
+end
+
+integrate(mat::AbstractMatrix, dt, nsteps, nt, method) = map(eachrow(mat)) do r
+    integrate((r[1], r[2], r[3], r[4]), dt, nsteps, nt, method)
+end</code></pre><h2 id="Computing-the-Invariants"><a class="docs-heading-anchor" href="#Computing-the-Invariants">Computing the Invariants</a><a id="Computing-the-Invariants-1"></a><a class="docs-heading-anchor-permalink" href="#Computing-the-Invariants" title="Permalink"></a></h2><p>Having gotten integration out of the way, we can move onto the invariants. For this system, the first invariant is given by</p><p class="math-container">\[I_{1} = \int_{\gamma} v(x) + A(x) \, dx\]</p><p>where <span>$A(x)$</span> is the magnetic vector potential as a function of the position vector <span>$x$</span>. The second invariant is given by</p><p class="math-container">\[I_{2} = \int_{S} \omega_{ij} (q) \, dz^{i} \, dz^{j}\]</p><p>with the two-form <span>$\omega$</span> given by</p><p class="math-container">\[\begin{pmatrix}
+ 0 &amp; B &amp; -1 &amp;  0 \\
+-B &amp; 0 &amp;  0 &amp; -1 \\
+ 1 &amp; 0 &amp;  0 &amp;  0 \\
+ 0 &amp; 1 &amp;  0 &amp;  0
+\end{pmatrix}\]</p><p>In code, we can define these forms as follows.</p><pre><code class="language-julia hljs">function oneform((x, y, vx, vy), ::Real, ::Any)
+    p = (vx, vy) .+ A(x, y)
+    @SVector [p[1], p[2], 0, 0]
+end
+
+function twoform(z, ::Real, ::Any)
+    b = B(z[1], z[2])
+    @SMatrix [ 0  b -1  0;
+              -b  0  0 -1;
+               1  0  0  0;
+               0  1  0  0]
+end</code></pre><p>Forms always have the signature <code>form(z, t, p)</code>, where <code>z</code> is the phasespace position, <code>t</code> is a time and <code>p</code> is an arbitrary parameter. To use these forms to compute our invariants, we must create the setup objects <code>FirstPI</code> and <code>SecondPI</code> and initialise the curve and surface we want in phasespace.</p><pre><code class="language-julia hljs">pi1 = FirstPI{Float64, 4}(oneform, 1_000)
+pi2 = SecondPI{Float64, 4}(twoform, 10_000)
+
+I1 = 0
+pnts1 = getpoints(pi1) do θ
+    10 .* (0, 0, sinpi(2θ), cospi(2θ))
+end
+
+I2 = 1_000
+pnts2 = getpoints(pi2) do x, y
+    10 .* (y - 0.5, x - 0.5, 0, 0)
+end</code></pre><p>The curve is just a point in space, so the first integral invariant evaluates to zero. The second invariant is equal to <span>$1000$</span> since, it is equal to the magnetic field of strength <span>$10$</span> integrated over a <span>$10$</span> by <span>$10$</span> square. We can confirm this by computing the inital invariants.</p><pre><code class="language-julia hljs">@assert isapprox(compute!(pi1, pnts1, 52.3, &quot;optional parameter&quot;), I1; atol=10^(-15))
+@assert isapprox(compute!(pi2, pnts2), I2; atol=10^(-11))</code></pre><p>By default <code>p</code> is <code>nothing</code> and <code>t</code> is zero, but as shown in the first line we can also explicitly supply a time and parameter if the forms we defined earlier had required them. <a href="../../reference/#PoincareInvariants.compute!"><code>compute!</code></a> used on a time series accepts an iterable of times and an arbitrary parameter.</p><pre><code class="language-julia hljs">times = range(0.0; step=0.05 * 50, length=5)
+
+series1 = integrate(pnts1, 0.05, 50, 5, Split2())
+@assert all(compute!(pi1, series1, times, (&quot;optional parameters&quot;, 3.7, 42))) do I
+    abs(I - I1) &lt; 10^(-13)
+end
+
+series2 = integrate(pnts2, 0.05, 50, 5, Split2())
+@assert all(compute!(pi2, series2)) do I
+    abs(I - I2) &lt; 10^(-11)
+end</code></pre><p>Again, we can plot the results. The top two plots show the increasingly distorted curve and surface over time (projected onto x and y position components), while the bottom two plots show the error in the invariant over time for the two integration algorithms.</p><p><img src="../particle.png" alt/></p><p>We see that RK4 does not preserve the non-canonical invariant while the splitting method does.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../pendulum/">« Pendulum</a><a class="docs-footer-nextpage" href="../diffeq/">DifferentialEquations.jl »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.7.0 on <span class="colophon-date" title="Thursday 7 November 2024 16:22">Thursday 7 November 2024</span>. Using Julia version 1.11.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
