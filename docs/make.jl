@@ -19,6 +19,7 @@ DocMeta.setdocmeta!(
 makedocs(
     sitename = "PoincareInvariants.jl",
     modules=[PoincareInvariants],
+    warnonly = Documenter.except(:autodocs_block, :cross_references, :docs_block, :doctest, :eval_block, :example_block, :footnote, :linkcheck_remotes, :linkcheck, :meta_block, :parse_error, :setup_block),
     pages = [
         "Home" => "index.md",
         "Theory" => "theory.md",

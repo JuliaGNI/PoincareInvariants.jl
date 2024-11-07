@@ -10,3 +10,6 @@
 ![CI](https://github.com/JuliaGNI/PoincareInvariants.jl/workflows/CI/badge.svg)
 [![codecov](https://codecov.io/gh/JuliaGNI/PoincareInvariants.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/JuliaGNI/PoincareInvariants.jl)
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.3661225.svg)](https://doi.org/10.5281/zenodo.3661225)
+
+Poincaré integral invariants provide useful diagnostics for analysing the long-time accuracy of numerical integrators for Hamiltonian dynamics and for distinguishing between symplectic and non-symplectic integrators.
+This package provides means for computing the first and second Poincaré integral invariant.

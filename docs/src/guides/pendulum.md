@@ -2,7 +2,7 @@
 
 In this tutorial we integrate the equations of motion for a pendulum and compute the first and second Poincaré integral invariants.
 First, we integrate the equations of motion then we can compute the invariants to check whether they are in fact conserved.
-The full script to generate the plots and do the computations shown here can be found at [examples/pendulum.jl](examples/pendulum.jl).
+The full script to generate the plots and do the computations shown here can be found at [examples/pendulum.jl](https://github.com/JuliaGNI/PoincareInvariants.jl/examples/pendulum.jl).
 
 Let us begin. We will need to import [PoincareInvariants.jl](https://github.com/JuliaGNI/PoincareInvariants.jl).
 

@@ -1,8 +1,7 @@
 # PoincareInvariants.jl
 
 Poincaré integral invariants provide useful diagnostics for analysing the long-time accuracy of numerical integrators for Hamiltonian dynamics and for distinguishing between symplectic and non-symplectic integrators.
-
-This package provides means for computing the first and second Poincaré integral invariant $\vartheta$ and $\omega$, which are given by the Lagrangian one- and two-form, respectively.
+This package provides means for computing the first and second Poincaré integral invariant $I_{1}$ and $I_{2}$, which are defined in terms of the Lagrangian one- and two-form, $\vartheta$ and $\omega$, respectively..
 
 ## First Poincaré Invariant
 
@@ -38,4 +37,4 @@ The area $S$ is parametrized by $(\sigma, \tau) \in [0,1]^{2}$, so that
 ```math
 I_{2} (t) = \int_{0}^{1} \int_{0}^{1} \omega_{ij} (q_{(\sigma, \tau)} (t)) \, \dfrac{dq_{(\sigma, \tau)}^{i}}{d\sigma} \, \dfrac{dq_{(\sigma, \tau)}^{j}}{d\tau} \, d\sigma \, d\tau .
 ```
-Here, we represent the surface in terms of Chebyshev polynomials and thus use Chebyshev points for the discretization of the domain $[0,1]^{2}$. The Chebyshev polynomials allow for an extremely accurate approximation of the surface, even if the latter becomes severely deformed. Moreover, they allow for the use of the [ApproxFun.jl](https://github.com/JuliaApproximation/ApproxFun.jl) package for the easy and accurate computation of the derivatives and the integral.
+Here, we represent the surface in terms of Chebyshev polynomials and thus use Chebyshev points for the discretization of the domain $[0,1]^{2}$. The Chebyshev polynomials allow for an extremely accurate approximation of the surface, even if the latter becomes severely deformed.
