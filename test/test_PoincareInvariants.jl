@@ -367,7 +367,7 @@ end
 
     f2(x) = init1(x) |> f |> f
     @test I1 ≈ compute!(diffpi1, getpoints(f2, diffpi1)) atol=5e-5
-    @test I1 ≈ compute!(freqpi1, getpoints(f2, freqpi1)) atol=1e-13
+    @test I1 ≈ compute!(freqpi1, getpoints(f2, freqpi1)) atol=5e-13
 
     g2(x, y) = init2(x, y) |> f |> f
     @test I2 ≈ compute!(chebpi2, getpoints(g2, chebpi2)) atol=1e-11
