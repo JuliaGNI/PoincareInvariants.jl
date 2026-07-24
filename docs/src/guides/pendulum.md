@@ -18,7 +18,8 @@ We take the problem from
 [harmonic oscillator](harmonic_oscillator.md), we integrate the canonical `HODEProblem` with
 the symplectic partitioned method `PartitionedGauss`, and the plain `ODEProblem` (state
 $[q, p]$) with the symplectic `ImplicitMidpoint` method and the non-symplectic explicit
-Runge-Kutta method `RK4`.
+Runge-Kutta method `RK4`. The plotting functions `plot_loop`, `plot_surface` and
+`plot_invariant` come from the package's Makie extension, activated by loading `CairoMakie`.
 
 ```@example pendulum
 using PoincareInvariants
@@ -28,35 +29,6 @@ using CairoMakie
 
 probh = hodeproblem([0.0], [0.0]; timespan = (0.0, 5.0), timestep = 0.2)  # canonical
 probo = odeproblem([0.0, 0.0];   timespan = (0.0, 5.0), timestep = 0.2)   # plain ODE
-
-saved_times(sol) = [sol[1].t[n] for n in 0:ntime(sol[1])]
-relerr(Is)       = (Is .- Is[1]) ./ Is[1]
-tsteps(sol)      = round.(Int, range(0, ntime(sol[1]), length = 10))
-
-phasepoints(sol, n) = ([sol[j].q[n][1] for j in 1:nsamples(sol)],
-                       [sol[j].p[n][1] for j in 1:nsamples(sol)])
-
-view3   = (; azimuth = 1.775π, elevation = π / 8, aspect = (1, 1, 1.6))
-palette = Makie.wong_colors()
-
-function plot_loop!(ax, sol)
-    ts = saved_times(sol)
-    for (k, n) in enumerate(tsteps(sol))
-        xs, ys = phasepoints(sol, n)
-        lines!(ax, xs, ys, fill(ts[n + 1], length(xs)); color = palette[mod1(k, 7)])
-    end
-    zlims!(ax, first(ts), last(ts))
-end
-
-function plot_surface!(ax, sol, nx, ny)
-    ts = saved_times(sol)
-    for (k, n) in enumerate(tsteps(sol))
-        xs, ys = phasepoints(sol, n)
-        surface!(ax, reshape(xs, ny, nx), reshape(ys, ny, nx), fill(ts[n + 1], ny, nx);
-            color = fill(palette[mod1(k, 7)], ny, nx), shading = NoShading)
-    end
-    zlims!(ax, first(ts), last(ts))
-end
 nothing # hide
 ```
 
@@ -81,12 +53,6 @@ pi1 = CanonicalFirstPI{Float64, 2}(500)
 sol1_pg = integrate(PIEnsembleProblem(probh, pi1, init1), PartitionedGauss(1))
 sol1_im = integrate(PIEnsembleProblem(probo, pi1, init1), ImplicitMidpoint())
 sol1_rk = integrate(PIEnsembleProblem(probo, pi1, init1), RK4())
-
-Is1_pg = compute!(pi1, sol1_pg)
-Is1_im = compute!(pi1, sol1_im)
-Is1_rk = compute!(pi1, sol1_rk)
-
-ts = saved_times(sol1_pg)
 nothing # hide
 ```
 
@@ -94,32 +60,16 @@ The loop is transported around the equilibrium and progressively sheared by the 
 enclosed area (the first invariant) is preserved:
 
 ```@example pendulum
-fig = Figure()
-ax = Axis3(fig[1, 1]; xlabel = "q", ylabel = "p", zlabel = "t", view3..., title = "Advected Loop")
-plot_loop!(ax, sol1_pg)
-fig
+plot_loop(sol1_pg; xlabel = "q", ylabel = "p")
 ```
 
 ```@example pendulum
-fig = Figure()
-ax = Axis(fig[1, 1]; xlabel = "t", ylabel = "Relative Error (I₁(t)-I₁(0))/I₁(0)",
-    title = "PartitionedGauss")
-hlines!(ax, [0.0]; color = :gray, linestyle = :dash)
-scatter!(ax, ts, relerr(Is1_pg))
-xlims!(ax, first(ts), last(ts))
-fig
+plot_invariant(pi1, sol1_pg; title = "PartitionedGauss")
 ```
 
 ```@example pendulum
-fig = Figure()
-ax = Axis(fig[1, 1]; xlabel = "t", ylabel = "Relative Error (I₁(t)-I₁(0))/I₁(0)",
+plot_invariant(pi1, "ImplicitMidpoint" => sol1_im, "Explicit Runge-Kutta-4" => sol1_rk;
     title = "ImplicitMidpoint vs Explicit Runge-Kutta-4")
-hlines!(ax, [0.0]; color = :gray, linestyle = :dash)
-scatter!(ax, ts, relerr(Is1_im); label = "ImplicitMidpoint")
-scatter!(ax, ts, relerr(Is1_rk); label = "Explicit Runge-Kutta-4")
-xlims!(ax, first(ts), last(ts))
-axislegend(ax; position = :lb)
-fig
 ```
 
 Both symplectic methods (`PartitionedGauss` and `ImplicitMidpoint`) conserve the invariant to
@@ -143,44 +93,23 @@ pi2 = CanonicalSecondPI{Float64, 2}(2_000)
 sol2_pg = integrate(PIEnsembleProblem(probh, pi2, init2), PartitionedGauss(1))
 sol2_im = integrate(PIEnsembleProblem(probo, pi2, init2), ImplicitMidpoint())
 sol2_rk = integrate(PIEnsembleProblem(probo, pi2, init2), RK4())
-
-Is2_pg = compute!(pi2, sol2_pg)
-Is2_im = compute!(pi2, sol2_im)
-Is2_rk = compute!(pi2, sol2_rk)
 nothing # hide
 ```
 
 ```@example pendulum
 grid = CanonicalSecondPI{Float64, 2}((15, 15), SecondFinDiffPlan)
-nx, ny = getpointspec(grid)
 solg = integrate(PIEnsembleProblem(probh, grid, init2), PartitionedGauss(1))
 
-fig = Figure()
-ax = Axis3(fig[1, 1]; xlabel = "q", ylabel = "p", zlabel = "t", view3..., title = "Advected Surface")
-plot_surface!(ax, solg, nx, ny)
-fig
+plot_surface(grid, solg; xlabel = "q", ylabel = "p")
 ```
 
 ```@example pendulum
-fig = Figure()
-ax = Axis(fig[1, 1]; xlabel = "t", ylabel = "Relative Error (I₂(t)-I₂(0))/I₂(0)",
-    title = "PartitionedGauss")
-hlines!(ax, [0.0]; color = :gray, linestyle = :dash)
-scatter!(ax, ts, relerr(Is2_pg))
-xlims!(ax, first(ts), last(ts))
-fig
+plot_invariant(pi2, sol2_pg; title = "PartitionedGauss")
 ```
 
 ```@example pendulum
-fig = Figure()
-ax = Axis(fig[1, 1]; xlabel = "t", ylabel = "Relative Error (I₂(t)-I₂(0))/I₂(0)",
+plot_invariant(pi2, "ImplicitMidpoint" => sol2_im, "Explicit Runge-Kutta-4" => sol2_rk;
     title = "ImplicitMidpoint vs Explicit Runge-Kutta-4")
-hlines!(ax, [0.0]; color = :gray, linestyle = :dash)
-scatter!(ax, ts, relerr(Is2_im); label = "ImplicitMidpoint")
-scatter!(ax, ts, relerr(Is2_rk); label = "Explicit Runge-Kutta-4")
-xlims!(ax, first(ts), last(ts))
-axislegend(ax; position = :lb)
-fig
 ```
 
 The symplectic methods conserve both invariants even as the curve and surface are distorted

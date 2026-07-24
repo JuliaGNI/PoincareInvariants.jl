@@ -19,7 +19,8 @@ carries a state-dependent (noncanonical) symplectic structure. We use the proble
 exported forms from
 [GeometricProblems.jl](https://github.com/JuliaGNI/GeometricProblems.jl), integrating the
 degenerate `IODEProblem` with a **Degenerate Variational Runge-Kutta** method, `DVRK`, which
-preserves the noncanonical structure.
+preserves the noncanonical structure. The plotting functions `plot_loop`, `plot_surface` and
+`plot_invariant` come from the package's Makie extension, activated by loading `CairoMakie`.
 
 ```@example particle
 using PoincareInvariants
@@ -30,36 +31,6 @@ using CairoMakie
 
 par  = MCP.default_parameters()
 prob = MCP.iodeproblem([1.0, 1.0]; timespan = (0.0, 5.0), timestep = 0.1)
-
-saved_times(sol) = [sol[1].t[n] for n in 0:ntime(sol[1])]
-relerr(Is)       = (Is .- Is[1]) ./ Is[1]
-tsteps(sol)      = round.(Int, range(0, ntime(sol[1]), length = 10))
-
-# (x₁, x₂) positions of every ensemble member at saved time index n
-phasepoints(sol, n) = ([sol[j].q[n][1] for j in 1:nsamples(sol)],
-                       [sol[j].q[n][2] for j in 1:nsamples(sol)])
-
-view3   = (; azimuth = 1.775π, elevation = π / 8, aspect = (1, 1, 1.6))
-palette = Makie.wong_colors()
-
-function plot_loop!(ax, sol)
-    ts = saved_times(sol)
-    for (k, n) in enumerate(tsteps(sol))
-        xs, ys = phasepoints(sol, n)
-        lines!(ax, xs, ys, fill(ts[n + 1], length(xs)); color = palette[mod1(k, 7)])
-    end
-    zlims!(ax, first(ts), last(ts))
-end
-
-function plot_surface!(ax, sol, nx, ny)
-    ts = saved_times(sol)
-    for (k, n) in enumerate(tsteps(sol))
-        xs, ys = phasepoints(sol, n)
-        surface!(ax, reshape(xs, ny, nx), reshape(ys, ny, nx), fill(ts[n + 1], ny, nx);
-            color = fill(palette[mod1(k, 7)], ny, nx), shading = NoShading)
-    end
-    zlims!(ax, first(ts), last(ts))
-end
 nothing # hide
 ```
 
@@ -94,7 +65,7 @@ I_{1} = \oint_{\gamma} A(x) \cdot dx
 ```
 
 We advect a small circle of radius $\rho = 0.2$ around the initial position $(1, 1)$ and pass
-the parameters `par` to [`compute!`](@ref) so the form can evaluate $A$.
+the parameters `par` to [`compute!`](@ref) (via `plot_invariant`) so the form can evaluate $A$.
 
 ```@example particle
 q₀ = SVector(1.0, 1.0)
@@ -102,29 +73,17 @@ q₀ = SVector(1.0, 1.0)
 
 pi1  = FirstPI{Float64, 2}(oneform, 500)
 sol1 = integrate(PIEnsembleProblem(prob, pi1, ϕ -> q₀ .+ ρ .* (cospi(2ϕ), sinpi(2ϕ))), DVRK(Gauss(2)))
-Is1  = compute!(pi1, sol1, par)
-
-ts = saved_times(sol1)
 nothing # hide
 ```
 
 The loop is transported and deformed by the flow:
 
 ```@example particle
-fig = Figure()
-ax = Axis3(fig[1, 1]; xlabel = "x₁", ylabel = "x₂", zlabel = "t", view3..., title = "Advected Loop")
-plot_loop!(ax, sol1)
-fig
+plot_loop(sol1; xlabel = "x₁", ylabel = "x₂")
 ```
 
 ```@example particle
-fig = Figure()
-ax = Axis(fig[1, 1]; xlabel = "t", ylabel = "Relative Error (I₁(t)-I₁(0))/I₁(0)",
-    title = "First Poincaré invariant")
-hlines!(ax, [0.0]; color = :gray, linestyle = :dash)
-scatter!(ax, ts, relerr(Is1))
-xlims!(ax, first(ts), last(ts))
-fig
+plot_invariant(pi1, sol1; p = par, title = "First Poincaré invariant")
 ```
 
 ## Second invariant
@@ -138,29 +97,18 @@ is the magnetic flux through the surface $S$. We advect a small square around $(
 ```@example particle
 pi2  = SecondPI{Float64, 2}(twoform, 2_000)
 sol2 = integrate(PIEnsembleProblem(prob, pi2, (x, y) -> q₀ .+ ρ .* (2x - 1, 2y - 1)), DVRK(Gauss(2)))
-Is2  = compute!(pi2, sol2, par)
 nothing # hide
 ```
 
 ```@example particle
 grid = SecondPI{Float64, 2}(twoform, (15, 15), SecondFinDiffPlan)
-nx, ny = getpointspec(grid)
 solg = integrate(PIEnsembleProblem(prob, grid, (x, y) -> q₀ .+ ρ .* (2x - 1, 2y - 1)), DVRK(Gauss(2)))
 
-fig = Figure()
-ax = Axis3(fig[1, 1]; xlabel = "x₁", ylabel = "x₂", zlabel = "t", view3..., title = "Advected Surface")
-plot_surface!(ax, solg, nx, ny)
-fig
+plot_surface(grid, solg; xlabel = "x₁", ylabel = "x₂")
 ```
 
 ```@example particle
-fig = Figure()
-ax = Axis(fig[1, 1]; xlabel = "t", ylabel = "Relative Error (I₂(t)-I₂(0))/I₂(0)",
-    title = "Second Poincaré invariant")
-hlines!(ax, [0.0]; color = :gray, linestyle = :dash)
-scatter!(ax, ts, relerr(Is2))
-xlims!(ax, first(ts), last(ts))
-fig
+plot_invariant(pi2, sol2; p = par, title = "Second Poincaré invariant")
 ```
 
 The `DVRK(Gauss(2))` method is a fourth-order variational integrator for noncanonical

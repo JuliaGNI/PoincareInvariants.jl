@@ -47,3 +47,12 @@ PIEnsembleProblem
 ```@docs
 CanonicalSymplecticMatrix
 ```
+
+## Plotting
+
+The following functions are provided by a package extension and become available once a Makie
+backend (e.g. `CairoMakie`) is loaded.
+
+```@docs
+plot_invariant
+```
