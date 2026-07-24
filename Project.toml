@@ -11,11 +11,18 @@ GeometricSolutions = "7843afe4-64f4-4df4-9231-049495c56661"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
+[weakdeps]
+Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
+
+[extensions]
+PoincareInvariantsMakieExt = "Makie"
+
 [compat]
 ChebyshevTransforms = "0.0.1"
 FFTW = "1"
 GeometricEquations = "0.21"
 GeometricSolutions = "0.6"
+Makie = "0.24"
 StaticArrays = "1"
 julia = "1.10"
 

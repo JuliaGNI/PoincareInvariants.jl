@@ -413,4 +413,31 @@ function compute!(
     end
 end
 
+## Plotting ##
+
+export plot_invariant, plot_invariant!, plot_loop, plot_loop!, plot_surface, plot_surface!
+
+"""
+    plot_invariant(pinv, sol; p=nothing, title="")
+    plot_invariant(pinv, label => sol...; p=nothing, title="", position=:lb)
+    plot_loop(sol; xlabel, ylabel, title="Advected Loop", nsteps=10)
+    plot_surface(grid, sol; xlabel, ylabel, title="Advected Surface", nsteps=10)
+
+visualise Poincaré invariants and the advected curve/surface of an `EnsembleSolution`.
+
+`plot_invariant` plots the relative error `(I(t) - I(0)) / I(0)` of the first or second
+invariant over time (a legend-labelled comparison when several `label => sol` pairs are
+given). `plot_loop` and `plot_surface` show the advected curve and surface in phase space,
+stacked along the time axis. Mutating `plot_*!` variants draw into an existing axis.
+
+These functions are provided by a package extension; load a Makie backend
+(e.g. `using CairoMakie`) to enable them.
+"""
+function plot_invariant end
+function plot_invariant! end
+function plot_loop end
+function plot_loop! end
+function plot_surface end
+function plot_surface! end
+
 end  # module

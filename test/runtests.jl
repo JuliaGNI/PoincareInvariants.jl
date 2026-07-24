@@ -17,3 +17,7 @@ end
 @safetestset "Integration with GeometricIntegrators" begin
     include("test_Integration.jl")
 end
+
+@safetestset "Plotting extension" begin
+    include("test_PlottingExtension.jl")
+end
