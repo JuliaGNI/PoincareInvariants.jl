@@ -24,14 +24,13 @@ makedocs(
         "Home" => "index.md",
         "Theory" => "theory.md",
         "Implementation" => "implementation.md",
-        "Guides" => [
-            "Integration" => "guides/integration.md",
-            "Harmonic Oscillator" => "guides/harmonic_oscillator.md",
-            "Pendulum" => "guides/pendulum.md",
-            "Massless Charged Particle" => "guides/massless_charged_particle.md",
-            "Lotka-Volterra" => "guides/lotka_volterra.md",
-            "Convergence" => "guides/convergence.md",
-            "Plans" => "guides/plans.md",
+        "Convergence" => "convergence.md",
+        "Tutorial" => "tutorial.md",
+        "Examples" => [
+            "Harmonic Oscillator" => "examples/harmonic_oscillator.md",
+            "Pendulum" => "examples/pendulum.md",
+            "Massless Charged Particle" => "examples/massless_charged_particle.md",
+            "Lotka-Volterra" => "examples/lotka_volterra.md",
         ],
         "Reference" => "reference.md"
     ],

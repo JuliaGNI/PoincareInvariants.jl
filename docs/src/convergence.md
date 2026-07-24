@@ -98,6 +98,6 @@ fig
 ```
 
 Even under severe deformation the spectral representations used by `FirstFourierPlan` and
-`SecondChebyshevPlan` (see [Using Different Integral Implementations](plans.md)) recover the
+`SecondChebyshevPlan` (see [Using Different Integral Implementations](@ref)) recover the
 invariants to high accuracy, which is what makes them suitable for tracking invariants along
 the flow of a dynamical system.
