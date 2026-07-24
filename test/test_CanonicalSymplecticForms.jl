@@ -1,10 +1,10 @@
-@safetestset "canonical_one_form" begin
-    using PoincareInvariants: canonical_one_form
+@safetestset "canonical_one_form!" begin
+    using PoincareInvariants: canonical_one_form!
     using LinearAlgebra: dot
     using Random: rand
 
-    @test_throws ArgumentError canonical_one_form([1, 2, 3], 0.5, nothing)
-    @test_throws ArgumentError canonical_one_form([0.3], 3.4, nothing)
+    @test_throws ArgumentError canonical_one_form!(zeros(3), 0.5, [1, 2, 3], nothing)
+    @test_throws ArgumentError canonical_one_form!(zeros(1), 3.4, [0.3], nothing)
 
     for mid in [3, 9, 22]
         n = mid * 2
@@ -13,9 +13,10 @@
         p = rand(mid)
         z = [q; p]
 
-        @inferred canonical_one_form(z, 0.1, nothing)
+        θ = zeros(n)
+        @inferred canonical_one_form!(θ, 0.1, z, nothing)
 
-        θ = canonical_one_form(z, 1.3, nothing)
+        canonical_one_form!(θ, 1.3, z, nothing)
 
         @test θ[1:mid] == p
         @test θ[mid+1:end] == zeros(mid)
@@ -27,8 +28,8 @@
     end
 end
 
-@safetestset "canonical_two_form" begin
-    using PoincareInvariants: CanonicalSymplecticMatrix, canonical_two_form
+@safetestset "CanonicalSymplecticMatrix" begin
+    using PoincareInvariants: CanonicalSymplecticMatrix
     using LinearAlgebra: dot
     using Random: rand
 
@@ -87,9 +88,5 @@ end
         @test vCw ≈ dot(v, C * w)
 
         @test_throws ArgumentError CanonicalSymplecticMatrix{T}(n + 1)
-
-        @inferred CanonicalSymplecticMatrix{Float64} canonical_two_form(v, 0.1, nothing)
-
-        @test canonical_two_form(v, 0.1, nothing) == CanonicalSymplecticMatrix(n)
     end
 end

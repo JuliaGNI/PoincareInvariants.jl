@@ -1,7 +1,7 @@
 module FirstFinDiffPlans
 
 using LinearAlgebra: dot
-using StaticArrays: SVector
+using StaticArrays: MVector
 
 using ..PoincareInvariants: FirstPoincareInvariant, getpointnum, getform
 
@@ -19,23 +19,27 @@ function compute!(
     θ = getform(pinv)
     I = zero(T)
 
-    dzi = Vector{T}(undef, D)
+    dzi = MVector{D, T}(undef)
+    θi = MVector{D, T}(undef)
 
     for i in 2:N-1
         zi = view(zs, i, :)
         dzi .= @views (zs[i+1, :] .- zs[i-1, :]) ./ 2
-        I += dot(θ(zi, t, p), dzi)
+        θ(θi, t, zi, p)
+        I += dot(θi, dzi)
     end
 
     # special cases i = 1
     z1 = view(zs, 1, :)
     dzi .= @views (zs[2, :] .- zs[N, :]) ./ 2
-    I += dot(θ(z1, t, p), dzi)
+    θ(θi, t, z1, p)
+    I += dot(θi, dzi)
 
     # special cases i = N
     zN = view(zs, N, :)
     dzi .= @views (zs[1, :] .- zs[N-1, :]) ./ 2
-    I += dot(θ(zN, t, p), dzi)
+    θ(θi, t, zN, p)
+    I += dot(θi, dzi)
 
     return I
 end

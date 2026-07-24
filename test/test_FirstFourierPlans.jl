@@ -31,8 +31,8 @@ end
     T = Float64
     D = 2
 
-    # rotating vector field
-    θ(z, p, t) = [-z[2], z[1]]
+    # rotating vector field, in-place following the form(out, t, z, p) convention
+    θ!(out, t, z, p) = (out[1] = -z[2]; out[2] = z[1]; nothing)
 
     # circular path with radius R
     # ḟ = 2π .* R .* (-sinpi(2ϕ), cospi(2ϕ))
@@ -43,8 +43,8 @@ end
     I = 2π * R^2
 
     N = 10
-    plan = FirstFourierPlan{T, D}(θ, N)
-    pinv = FirstPoincareInvariant{T, D}(θ, N, plan)
+    plan = FirstFourierPlan{T, D}(θ!, N)
+    pinv = FirstPoincareInvariant{T, D}(θ!, N, plan)
     pnts = getpoints(f, Float64, N, FirstFourierPlan)
     @test I ≈ compute!(pinv, pnts, 0.0, nothing) atol=10eps()
 end

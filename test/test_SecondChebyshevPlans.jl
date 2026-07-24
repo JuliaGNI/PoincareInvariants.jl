@@ -91,13 +91,13 @@ end
         iplan = InvPaduaTransformPlan{Float64}(degree)
         invpaduatransform!(phasepoints, iplan, phasecoeffs)
 
-        ω(v, t, p) = [0 -1; 1  0]
+        ω!(out, t, z, p) = (out[1, 1] = 0; out[1, 2] = -1; out[2, 1] = 1; out[2, 2] = 0; nothing)
 
         plan = CallIntPlan{Float64, D}(degree)
 
         intcoeffs = zeros(degree+1, degree+1)
 
-        getintegrand!(intcoeffs, plan, ω, phasepoints, 0, nothing, ∂xcoeffs, ∂ycoeffs)
+        getintegrand!(intcoeffs, plan, ω!, phasepoints, 0, nothing, ∂xcoeffs, ∂ycoeffs)
 
         @test intcoeffs ≈ [-72   -82  -30;
                            -82  -432    0;
@@ -124,7 +124,7 @@ end
         iplan = InvPaduaTransformPlan{Float64}(degree)
         invpaduatransform!(phasepoints, iplan, phasecoeffs)
 
-        ω = canonical_two_form
+        ω = CanonicalSymplecticMatrix{Float64}(D)
 
         plan = CallIntPlan{Float64, D}(degree)
 
@@ -146,7 +146,7 @@ end
 
     D = 12
     N = 200
-    ω = canonical_two_form
+    ω = CanonicalSymplecticMatrix{Float64}(D)
     pointnum = nextpaduanum(N)
     degree = getdegree(pointnum)
     plan = SecondChebyshevPlan{Float64, D}(ω, pointnum)

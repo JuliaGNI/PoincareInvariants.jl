@@ -40,7 +40,7 @@ function compute!(
 
     θ = getform(pinv)
     for (i, z) in enumerate(eachrow(zs))
-        plan.θs[i, :] .= θ(z, t, p)
+        θ(view(plan.θs, i, :), t, z, p)
     end
 
     I = zero(T)

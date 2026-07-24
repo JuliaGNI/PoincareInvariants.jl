@@ -12,6 +12,8 @@ using ..PoincareInvariants: SecondPoincareInvariant, @argcheck
 
 using LinearAlgebra
 
+using StaticArrays: MMatrix
+
 using ChebyshevTransforms
 
 ## Differentiation ##
@@ -99,13 +101,16 @@ function getintegrand!(
     invpaduatransform!(plan.∂xvals, plan.invpaduaplan, ∂xcoeffs)
     invpaduatransform!(plan.∂yvals, plan.invpaduaplan, ∂ycoeffs)
 
+    ωbuf = MMatrix{D, D, T}(undef)
+
     for i in axes(plan.intvals, 1)
         # This if statement should hopefully get optimised away by the compiler
         if ωT <: AbstractMatrix
             ωi = ω
         else
             pnti = view(points, i, :)
-            ωi = ω(pnti, t, p)
+            ω(ωbuf, t, pnti, p)
+            ωi = ωbuf
         end
 
         ∂xi = view(plan.∂xvals, i, :)

@@ -30,23 +30,22 @@ using StaticArrays
 using CairoMakie
 
 prob = lodeproblem([2.0, 1.0]; timespan = (0.0, 1.0), timestep = 0.02)
+par  = parameters(prob)
 nothing # hide
 ```
 
 ## The invariant forms
 
-The one-form $\vartheta$ and the two-form $\omega = d\vartheta$ are exported by the problem
-module (`ϑ` and the in-place `ω`); we only adapt them to the `form(z, t, p)` interface.
-Neither depends on the physical parameters, so `p` is ignored.
+The noncanonical symplectic one-form $\vartheta$ and two-form $\omega = d\vartheta$ belong to
+the `LODEProblem` itself. `PoincareInvariants` expects a differential form as an **in-place**
+function `form(out, t, z, p)` — writing its value at the phase space point `z` into the
+preallocated `out` — and this is exactly the convention `GeometricProblems` uses for its
+one- and two-forms (`ϑ(Θ, t, q, params)`, `ω(Ω, t, q, params)`). We can therefore take them
+straight from the problem's function tuple with `functions(prob)` and pass `fs.ϑ` / `fs.ω`
+**directly** to `FirstPI` / `SecondPI` below, with no wrapper:
 
 ```@example lotka
-oneform(z, t, p) = SVector{2}(ϑ(t, z))
-
-function twoform(z, t, p)
-    Ω = zeros(eltype(z), 2, 2)
-    ω(Ω, t, z)
-    SMatrix{2, 2}(Ω)
-end
+fs = functions(prob)
 nothing # hide
 ```
 
@@ -62,7 +61,7 @@ We advect a circle of radius $\rho = 0.2$ around the initial point $(2, 1)$.
 q₀ = SVector(2.0, 1.0)
 ρ  = 0.2
 
-pi1  = FirstPI{Float64, 2}(oneform, 500)
+pi1  = FirstPI{Float64, 2}(fs.ϑ, 500)
 sol1 = integrate(PIEnsembleProblem(prob, pi1, ϕ -> q₀ .+ ρ .* (cospi(2ϕ), sinpi(2ϕ))), DVRK(Gauss(2)))
 nothing # hide
 ```
@@ -74,7 +73,7 @@ plot_loop(sol1; xlabel = "q₁", ylabel = "q₂")
 ```
 
 ```@example lotka
-plot_invariant(pi1, sol1; title = "First Poincaré invariant")
+plot_invariant(pi1, sol1; p = par, title = "First Poincaré invariant")
 ```
 
 ## Second invariant
@@ -86,20 +85,20 @@ I_{2} = \int_{S} \omega_{ij}(q) \, dq^i \, dq^j
 We advect a square around $(2, 1)$, staying within the positive quadrant.
 
 ```@example lotka
-pi2  = SecondPI{Float64, 2}(twoform, 2_000)
+pi2  = SecondPI{Float64, 2}(fs.ω, 2_000)
 sol2 = integrate(PIEnsembleProblem(prob, pi2, (x, y) -> q₀ .+ ρ .* (2x - 1, 2y - 1)), DVRK(Gauss(2)))
 nothing # hide
 ```
 
 ```@example lotka
-grid = SecondPI{Float64, 2}(twoform, (15, 15), SecondFinDiffPlan)
+grid = SecondPI{Float64, 2}(fs.ω, (15, 15), SecondFinDiffPlan)
 solg = integrate(PIEnsembleProblem(prob, grid, (x, y) -> q₀ .+ ρ .* (2x - 1, 2y - 1)), DVRK(Gauss(2)))
 
 plot_surface(grid, solg; xlabel = "q₁", ylabel = "q₂")
 ```
 
 ```@example lotka
-plot_invariant(pi2, sol2; title = "Second Poincaré invariant")
+plot_invariant(pi2, sol2; p = par, title = "Second Poincaré invariant")
 ```
 
 The relative errors stay at the level of machine precision: with the correct form of the

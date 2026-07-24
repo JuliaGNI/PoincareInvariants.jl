@@ -54,6 +54,8 @@ Both plans have finite-difference counterparts (`FirstFinDiffPlan`, `SecondFinDi
 
 ## Using Different Integral Implementations
 
+In every implementation the differential form is supplied as an **in-place** function following the convention `form(out, t, z, p)`: it writes its value at the phase space point `z` (a single point) into the preallocated output `out` — a length-`D` vector for a one-form `θ`, a `D×D` matrix for a two-form `ω`. This argument order matches the one- and two-forms exported by `GeometricEquations`/`GeometricProblems` (`ϑ(Θ, t, q, params)`, `ω(Ω, t, q, params)`), so a problem's own forms can be passed straight to `FirstPI`/`SecondPI`. Internally each plan fills a single preallocated [`StaticArrays`](https://github.com/JuliaArrays/StaticArrays.jl) buffer (an `MVector`/`MMatrix`) and reuses it across all sample points, so evaluating the form allocates nothing. A constant `ω::AbstractMatrix` (such as a `CanonicalSymplecticMatrix`) is used directly and is not called.
+
 There are a number of different implementations to choose from to calculate the invariants. For the first invariant, the choices are
 
 ```Julia

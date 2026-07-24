@@ -2,7 +2,7 @@
     @safetestset "FirstPoincareInvariant" begin
         using PoincareInvariants
 
-        D = 6; N = 123; θ = canonical_one_form; P = FirstFinDiffPlan
+        D = 6; N = 123; θ = canonical_one_form!; P = FirstFinDiffPlan
         pinv = FirstPoincareInvariant{Float64, D}(θ, N, P)
 
         @test getdim(pinv) == D
@@ -23,7 +23,7 @@
     @safetestset "SecondPoincareInvariant" begin
         using PoincareInvariants
 
-        D = 4; N = 321; ω = canonical_two_form; P = SecondFinDiffPlan
+        D = 4; N = 321; ω = CanonicalSymplecticMatrix{Float64}(D); P = SecondFinDiffPlan
         pinv = SecondPoincareInvariant{Float64, D}(ω, N, P)
 
         @test getdim(pinv) == D
@@ -62,15 +62,15 @@ end
         ]
 
         first_pinvs = [
-            FirstPoincareInvariant{Ts[1], D}(canonical_one_form, Ns[1]),
-            FirstPoincareInvariant{Ts[2], D}(canonical_one_form, Ns[2], FirstFinDiffPlan),
-            FirstPoincareInvariant{Ts[3], D}(canonical_one_form, Ns[3], FirstFinDiffPlan),
-            FirstPoincareInvariant{Ts[4], D}(canonical_one_form, Ns[4], FirstFourierPlan),
-            FirstPoincareInvariant{Ts[5], D}(canonical_one_form, Ns[5], FirstFourierPlan),
+            FirstPoincareInvariant{Ts[1], D}(canonical_one_form!, Ns[1]),
+            FirstPoincareInvariant{Ts[2], D}(canonical_one_form!, Ns[2], FirstFinDiffPlan),
+            FirstPoincareInvariant{Ts[3], D}(canonical_one_form!, Ns[3], FirstFinDiffPlan),
+            FirstPoincareInvariant{Ts[4], D}(canonical_one_form!, Ns[4], FirstFourierPlan),
+            FirstPoincareInvariant{Ts[5], D}(canonical_one_form!, Ns[5], FirstFourierPlan),
 
-            FirstPI{Ts[6], D}(canonical_one_form, Ns[6]),
-            FirstPI{Ts[7], D}(canonical_one_form, Ns[7], FirstFinDiffPlan),
-            FirstPI{Ts[8], D}(canonical_one_form, Ns[8], FirstFourierPlan),
+            FirstPI{Ts[6], D}(canonical_one_form!, Ns[6]),
+            FirstPI{Ts[7], D}(canonical_one_form!, Ns[7], FirstFinDiffPlan),
+            FirstPI{Ts[8], D}(canonical_one_form!, Ns[8], FirstFourierPlan),
 
             CanonicalFirstPI{Ts[9], D}(Ns[9]),
             CanonicalFirstPI{Ts[10], D}(Ns[10], FirstFinDiffPlan),
@@ -117,15 +117,15 @@ end
         ]
 
         second_pinvs = [
-            SecondPoincareInvariant{Ts[1], D}(canonical_two_form, ps[1]),
-            SecondPoincareInvariant{Ts[2], D}(canonical_two_form, ps[2], SecondChebyshevPlan),
-            SecondPoincareInvariant{Ts[3], D}(canonical_two_form, ps[3], SecondChebyshevPlan),
-            SecondPoincareInvariant{Ts[4], D}(canonical_two_form, ps[4], SecondFinDiffPlan),
-            SecondPoincareInvariant{Ts[5], D}(canonical_two_form, ps[5], SecondFinDiffPlan),
+            SecondPoincareInvariant{Ts[1], D}(CanonicalSymplecticMatrix{Ts[1]}(D), ps[1]),
+            SecondPoincareInvariant{Ts[2], D}(CanonicalSymplecticMatrix{Ts[2]}(D), ps[2], SecondChebyshevPlan),
+            SecondPoincareInvariant{Ts[3], D}(CanonicalSymplecticMatrix{Ts[3]}(D), ps[3], SecondChebyshevPlan),
+            SecondPoincareInvariant{Ts[4], D}(CanonicalSymplecticMatrix{Ts[4]}(D), ps[4], SecondFinDiffPlan),
+            SecondPoincareInvariant{Ts[5], D}(CanonicalSymplecticMatrix{Ts[5]}(D), ps[5], SecondFinDiffPlan),
 
-            SecondPI{Ts[6], D}(canonical_two_form, ps[6]),
-            SecondPI{Ts[7], D}(canonical_two_form, ps[7], SecondChebyshevPlan),
-            SecondPI{Ts[8], D}(canonical_two_form, ps[8], SecondFinDiffPlan),
+            SecondPI{Ts[6], D}(CanonicalSymplecticMatrix{Ts[6]}(D), ps[6]),
+            SecondPI{Ts[7], D}(CanonicalSymplecticMatrix{Ts[7]}(D), ps[7], SecondChebyshevPlan),
+            SecondPI{Ts[8], D}(CanonicalSymplecticMatrix{Ts[8]}(D), ps[8], SecondFinDiffPlan),
 
             SecondPI{Ts[9], D}(CanonicalSymplecticMatrix{Float64}(D), ps[9]),
             SecondPI{Ts[10], D}(CanonicalSymplecticMatrix{Double64}(D), ps[10], SecondChebyshevPlan),
@@ -162,22 +162,26 @@ end
         using PoincareInvariants
 
         D = 6
-        θ(z, t, p) = [-z[4], -z[5], -p * z[6], t * z[1], p * z[2], z[3]]
+        function θ!(out, t, z, p)
+            out[1] = -z[4]; out[2] = -z[5]; out[3] = -p * z[6]
+            out[4] = t * z[1]; out[5] = p * z[2]; out[6] = z[3]
+            nothing
+        end
 
         function f(ϕ)
             y, x = sincospi(2ϕ)
             return 0.5 * x, x, 3 * x, 0.1 * y, 0.85 * y, 2 * y
         end
 
-        Idefault = let pinv = FirstPI{Float64, D}(θ, 1_000)
+        Idefault = let pinv = FirstPI{Float64, D}(θ!, 1_000)
             compute!(pinv, getpoints(f, pinv), 0.3, 0.1)
         end
 
-        Idiff = let pinv = FirstPI{Float64, D}(θ, 1_000, FirstFinDiffPlan)
+        Idiff = let pinv = FirstPI{Float64, D}(θ!, 1_000, FirstFinDiffPlan)
             compute!(pinv, getpoints(f, pinv), 0.3, 0.1)
         end
 
-        Ifreq = let pinv = FirstPI{Float64, D}(θ, 1_000, FirstFourierPlan)
+        Ifreq = let pinv = FirstPI{Float64, D}(θ!, 1_000, FirstFourierPlan)
             compute!(pinv, getpoints(f, pinv), 0.3, 0.1)
         end
 
@@ -189,14 +193,16 @@ end
         using PoincareInvariants
 
         D = 6
-        ω(z, t, p) = [
-                0     0     0  z[1]  z[2]  z[3]
-                0     0     0  z[4]  z[5]  z[6]
-                0     0     0     t     p     1
-            -z[1] -z[4]    -t     0     0     0
-            -z[2] -z[5]    -p     0     0     0
-            -z[3] -z[6]    -1     0     0     0
-        ]
+        function ω!(out, t, z, p)
+            out .= 0
+            out[1, 4] =  z[1]; out[1, 5] =  z[2]; out[1, 6] =  z[3]
+            out[2, 4] =  z[4]; out[2, 5] =  z[5]; out[2, 6] =  z[6]
+            out[3, 4] =     t; out[3, 5] =     p; out[3, 6] =     1
+            out[4, 1] = -z[1]; out[4, 2] = -z[4]; out[4, 3] =    -t
+            out[5, 1] = -z[2]; out[5, 2] = -z[5]; out[5, 3] =    -p
+            out[6, 1] = -z[3]; out[6, 2] = -z[6]; out[6, 3] =    -1
+            nothing
+        end
 
         f(x, y) = (
             exp(x) * y,
@@ -207,15 +213,15 @@ end
             x + y
         )
 
-        Idefault = let pinv = SecondPI{Float64, D}(ω, 1_000)
+        Idefault = let pinv = SecondPI{Float64, D}(ω!, 1_000)
             compute!(pinv, getpoints(f, pinv), 5, 11)
         end
 
-        Icheb = let pinv = SecondPI{Float64, D}(ω, 1_000, SecondChebyshevPlan)
+        Icheb = let pinv = SecondPI{Float64, D}(ω!, 1_000, SecondChebyshevPlan)
             compute!(pinv, getpoints(f, pinv), 5, 11)
         end
 
-        Ifindiff = let pinv = SecondPI{Float64, D}(ω, (31, 33), SecondFinDiffPlan)
+        Ifindiff = let pinv = SecondPI{Float64, D}(ω!, (31, 33), SecondFinDiffPlan)
             compute!(pinv, getpoints(f, pinv), 5, 11)
         end
 
@@ -232,11 +238,20 @@ end
     Nsteps = 13
     times = [2.0 + n * 0.15 for n in 0:Nsteps-1]
 
-    f1(z, t, p) = canonical_one_form(z, t, p) .* t
-    pi1 = FirstPI{Float64, D}(f1, N)
+    # in-place forms scaled by the time t, following the form(out, t, z, p) convention
+    f1!(out, t, z, p) = (canonical_one_form!(out, t, z, p); out .*= t; nothing)
+    pi1 = FirstPI{Float64, D}(f1!, N)
 
-    f2(z, t, p) = canonical_two_form(z, t, p) .* t
-    pi2 = SecondPI{Float64, D}(f2, N)
+    function f2!(out, t, z, p)
+        out .= 0
+        mid = length(z) ÷ 2
+        for i in 1:mid
+            out[i, mid + i] = -t
+            out[mid + i, i] =  t
+        end
+        nothing
+    end
+    pi2 = SecondPI{Float64, D}(f2!, N)
 
     p1(θ) = (cospi(2θ), cospi(2θ), sinpi(2θ), sinpi(2θ))
     p2(x, y) = (x, x, y, y)
