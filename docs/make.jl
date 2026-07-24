@@ -22,10 +22,10 @@ makedocs(
     warnonly = Documenter.except(:autodocs_block, :cross_references, :docs_block, :doctest, :eval_block, :example_block, :footnote, :linkcheck_remotes, :linkcheck, :meta_block, :parse_error, :setup_block),
     pages = [
         "Home" => "index.md",
+        "Tutorial" => "tutorial.md",
         "Theory" => "theory.md",
         "Implementation" => "implementation.md",
         "Convergence" => "convergence.md",
-        "Tutorial" => "tutorial.md",
         "Examples" => [
             "Harmonic Oscillator" => "examples/harmonic_oscillator.md",
             "Pendulum" => "examples/pendulum.md",
