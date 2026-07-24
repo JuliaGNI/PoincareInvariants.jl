@@ -23,6 +23,7 @@ makedocs(
     pages = [
         "Home" => "index.md",
         "Theory" => "theory.md",
+        "Implementation" => "implementation.md",
         "Guides" => [
             "Integration" => "guides/integration.md",
             "Harmonic Oscillator" => "guides/harmonic_oscillator.md",
