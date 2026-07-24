@@ -24,9 +24,12 @@ makedocs(
         "Home" => "index.md",
         "Theory" => "theory.md",
         "Guides" => [
+            "Integration" => "guides/integration.md",
+            "Harmonic Oscillator" => "guides/harmonic_oscillator.md",
             "Pendulum" => "guides/pendulum.md",
-            "Charged Particle" => "guides/charged_particle.md",
-            "DifferentialEquations.jl" => "guides/diffeq.md",
+            "Massless Charged Particle" => "guides/massless_charged_particle.md",
+            "Lotka-Volterra" => "guides/lotka_volterra.md",
+            "Convergence" => "guides/convergence.md",
             "Plans" => "guides/plans.md",
         ],
         "Reference" => "reference.md"

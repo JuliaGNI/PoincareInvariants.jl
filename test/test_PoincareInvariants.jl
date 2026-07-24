@@ -432,27 +432,3 @@ end
     g3(x, y) = init2(x, y) |> f |> f |> f
     # neither of the two methods manage this
 end
-
-@safetestset "Pendulum" begin
-    using OrdinaryDiffEq
-    using RecursiveArrayTools: ArrayPartition
-    using PoincareInvariants
-
-    # ArrayPartition is a pain to work with!
-    prob = SecondOrderODEProblem((p, θ, params, t) -> [-sin(θ[1])], 0.0, 0.0, (0.0, 2.0))
-    dt = 0.1
-    pf(prob, i, repeat) = remake(prob; u0 = ArrayPartition((prob.u0[1:1], prob.u0[2:2])))
-
-    I1 = 3π
-    pi1 = CanonicalFirstPI{Float64, 2}(1_000)
-    prob1 = PIEnsembleProblem(ϕ -> (sinpi(2ϕ), 3 * cospi(2ϕ)), prob, pi1; prob_func=pf)
-    sol1 = solve(prob1, SymplecticEuler(), EnsembleSerial(); adaptive=false, dt=dt)
-
-    I2 = 16
-    pi2 = CanonicalSecondPI{Float64, 2}(1_000)
-    prob2 = PIEnsembleProblem((x, y) -> 4 .* (x, y) .- 2, prob, pi2; prob_func=pf)
-    sol2 = solve(prob2, SymplecticEuler(), EnsembleSerial(); adaptive=false, dt=dt)
-
-    @test maximum(abs, I1 .- compute!(pi1, sol1)) < 1e-14
-    @test maximum(abs, I2 .- compute!(pi2, sol2)) < 1e-10
-end

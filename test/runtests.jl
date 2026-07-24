@@ -13,3 +13,7 @@ end
 @safetestset "PoincareInvariants" begin
     include("test_PoincareInvariants.jl")
 end
+
+@safetestset "Integration with GeometricIntegrators" begin
+    include("test_Integration.jl")
+end

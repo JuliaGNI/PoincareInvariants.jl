@@ -1,29 +1,30 @@
-# Pendulum
+# Harmonic Oscillator
 
-The mathematical pendulum is a canonical Hamiltonian system. In a unit system where gravity,
-mass and length are equal to one its Hamiltonian is
-
-```math
-H(q, p) = \frac{p^2}{2} + \cos(q) ,
-```
-
-with angle $q$ and conjugate momentum $p$, giving the equations of motion
+The harmonic oscillator is the simplest canonical Hamiltonian system. With unit mass and
+spring constant $k$ its Hamiltonian is
 
 ```math
-\dot{q} = p , \qquad \dot{p} = -\sin(q) .
+H(q, p) = \frac{p^2}{2} + \frac{k \, q^2}{2} ,
 ```
 
-We take the problem from
-[GeometricProblems.jl](https://github.com/JuliaGNI/GeometricProblems.jl). As for the
-[harmonic oscillator](harmonic_oscillator.md), we integrate the canonical `HODEProblem` with
-the symplectic partitioned method `PartitionedGauss`, and the plain `ODEProblem` (state
-$[q, p]$) with the symplectic `ImplicitMidpoint` method and the non-symplectic explicit
-Runge-Kutta method `RK4`.
+so that the equations of motion in the canonical phase space $(q, p)$ read
 
-```@example pendulum
+```math
+\dot{q} = p , \qquad \dot{p} = -k \, q .
+```
+
+We use the ready-made problem from
+[GeometricProblems.jl](https://github.com/JuliaGNI/GeometricProblems.jl). For each invariant
+we show the advected curve or surface, and two plots of the relative error over time: one for
+the symplectic partitioned method `PartitionedGauss` (applied to the canonical `HODEProblem`),
+and one comparing the symplectic `ImplicitMidpoint` method with the non-symplectic explicit
+Runge-Kutta method `RK4` (both applied to the plain `ODEProblem` whose state is the pair
+$[q, p]$).
+
+```@example oscillator
 using PoincareInvariants
 using GeometricIntegrators
-using GeometricProblems.Pendulum
+using GeometricProblems.HarmonicOscillator
 using CairoMakie
 
 probh = hodeproblem([0.0], [0.0]; timespan = (0.0, 5.0), timestep = 0.2)  # canonical
@@ -31,11 +32,13 @@ probo = odeproblem([0.0, 0.0];   timespan = (0.0, 5.0), timestep = 0.2)   # plai
 
 saved_times(sol) = [sol[1].t[n] for n in 0:ntime(sol[1])]
 relerr(Is)       = (Is .- Is[1]) ./ Is[1]
-tsteps(sol)      = round.(Int, range(0, ntime(sol[1]), length = 10))
+tsteps(sol)      = round.(Int, range(0, ntime(sol[1]), length = 10))  # 10 time slices
 
+# (q, p) phase space points of every ensemble member at saved time index n
 phasepoints(sol, n) = ([sol[j].q[n][1] for j in 1:nsamples(sol)],
                        [sol[j].p[n][1] for j in 1:nsamples(sol)])
 
+# 3D view shared by all advected curve/surface plots
 view3   = (; azimuth = 1.775π, elevation = π / 8, aspect = (1, 1, 1.6))
 palette = Makie.wong_colors()
 
@@ -62,19 +65,18 @@ nothing # hide
 
 ## First invariant
 
-The first invariant is the loop integral of the canonical one-form,
+The first Poincaré invariant is the loop integral of the canonical one-form $\vartheta = p \, dq$,
 
 ```math
 I_{1} = \oint_{\gamma} p \, dq ,
 ```
 
-the area enclosed by the closed curve $\gamma$. We use a circle of radius $r = 1/2$ centred
-at the stable equilibrium $(q, p) = (\pi, 0)$ (recall that for $H = p^2/2 + \cos q$ the point
-$q = 0$ is the *unstable* equilibrium).
+which equals the area enclosed by the closed curve $\gamma$. We take a circle of radius
+$r = 1/2$ centred at the origin and integrate it with the three methods.
 
-```@example pendulum
+```@example oscillator
 r = 0.5
-init1 = ϕ -> (π + r * sinpi(2ϕ), r * cospi(2ϕ))
+init1 = ϕ -> (r * sinpi(2ϕ), r * cospi(2ϕ))
 
 pi1 = CanonicalFirstPI{Float64, 2}(500)
 
@@ -90,17 +92,19 @@ ts = saved_times(sol1_pg)
 nothing # hide
 ```
 
-The loop is transported around the equilibrium and progressively sheared by the flow, yet the
-enclosed area (the first invariant) is preserved:
+As the loop is advected by the flow it rotates rigidly in phase space (the harmonic
+oscillator is linear):
 
-```@example pendulum
+```@example oscillator
 fig = Figure()
 ax = Axis3(fig[1, 1]; xlabel = "q", ylabel = "p", zlabel = "t", view3..., title = "Advected Loop")
 plot_loop!(ax, sol1_pg)
 fig
 ```
 
-```@example pendulum
+The symplectic partitioned method conserves the invariant to machine precision:
+
+```@example oscillator
 fig = Figure()
 ax = Axis(fig[1, 1]; xlabel = "t", ylabel = "Relative Error (I₁(t)-I₁(0))/I₁(0)",
     title = "PartitionedGauss")
@@ -110,7 +114,10 @@ xlims!(ax, first(ts), last(ts))
 fig
 ```
 
-```@example pendulum
+`ImplicitMidpoint` is symplectic too and likewise conserves the invariant to machine
+precision, while the non-symplectic explicit Runge-Kutta method lets it drift:
+
+```@example oscillator
 fig = Figure()
 ax = Axis(fig[1, 1]; xlabel = "t", ylabel = "Relative Error (I₁(t)-I₁(0))/I₁(0)",
     title = "ImplicitMidpoint vs Explicit Runge-Kutta-4")
@@ -122,21 +129,19 @@ axislegend(ax; position = :lb)
 fig
 ```
 
-Both symplectic methods (`PartitionedGauss` and `ImplicitMidpoint`) conserve the invariant to
-machine precision, while the non-symplectic `RK4` method lets it drift.
-
 ## Second invariant
 
-The second invariant is the surface integral of the canonical two-form,
+The second Poincaré invariant is the surface integral of the canonical two-form
+$\omega = dq \wedge dp$,
 
 ```math
 I_{2} = \int_{S} dq \wedge dp ,
 ```
 
-the area of the surface $S$. We use a unit square centred at the stable equilibrium.
+i.e. the (signed) area of the surface $S$. We take a unit square centred at the origin.
 
-```@example pendulum
-init2 = (x, y) -> (π + (x - 0.5), y - 0.5)
+```@example oscillator
+init2 = (x, y) -> (x - 0.5, y - 0.5)
 
 pi2 = CanonicalSecondPI{Float64, 2}(2_000)
 
@@ -150,7 +155,10 @@ Is2_rk = compute!(pi2, sol2_rk)
 nothing # hide
 ```
 
-```@example pendulum
+For the surface we advect a coarse regular grid (with the same symplectic method) so it can
+be drawn as a filled patch at each time:
+
+```@example oscillator
 grid = CanonicalSecondPI{Float64, 2}((15, 15), SecondFinDiffPlan)
 nx, ny = getpointspec(grid)
 solg = integrate(PIEnsembleProblem(probh, grid, init2), PartitionedGauss(1))
@@ -161,7 +169,7 @@ plot_surface!(ax, solg, nx, ny)
 fig
 ```
 
-```@example pendulum
+```@example oscillator
 fig = Figure()
 ax = Axis(fig[1, 1]; xlabel = "t", ylabel = "Relative Error (I₂(t)-I₂(0))/I₂(0)",
     title = "PartitionedGauss")
@@ -171,7 +179,7 @@ xlims!(ax, first(ts), last(ts))
 fig
 ```
 
-```@example pendulum
+```@example oscillator
 fig = Figure()
 ax = Axis(fig[1, 1]; xlabel = "t", ylabel = "Relative Error (I₂(t)-I₂(0))/I₂(0)",
     title = "ImplicitMidpoint vs Explicit Runge-Kutta-4")
@@ -183,6 +191,5 @@ axislegend(ax; position = :lb)
 fig
 ```
 
-The symplectic methods conserve both invariants even as the curve and surface are distorted
-by the flow, whereas the non-symplectic explicit Runge-Kutta method lets them drift — exactly
-the behaviour Poincaré integral invariants are designed to diagnose.
+As for the first invariant, the two symplectic methods conserve the second invariant to
+machine precision, whereas the explicit Runge-Kutta method does not.
