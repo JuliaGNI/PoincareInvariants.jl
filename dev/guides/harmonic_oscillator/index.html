@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Harmonic Oscillator · PoincareInvariants.jl</title><meta name="title" content="Harmonic Oscillator · PoincareInvariants.jl"/><meta property="og:title" content="Harmonic Oscillator · PoincareInvariants.jl"/><meta property="twitter:title" content="Harmonic Oscillator · PoincareInvariants.jl"/><meta name="description" content="Documentation for PoincareInvariants.jl."/><meta property="og:description" content="Documentation for PoincareInvariants.jl."/><meta property="twitter:description" content="Documentation for PoincareInvariants.jl."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">PoincareInvariants.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><a class="tocitem" href="../../theory/">Theory</a></li><li><span class="tocitem">Guides</span><ul><li><a class="tocitem" href="../integration/">Integration</a></li><li class="is-active"><a class="tocitem" href>Harmonic Oscillator</a><ul class="internal"><li><a class="tocitem" href="#First-invariant"><span>First invariant</span></a></li><li><a class="tocitem" href="#Second-invariant"><span>Second invariant</span></a></li></ul></li><li><a class="tocitem" href="../pendulum/">Pendulum</a></li><li><a class="tocitem" href="../massless_charged_particle/">Massless Charged Particle</a></li><li><a class="tocitem" href="../lotka_volterra/">Lotka-Volterra</a></li><li><a class="tocitem" href="../convergence/">Convergence</a></li><li><a class="tocitem" href="../plans/">Plans</a></li></ul></li><li><a class="tocitem" href="../../reference/">Reference</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Guides</a></li><li class="is-active"><a href>Harmonic Oscillator</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Harmonic Oscillator</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/JuliaGNI/PoincareInvariants.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/JuliaGNI/PoincareInvariants.jl/blob/main/docs/src/guides/harmonic_oscillator.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Harmonic-Oscillator"><a class="docs-heading-anchor" href="#Harmonic-Oscillator">Harmonic Oscillator</a><a id="Harmonic-Oscillator-1"></a><a class="docs-heading-anchor-permalink" href="#Harmonic-Oscillator" title="Permalink"></a></h1><p>The harmonic oscillator is the simplest canonical Hamiltonian system. With unit mass and spring constant <span>$k$</span> its Hamiltonian is</p><p class="math-container">\[H(q, p) = \frac{p^2}{2} + \frac{k \, q^2}{2} ,\]</p><p>so that the equations of motion in the canonical phase space <span>$(q, p)$</span> read</p><p class="math-container">\[\dot{q} = p , \qquad \dot{p} = -k \, q .\]</p><p>We use the ready-made problem from <a href="https://github.com/JuliaGNI/GeometricProblems.jl">GeometricProblems.jl</a>. For each invariant we show the advected curve or surface, and two plots of the relative error over time: one for the symplectic partitioned method <code>PartitionedGauss</code> (applied to the canonical <code>HODEProblem</code>), and one comparing the symplectic <code>ImplicitMidpoint</code> method with the non-symplectic explicit Runge-Kutta method <code>RK4</code> (both applied to the plain <code>ODEProblem</code> whose state is the pair <span>$[q, p]$</span>).</p><pre><code class="language-julia hljs">using PoincareInvariants
+using GeometricIntegrators
+using GeometricProblems.HarmonicOscillator
+using CairoMakie
+
+probh = hodeproblem([0.0], [0.0]; timespan = (0.0, 5.0), timestep = 0.2)  # canonical
+probo = odeproblem([0.0, 0.0];   timespan = (0.0, 5.0), timestep = 0.2)   # plain ODE
+
+saved_times(sol) = [sol[1].t[n] for n in 0:ntime(sol[1])]
+relerr(Is)       = (Is .- Is[1]) ./ Is[1]
+tsteps(sol)      = round.(Int, range(0, ntime(sol[1]), length = 10))  # 10 time slices
+
+# (q, p) phase space points of every ensemble member at saved time index n
+phasepoints(sol, n) = ([sol[j].q[n][1] for j in 1:nsamples(sol)],
+                       [sol[j].p[n][1] for j in 1:nsamples(sol)])
+
+# 3D view shared by all advected curve/surface plots
+view3   = (; azimuth = 1.775π, elevation = π / 8, aspect = (1, 1, 1.6))
+palette = Makie.wong_colors()
+
+function plot_loop!(ax, sol)
+    ts = saved_times(sol)
+    for (k, n) in enumerate(tsteps(sol))
+        xs, ys = phasepoints(sol, n)
+        lines!(ax, xs, ys, fill(ts[n + 1], length(xs)); color = palette[mod1(k, 7)])
+    end
+    zlims!(ax, first(ts), last(ts))
+end
+
+function plot_surface!(ax, sol, nx, ny)
+    ts = saved_times(sol)
+    for (k, n) in enumerate(tsteps(sol))
+        xs, ys = phasepoints(sol, n)
+        surface!(ax, reshape(xs, ny, nx), reshape(ys, ny, nx), fill(ts[n + 1], ny, nx);
+            color = fill(palette[mod1(k, 7)], ny, nx), shading = NoShading)
+    end
+    zlims!(ax, first(ts), last(ts))
+end</code></pre><h2 id="First-invariant"><a class="docs-heading-anchor" href="#First-invariant">First invariant</a><a id="First-invariant-1"></a><a class="docs-heading-anchor-permalink" href="#First-invariant" title="Permalink"></a></h2><p>The first Poincaré invariant is the loop integral of the canonical one-form <span>$\vartheta = p \, dq$</span>,</p><p class="math-container">\[I_{1} = \oint_{\gamma} p \, dq ,\]</p><p>which equals the area enclosed by the closed curve <span>$\gamma$</span>. We take a circle of radius <span>$r = 1/2$</span> centred at the origin and integrate it with the three methods.</p><pre><code class="language-julia hljs">r = 0.5
+init1 = ϕ -&gt; (r * sinpi(2ϕ), r * cospi(2ϕ))
+
+pi1 = CanonicalFirstPI{Float64, 2}(500)
+
+sol1_pg = integrate(PIEnsembleProblem(probh, pi1, init1), PartitionedGauss(1))
+sol1_im = integrate(PIEnsembleProblem(probo, pi1, init1), ImplicitMidpoint())
+sol1_rk = integrate(PIEnsembleProblem(probo, pi1, init1), RK4())
+
+Is1_pg = compute!(pi1, sol1_pg)
+Is1_im = compute!(pi1, sol1_im)
+Is1_rk = compute!(pi1, sol1_rk)
+
+ts = saved_times(sol1_pg)</code></pre><p>As the loop is advected by the flow it rotates rigidly in phase space (the harmonic oscillator is linear):</p><pre><code class="language-julia hljs">fig = Figure()
+ax = Axis3(fig[1, 1]; xlabel = &quot;q&quot;, ylabel = &quot;p&quot;, zlabel = &quot;t&quot;, view3..., title = &quot;Advected Loop&quot;)
+plot_loop!(ax, sol1_pg)
+fig</code></pre><img src="e56f96f5.png" alt="Example block output"/><p>The symplectic partitioned method conserves the invariant to machine precision:</p><pre><code class="language-julia hljs">fig = Figure()
+ax = Axis(fig[1, 1]; xlabel = &quot;t&quot;, ylabel = &quot;Relative Error (I₁(t)-I₁(0))/I₁(0)&quot;,
+    title = &quot;PartitionedGauss&quot;)
+hlines!(ax, [0.0]; color = :gray, linestyle = :dash)
+scatter!(ax, ts, relerr(Is1_pg))
+xlims!(ax, first(ts), last(ts))
+fig</code></pre><img src="d815373c.png" alt="Example block output"/><p><code>ImplicitMidpoint</code> is symplectic too and likewise conserves the invariant to machine precision, while the non-symplectic explicit Runge-Kutta method lets it drift:</p><pre><code class="language-julia hljs">fig = Figure()
+ax = Axis(fig[1, 1]; xlabel = &quot;t&quot;, ylabel = &quot;Relative Error (I₁(t)-I₁(0))/I₁(0)&quot;,
+    title = &quot;ImplicitMidpoint vs Explicit Runge-Kutta-4&quot;)
+hlines!(ax, [0.0]; color = :gray, linestyle = :dash)
+scatter!(ax, ts, relerr(Is1_im); label = &quot;ImplicitMidpoint&quot;)
+scatter!(ax, ts, relerr(Is1_rk); label = &quot;Explicit Runge-Kutta-4&quot;)
+xlims!(ax, first(ts), last(ts))
+axislegend(ax; position = :lb)
+fig</code></pre><img src="c5590355.png" alt="Example block output"/><h2 id="Second-invariant"><a class="docs-heading-anchor" href="#Second-invariant">Second invariant</a><a id="Second-invariant-1"></a><a class="docs-heading-anchor-permalink" href="#Second-invariant" title="Permalink"></a></h2><p>The second Poincaré invariant is the surface integral of the canonical two-form <span>$\omega = dq \wedge dp$</span>,</p><p class="math-container">\[I_{2} = \int_{S} dq \wedge dp ,\]</p><p>i.e. the (signed) area of the surface <span>$S$</span>. We take a unit square centred at the origin.</p><pre><code class="language-julia hljs">init2 = (x, y) -&gt; (x - 0.5, y - 0.5)
+
+pi2 = CanonicalSecondPI{Float64, 2}(2_000)
+
+sol2_pg = integrate(PIEnsembleProblem(probh, pi2, init2), PartitionedGauss(1))
+sol2_im = integrate(PIEnsembleProblem(probo, pi2, init2), ImplicitMidpoint())
+sol2_rk = integrate(PIEnsembleProblem(probo, pi2, init2), RK4())
+
+Is2_pg = compute!(pi2, sol2_pg)
+Is2_im = compute!(pi2, sol2_im)
+Is2_rk = compute!(pi2, sol2_rk)</code></pre><p>For the surface we advect a coarse regular grid (with the same symplectic method) so it can be drawn as a filled patch at each time:</p><pre><code class="language-julia hljs">grid = CanonicalSecondPI{Float64, 2}((15, 15), SecondFinDiffPlan)
+nx, ny = getpointspec(grid)
+solg = integrate(PIEnsembleProblem(probh, grid, init2), PartitionedGauss(1))
+
+fig = Figure()
+ax = Axis3(fig[1, 1]; xlabel = &quot;q&quot;, ylabel = &quot;p&quot;, zlabel = &quot;t&quot;, view3..., title = &quot;Advected Surface&quot;)
+plot_surface!(ax, solg, nx, ny)
+fig</code></pre><img src="25abe6bd.png" alt="Example block output"/><pre><code class="language-julia hljs">fig = Figure()
+ax = Axis(fig[1, 1]; xlabel = &quot;t&quot;, ylabel = &quot;Relative Error (I₂(t)-I₂(0))/I₂(0)&quot;,
+    title = &quot;PartitionedGauss&quot;)
+hlines!(ax, [0.0]; color = :gray, linestyle = :dash)
+scatter!(ax, ts, relerr(Is2_pg))
+xlims!(ax, first(ts), last(ts))
+fig</code></pre><img src="0a1e8b46.png" alt="Example block output"/><pre><code class="language-julia hljs">fig = Figure()
+ax = Axis(fig[1, 1]; xlabel = &quot;t&quot;, ylabel = &quot;Relative Error (I₂(t)-I₂(0))/I₂(0)&quot;,
+    title = &quot;ImplicitMidpoint vs Explicit Runge-Kutta-4&quot;)
+hlines!(ax, [0.0]; color = :gray, linestyle = :dash)
+scatter!(ax, ts, relerr(Is2_im); label = &quot;ImplicitMidpoint&quot;)
+scatter!(ax, ts, relerr(Is2_rk); label = &quot;Explicit Runge-Kutta-4&quot;)
+xlims!(ax, first(ts), last(ts))
+axislegend(ax; position = :lb)
+fig</code></pre><img src="b8c187cf.png" alt="Example block output"/><p>As for the first invariant, the two symplectic methods conserve the second invariant to machine precision, whereas the explicit Runge-Kutta method does not.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../integration/">« Integration</a><a class="docs-footer-nextpage" href="../pendulum/">Pendulum »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Friday 24 July 2026 14:59">Friday 24 July 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

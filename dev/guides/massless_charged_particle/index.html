@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Massless Charged Particle · PoincareInvariants.jl</title><meta name="title" content="Massless Charged Particle · PoincareInvariants.jl"/><meta property="og:title" content="Massless Charged Particle · PoincareInvariants.jl"/><meta property="twitter:title" content="Massless Charged Particle · PoincareInvariants.jl"/><meta name="description" content="Documentation for PoincareInvariants.jl."/><meta property="og:description" content="Documentation for PoincareInvariants.jl."/><meta property="twitter:description" content="Documentation for PoincareInvariants.jl."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">PoincareInvariants.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><a class="tocitem" href="../../theory/">Theory</a></li><li><span class="tocitem">Guides</span><ul><li><a class="tocitem" href="../integration/">Integration</a></li><li><a class="tocitem" href="../harmonic_oscillator/">Harmonic Oscillator</a></li><li><a class="tocitem" href="../pendulum/">Pendulum</a></li><li class="is-active"><a class="tocitem" href>Massless Charged Particle</a><ul class="internal"><li><a class="tocitem" href="#The-invariant-forms"><span>The invariant forms</span></a></li><li><a class="tocitem" href="#First-invariant"><span>First invariant</span></a></li><li><a class="tocitem" href="#Second-invariant"><span>Second invariant</span></a></li></ul></li><li><a class="tocitem" href="../lotka_volterra/">Lotka-Volterra</a></li><li><a class="tocitem" href="../convergence/">Convergence</a></li><li><a class="tocitem" href="../plans/">Plans</a></li></ul></li><li><a class="tocitem" href="../../reference/">Reference</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Guides</a></li><li class="is-active"><a href>Massless Charged Particle</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Massless Charged Particle</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/JuliaGNI/PoincareInvariants.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/JuliaGNI/PoincareInvariants.jl/blob/main/docs/src/guides/massless_charged_particle.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Massless-Charged-Particle"><a class="docs-heading-anchor" href="#Massless-Charged-Particle">Massless Charged Particle</a><a id="Massless-Charged-Particle-1"></a><a class="docs-heading-anchor-permalink" href="#Massless-Charged-Particle" title="Permalink"></a></h1><p>The massless charged particle in the plane is a noncanonical symplectic system. Its phase space is just the position <span>$x = (x_1, x_2)$</span>, and its dynamics derive from the degenerate Lagrangian</p><p class="math-container">\[L(x, \dot{x}) = A(x) \cdot \dot{x} - \phi(x) ,\]</p><p>with magnetic vector potential <span>$A$</span>, electrostatic potential <span>$\phi$</span> and magnetic field <span>$B(x) = \nabla \times A(x)$</span>. The Hamiltonian form of the equations of motion,</p><p class="math-container">\[\dot{x} = \frac{1}{B(x)} \begin{pmatrix} 0 &amp; -1 \\ +1 &amp; 0 \end{pmatrix} \nabla \phi(x) ,\]</p><p>carries a state-dependent (noncanonical) symplectic structure. We use the problem and its exported forms from <a href="https://github.com/JuliaGNI/GeometricProblems.jl">GeometricProblems.jl</a>, integrating the degenerate <code>IODEProblem</code> with a <strong>Degenerate Variational Runge-Kutta</strong> method, <code>DVRK</code>, which preserves the noncanonical structure.</p><pre><code class="language-julia hljs">using PoincareInvariants
+using GeometricIntegrators
+import GeometricProblems.MasslessChargedParticle as MCP
+using StaticArrays
+using CairoMakie
+
+par  = MCP.default_parameters()
+prob = MCP.iodeproblem([1.0, 1.0]; timespan = (0.0, 5.0), timestep = 0.1)
+
+saved_times(sol) = [sol[1].t[n] for n in 0:ntime(sol[1])]
+relerr(Is)       = (Is .- Is[1]) ./ Is[1]
+tsteps(sol)      = round.(Int, range(0, ntime(sol[1]), length = 10))
+
+# (x₁, x₂) positions of every ensemble member at saved time index n
+phasepoints(sol, n) = ([sol[j].q[n][1] for j in 1:nsamples(sol)],
+                       [sol[j].q[n][2] for j in 1:nsamples(sol)])
+
+view3   = (; azimuth = 1.775π, elevation = π / 8, aspect = (1, 1, 1.6))
+palette = Makie.wong_colors()
+
+function plot_loop!(ax, sol)
+    ts = saved_times(sol)
+    for (k, n) in enumerate(tsteps(sol))
+        xs, ys = phasepoints(sol, n)
+        lines!(ax, xs, ys, fill(ts[n + 1], length(xs)); color = palette[mod1(k, 7)])
+    end
+    zlims!(ax, first(ts), last(ts))
+end
+
+function plot_surface!(ax, sol, nx, ny)
+    ts = saved_times(sol)
+    for (k, n) in enumerate(tsteps(sol))
+        xs, ys = phasepoints(sol, n)
+        surface!(ax, reshape(xs, ny, nx), reshape(ys, ny, nx), fill(ts[n + 1], ny, nx);
+            color = fill(palette[mod1(k, 7)], ny, nx), shading = NoShading)
+    end
+    zlims!(ax, first(ts), last(ts))
+end</code></pre><h2 id="The-invariant-forms"><a class="docs-heading-anchor" href="#The-invariant-forms">The invariant forms</a><a id="The-invariant-forms-1"></a><a class="docs-heading-anchor-permalink" href="#The-invariant-forms" title="Permalink"></a></h2><p>The first invariant uses the one-form <span>$\vartheta = A(x)$</span> (the magnetic vector potential), and the second uses the two-form <span>$\omega = d\vartheta$</span>, which for this system is</p><p class="math-container">\[\omega = \begin{pmatrix} 0 &amp; B(x) \\ -B(x) &amp; 0 \end{pmatrix} .\]</p><p>Both are provided directly by the problem module (<code>ϑ</code> and <code>B</code>), so we only reshape them into the <code>form(z, t, p)</code> interface expected by <code>PoincareInvariants</code>. The parameter slot <code>p</code> carries the physical parameters <code>par</code>.</p><pre><code class="language-julia hljs">oneform(z, t, p) = SVector{2}(MCP.ϑ(t, z, p))
+
+function twoform(z, t, p)
+    b = MCP.B(z, p)
+    @SMatrix [0.0  b;
+              -b   0.0]
+end</code></pre><h2 id="First-invariant"><a class="docs-heading-anchor" href="#First-invariant">First invariant</a><a id="First-invariant-1"></a><a class="docs-heading-anchor-permalink" href="#First-invariant" title="Permalink"></a></h2><p class="math-container">\[I_{1} = \oint_{\gamma} A(x) \cdot dx\]</p><p>We advect a small circle of radius <span>$\rho = 0.2$</span> around the initial position <span>$(1, 1)$</span> and pass the parameters <code>par</code> to <a href="../../reference/#PoincareInvariants.compute!"><code>compute!</code></a> so the form can evaluate <span>$A$</span>.</p><pre><code class="language-julia hljs">q₀ = SVector(1.0, 1.0)
+ρ  = 0.2
+
+pi1  = FirstPI{Float64, 2}(oneform, 500)
+sol1 = integrate(PIEnsembleProblem(prob, pi1, ϕ -&gt; q₀ .+ ρ .* (cospi(2ϕ), sinpi(2ϕ))), DVRK(Gauss(2)))
+Is1  = compute!(pi1, sol1, par)
+
+ts = saved_times(sol1)</code></pre><p>The loop is transported and deformed by the flow:</p><pre><code class="language-julia hljs">fig = Figure()
+ax = Axis3(fig[1, 1]; xlabel = &quot;x₁&quot;, ylabel = &quot;x₂&quot;, zlabel = &quot;t&quot;, view3..., title = &quot;Advected Loop&quot;)
+plot_loop!(ax, sol1)
+fig</code></pre><img src="72206822.png" alt="Example block output"/><pre><code class="language-julia hljs">fig = Figure()
+ax = Axis(fig[1, 1]; xlabel = &quot;t&quot;, ylabel = &quot;Relative Error (I₁(t)-I₁(0))/I₁(0)&quot;,
+    title = &quot;First Poincaré invariant&quot;)
+hlines!(ax, [0.0]; color = :gray, linestyle = :dash)
+scatter!(ax, ts, relerr(Is1))
+xlims!(ax, first(ts), last(ts))
+fig</code></pre><img src="0b6b6ef5.png" alt="Example block output"/><h2 id="Second-invariant"><a class="docs-heading-anchor" href="#Second-invariant">Second invariant</a><a id="Second-invariant-1"></a><a class="docs-heading-anchor-permalink" href="#Second-invariant" title="Permalink"></a></h2><p class="math-container">\[I_{2} = \int_{S} \omega = \int_{S} B(x) \, dx_1 \, dx_2\]</p><p>is the magnetic flux through the surface <span>$S$</span>. We advect a small square around <span>$(1, 1)$</span>.</p><pre><code class="language-julia hljs">pi2  = SecondPI{Float64, 2}(twoform, 2_000)
+sol2 = integrate(PIEnsembleProblem(prob, pi2, (x, y) -&gt; q₀ .+ ρ .* (2x - 1, 2y - 1)), DVRK(Gauss(2)))
+Is2  = compute!(pi2, sol2, par)</code></pre><pre><code class="language-julia hljs">grid = SecondPI{Float64, 2}(twoform, (15, 15), SecondFinDiffPlan)
+nx, ny = getpointspec(grid)
+solg = integrate(PIEnsembleProblem(prob, grid, (x, y) -&gt; q₀ .+ ρ .* (2x - 1, 2y - 1)), DVRK(Gauss(2)))
+
+fig = Figure()
+ax = Axis3(fig[1, 1]; xlabel = &quot;x₁&quot;, ylabel = &quot;x₂&quot;, zlabel = &quot;t&quot;, view3..., title = &quot;Advected Surface&quot;)
+plot_surface!(ax, solg, nx, ny)
+fig</code></pre><img src="301ea9b6.png" alt="Example block output"/><pre><code class="language-julia hljs">fig = Figure()
+ax = Axis(fig[1, 1]; xlabel = &quot;t&quot;, ylabel = &quot;Relative Error (I₂(t)-I₂(0))/I₂(0)&quot;,
+    title = &quot;Second Poincaré invariant&quot;)
+hlines!(ax, [0.0]; color = :gray, linestyle = :dash)
+scatter!(ax, ts, relerr(Is2))
+xlims!(ax, first(ts), last(ts))
+fig</code></pre><img src="501f48db.png" alt="Example block output"/><p>The <code>DVRK(Gauss(2))</code> method is a fourth-order variational integrator for noncanonical symplectic systems, so both invariants are conserved with high accuracy as the curve and surface are advected by the flow. A standard, structure-agnostic integrator would let them drift.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../pendulum/">« Pendulum</a><a class="docs-footer-nextpage" href="../lotka_volterra/">Lotka-Volterra »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Friday 24 July 2026 14:59">Friday 24 July 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
