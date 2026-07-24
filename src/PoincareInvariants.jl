@@ -17,12 +17,11 @@ export SecondChebyshevPlan, SecondFinDiffPlan
 
 export canonical_one_form, CanonicalSymplecticMatrix, canonical_two_form
 
-# DifferentialEquations.jl integration
+# JuliaGNI ecosystem integration
 
-import CommonSolve: solve
-import SciMLBase: EnsembleProblem, EnsembleSolution
-
-using SciMLBase: DEFAULT_PROB_FUNC, DEFAULT_OUTPUT_FUNC, DEFAULT_REDUCTION, remake
+using GeometricEquations: EnsembleProblem, ODE, HODE, PODE, IODE, LODE,
+    equation, timespan, timestep, parameters
+using GeometricSolutions: EnsembleSolution, GeometricSolution, nsamples, ntime
 
 export PIEnsembleProblem
 
@@ -335,43 +334,82 @@ const DEFAULT_SECOND_PLAN = SecondChebyshevPlan
 
 ## Integration ##
 
-struct PIEnsembleProblem{T, P <: EnsembleProblem, PI <: AbstractPoincareInvariant{T,<:Any}}
-    problem::P
-    pinv::PI
-end
+"""
+    PIEnsembleProblem(prob, pinv, init)
 
-function PIEnsembleProblem(init, prob, pinv::PI;
-    output_func = DEFAULT_OUTPUT_FUNC,
-    prob_func = DEFAULT_PROB_FUNC,
-    reduction = DEFAULT_REDUCTION,
-    u_init = nothing,
-    safetycopy = false
-) where PI <: AbstractPoincareInvariant{T,<:Any} where T
+builds a `GeometricEquations.EnsembleProblem` from a base problem `prob`, a Poincaré
+invariant setup object `pinv`, and a curve or surface parameterisation `init`.
+
+`prob` is a geometric `EquationProblem` (e.g. an `ODEProblem`, `HODEProblem`, `IODEProblem`
+or `LODEProblem`) specifying the dynamics, time span and time step. The parameterisation
+`init` is sampled with [`getpoints`](@ref), and each sampled phase space point becomes the
+initial condition of one member of the ensemble. For `HODEProblem`/`PODEProblem` the point
+is split into the position and momentum halves `(q, p)`; for `IODEProblem`/`LODEProblem` the
+momentum is initialised from the equation's one-form as `p₀ = ϑ(t₀, q₀)`.
+
+The returned ensemble can be integrated with `GeometricIntegrators.integrate` and the
+invariant computed from the resulting solution with [`compute!`](@ref).
+"""
+function PIEnsembleProblem(prob, pinv::AbstractPoincareInvariant, init)
     points = getpoints(init, pinv)
-    pf = (prob, i, repeat) -> prob_func(remake(prob; u0=points[i, :]), i, repeat)
-    problem = EnsembleProblem(prob, pf, output_func, reduction, u_init, safetycopy)
-    return PIEnsembleProblem{T, typeof(problem), PI}(problem, pinv)
+    equ = equation(prob)
+    t₀ = timespan(prob)[begin]
+    par = parameters(prob)
+    ics = [_ensemble_ics(equ, view(points, i, :), t₀, par) for i in axes(points, 1)]
+    EnsembleProblem(equ, timespan(prob), timestep(prob), ics, par)
 end
 
-# I need my own problem type here, because the trajectories argument is required at this
-# stage. Otherwise the user would have to input trajectories=getpointnum(pinv) themself
-function solve(prob::PIEnsembleProblem, alg, ensemblealg; kwargs...)
-    solve(prob.problem, alg, ensemblealg; trajectories=getpointnum(prob.pinv), kwargs...)
+# map a single D-dimensional phase space point to the initial condition NamedTuple
+# expected by the underlying geometric equation
+_ensemble_ics(::ODE, point, t₀, params) = (q = collect(point),)
+
+function _ensemble_ics(::Union{HODE, PODE}, point, t₀, params)
+    mid = length(point) ÷ 2
+    (q = collect(point[1:mid]), p = collect(point[mid+1:end]))
 end
 
+function _ensemble_ics(equ::Union{IODE, LODE}, point, t₀, params)
+    q = collect(point)
+    p = zero(q)
+    v = zero(q)
+    equ.ϑ(p, t₀, q, v, params)
+    (q = q, p = p)
+end
+
+"""
+    compute!(pinv::AbstractPoincareInvariant, sol::EnsembleSolution, p=nothing)
+
+computes the Poincaré invariant at every saved time step of an `EnsembleSolution` returned
+by `GeometricIntegrators.integrate`. Each ensemble member provides the trajectory of one
+point on the curve or surface. Returns a `Vector` holding one invariant value per time step.
+
+The optional parameter `p` is passed to the differential form, just like the time.
+"""
 function compute!(
     pinv::AbstractPoincareInvariant,
     sol::EnsembleSolution,
     p=nothing
 )
-    # assumes times are the same for all solutions
-    times = sol[1].t
-    map(eachindex(times)) do i
-        for j in 1:getpointnum(pinv)
-            # j-th trajectory at time i
-            pinv.points[j, :] .= sol[j][i]
+    D = getdim(pinv)
+    n = nsamples(sol)
+    # assumes the time grid is the same for all ensemble members
+    m1 = sol[1]
+    hasp = hasproperty(m1, :p)
+    map(0:ntime(m1)) do i
+        for j in 1:n
+            m = sol[j]
+            q = m.q[i]
+            if hasp && length(q) < D
+                # canonical (q, p) phase space: stack position and momentum halves
+                mid = length(q)
+                @views pinv.points[j, 1:mid] .= q
+                @views pinv.points[j, mid+1:D] .= m.p[i]
+            else
+                # phase space coincides with the position variable q
+                @views pinv.points[j, 1:D] .= q
+            end
         end
-        compute!(pinv, times[i], p)
+        compute!(pinv, m1.t[i], p)
     end
 end
 

@@ -36,6 +36,12 @@ getform
 getplan
 ```
 
+## Integration
+
+```@docs
+PIEnsembleProblem
+```
+
 ## Canonical Symplectic Forms
 
 ```@docs
