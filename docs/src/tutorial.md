@@ -71,6 +71,6 @@ structure.
   DVI methods preserve a discrete *canonical* structure and are not suitable here.)
 
 The following guides work through a canonical example
-([Harmonic Oscillator](harmonic_oscillator.md), [Pendulum](pendulum.md)) and a noncanonical
-example ([Massless Charged Particle](massless_charged_particle.md),
-[Lotka-Volterra](lotka_volterra.md)) in detail.
+([Harmonic Oscillator](examples/harmonic_oscillator.md), [Pendulum](examples/pendulum.md)) and a noncanonical
+example ([Massless Charged Particle](examples/massless_charged_particle.md),
+[Lotka-Volterra](examples/lotka_volterra.md)) in detail.
