@@ -7,6 +7,8 @@ using ..PoincareInvariants: @argcheck
 
 using LinearAlgebra: dot
 
+using StaticArrays: MVector, MMatrix
+
 struct SecondFinDiffPlan{T, D} end
 
 function SecondFinDiffPlan{T, D}(ω, ps::NTuple{2, Int}) where {T, D}
@@ -23,8 +25,9 @@ function compute!(
 
     I = zero(T)
 
-    ∂xi = Vector{T}(undef, D)
-    ∂yi = Vector{T}(undef, D)
+    ∂xi = MVector{D, T}(undef)
+    ∂yi = MVector{D, T}(undef)
+    ωbuf = MMatrix{D, D, T}(undef)
 
     colviews = [view(points, :, d) for d in 1:D]
 
@@ -40,7 +43,8 @@ function compute!(
                 ωi = pinv.ω
             else
                 pnti = view(points, i, :)
-                ωi = pinv.ω(pnti, t, p)
+                pinv.ω(ωbuf, t, pnti, p)
+                ωi = ωbuf
             end
 
             w = getsimpweight(T, ix, iy, (nx, ny))

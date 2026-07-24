@@ -33,7 +33,8 @@ end
     T = Float64
     D = 3
 
-    θ(z, t, p) = SVector{3}(p * z[2], -t * z[1], z[3])
+    # in-place one form following the form(out, t, z, p) convention
+    θ!(out, t, z, p) = (out[1] = p * z[2]; out[2] = -t * z[1]; out[3] = z[3]; nothing)
     f(x) = ((s, c) = sincospi(2x); SVector{3}(2c,  5s, c + s))
 
     T = Float64
@@ -52,9 +53,11 @@ end
         end
 
         fi = fvals[i, :]
-        return Δx * dot(θ(fi, 2, 3), dfi)
+        θi = zeros(D)
+        θ!(θi, 2, fi, 3)
+        return Δx * dot(θi, dfi)
     end
 
-    pinv = FirstPoincareInvariant{T, D}(θ, N, FirstFinDiffPlan{T, D}())
+    pinv = FirstPoincareInvariant{T, D}(θ!, N, FirstFinDiffPlan{T, D}())
     @test compute!(pinv, fvals, 2, 3) ≈ testI atol=500eps()
 end

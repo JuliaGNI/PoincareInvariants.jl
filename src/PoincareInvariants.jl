@@ -15,7 +15,7 @@ export getdim, getform, getplan
 export FirstFinDiffPlan, FirstFourierPlan
 export SecondChebyshevPlan, SecondFinDiffPlan
 
-export canonical_one_form, CanonicalSymplecticMatrix, canonical_two_form
+export canonical_one_form!, CanonicalSymplecticMatrix
 
 # JuliaGNI ecosystem integration
 
@@ -45,6 +45,14 @@ of the curve or surface parameterisation evaluated on some set of points, e.g. a
 
 `t` is the time at which the invariant is evaluated `p` are any user supplied optional
 arguments. Both `t` and `p` are passed directly to the differential form.
+
+The differential form is an **in-place** function following the convention
+`form(out, t, z, p)`: it writes its value at the phase space point `z` (one point, a length-`D`
+vector) into the preallocated output `out` — a length-`D` vector for a one form `θ`, a `D×D`
+matrix for a two form `ω`. This argument order matches the one- and two-forms exported by
+`GeometricEquations`/`GeometricProblems` (`ϑ(Θ, t, q, params)`, `ω(Ω, t, q, params)`), so a
+problem's own forms can be passed directly. A constant `ω::AbstractMatrix` (e.g. a
+`CanonicalSymplecticMatrix`) is used as-is and is not called.
 
 Plan implementations should define a method `compute!(pinv, t::Real, p)`, which acts on the
 internal points storage `pinv.points`.
@@ -148,8 +156,7 @@ function getform end
 
 include("CanonicalSymplecticForms.jl")
 
-using .CanonicalSymplecticForms: canonical_one_form, CanonicalSymplecticMatrix,
-    canonical_two_form
+using .CanonicalSymplecticForms: canonical_one_form!, CanonicalSymplecticMatrix
 
 
 ## FirstPoincareInvariant ##
@@ -203,20 +210,20 @@ function FirstPoincareInvariant{T, D}(
 end
 
 """
-    FirstPoincareInvariant{T, D, typeof(canonical_one_form)}(N::Integer, P=DEFAULT_FIRST_PLAN)
+    FirstPoincareInvariant{T, D, typeof(canonical_one_form!)}(N::Integer, P=DEFAULT_FIRST_PLAN)
     CanonicalFirstPI{T, D}(N::Integer, P=DEFAULT_FIRST_PLAN)
 
 creates a setup object to compute the first integral invariant using the canonical one form
 in phase space of dimension `D` with numeric type `T`, `N` points and plan type `P`.
 """
-function FirstPoincareInvariant{T, D, typeof(canonical_one_form)}(
+function FirstPoincareInvariant{T, D, typeof(canonical_one_form!)}(
     N::Integer, P=DEFAULT_FIRST_PLAN
 ) where {T, D}
-    FirstPoincareInvariant{T, D}(canonical_one_form, N, P)
+    FirstPoincareInvariant{T, D}(canonical_one_form!, N, P)
 end
 
 const FirstPI = FirstPoincareInvariant
-const CanonicalFirstPI{T, D} = FirstPoincareInvariant{T, D, typeof(canonical_one_form)}
+const CanonicalFirstPI{T, D} = FirstPoincareInvariant{T, D, typeof(canonical_one_form!)}
 
 # Interface
 

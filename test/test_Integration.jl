@@ -72,22 +72,21 @@ end
     prob = MasslessChargedParticleSingular.lodeproblem([1.0, 1.0]; timespan = (0.0, 1.0), timestep = 0.05)
     par  = parameters(prob)
 
-    # one-form ϑ = A(x) and two-form ω = dϑ, pulled directly from the problem's function
-    # tuple (in-place, parameter-carrying) — identical setup to LotkaVolterra2dSingular below
+    # the in-place one-form ϑ and two-form ω = dϑ of the problem match the invariant form
+    # convention `form(out, t, z, p)` exactly, so we pass them straight to FirstPI / SecondPI
+    # with no wrapper — identical setup to LotkaVolterra2dSingular below
     fs = functions(prob)
-    oneform(z, t, p) = (Θ = zeros(eltype(z), 2);    fs.ϑ(Θ, t, z, p); SVector{2}(Θ))
-    twoform(z, t, p) = (Ω = zeros(eltype(z), 2, 2); fs.ω(Ω, t, z, p); SMatrix{2, 2}(Ω))
 
     q₀ = SVector(1.0, 1.0)
     ρ = 0.2
 
-    pi1 = FirstPI{Float64, 2}(oneform, 500)
+    pi1 = FirstPI{Float64, 2}(fs.ϑ, 500)
     ens1 = PIEnsembleProblem(prob, pi1, ϕ -> q₀ .+ ρ .* (cospi(2ϕ), sinpi(2ϕ)))
     sol1 = integrate(ens1, DVRK(Gauss(2)))
     Is1 = compute!(pi1, sol1, par)
     @test maxdev(Is1) < 1e-13
 
-    pi2 = SecondPI{Float64, 2}(twoform, 2_000)
+    pi2 = SecondPI{Float64, 2}(fs.ω, 2_000)
     ens2 = PIEnsembleProblem(prob, pi2, (x, y) -> q₀ .+ ρ .* (2x - 1, 2y - 1))
     sol2 = integrate(ens2, DVRK(Gauss(2)))
     Is2 = compute!(pi2, sol2, par)
@@ -100,23 +99,20 @@ end
     prob = LotkaVolterra2dSingular.lodeproblem([2.0, 1.0]; timespan = (0.0, 1.0), timestep = 0.05)
     par  = parameters(prob)
 
-    # one-form ϑ and two-form ω = dϑ, pulled directly from the problem's function tuple so
-    # the invariant forms are exactly the (in-place, parameter-carrying) functions the
-    # problem was integrated with
+    # the problem's in-place one-form ϑ and two-form ω = dϑ follow the `form(out, t, z, p)`
+    # convention, so they are passed directly as the invariant forms
     fs = functions(prob)
-    oneform(z, t, p) = (Θ = zeros(eltype(z), 2);    fs.ϑ(Θ, t, z, p); SVector{2}(Θ))
-    twoform(z, t, p) = (Ω = zeros(eltype(z), 2, 2); fs.ω(Ω, t, z, p); SMatrix{2, 2}(Ω))
 
     q₀ = SVector(2.0, 1.0)
     ρ = 0.2
 
-    pi1 = FirstPI{Float64, 2}(oneform, 500)
+    pi1 = FirstPI{Float64, 2}(fs.ϑ, 500)
     ens1 = PIEnsembleProblem(prob, pi1, ϕ -> q₀ .+ ρ .* (cospi(2ϕ), sinpi(2ϕ)))
     sol1 = integrate(ens1, DVRK(Gauss(2)))
     Is1 = compute!(pi1, sol1, par)
     @test maxdev(Is1) < 1e-11
 
-    pi2 = SecondPI{Float64, 2}(twoform, 2_000)
+    pi2 = SecondPI{Float64, 2}(fs.ω, 2_000)
     ens2 = PIEnsembleProblem(prob, pi2, (x, y) -> q₀ .+ ρ .* (2x - 1, 2y - 1))
     sol2 = integrate(ens2, DVRK(Gauss(2)))
     Is2 = compute!(pi2, sol2, par)

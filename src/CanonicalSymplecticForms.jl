@@ -3,62 +3,30 @@ module CanonicalSymplecticForms
 import Base
 import LinearAlgebra
 
-export canonical_one_form, CanonicalSymplecticMatrix, canonical_two_form
+export canonical_one_form!, CanonicalSymplecticMatrix
 
 function checkn(T, n::Integer)
     n > 0 || throw(ArgumentError("$T must have positive size"))
     iseven(n) || throw(ArgumentError("$T must have even size"))
 end
 
-struct CanonicalSymplecticVector{T, VT <: AbstractVector{T}} <: AbstractVector{T}
-    p::VT
+"""
+    canonical_one_form!(out, t, z, p)
 
-    function CanonicalSymplecticVector{T, VT}(p) where {T, VT}
-        Base.require_one_based_indexing(p)
-        new{T, VT}(p)
-    end
-end
-
-CanonicalSymplecticVector{T}(p::VT) where {T, VT} = CanonicalSymplecticVector{T, VT}(p)
-CanonicalSymplecticVector(p::VT) where VT = CanonicalSymplecticVector{eltype(p), VT}(p)
-
-Base.size(C::CanonicalSymplecticVector) = (length(C.p) * 2,)
-
-function Base.getindex(C::CanonicalSymplecticVector{T}, i::Int) where T
-    mid = length(C.p)
-    @boundscheck let n = mid * 2
-        if !(1 ≤ i ≤ n)
-            msg = "attempt to access $n-element CanonicalSymplecticVector at index [$i]"
-            throw(BoundsError(msg))
-        end
-    end
-
-    if i ≤ mid
-        return @inbounds C.p[i]
-    else
-        return zero(T)
-    end
-end
-
-function LinearAlgebra.dot(C::CanonicalSymplecticVector, x::AbstractVector)
-    m = length(C.p)
-    axes(x, 1) == 1:2m || throw(DimensionMismatch())
-
-    s = zero(promote_type(eltype(x), eltype(C)))
-    @inbounds for i in 1:m
-        s += C.p[i] * x[i]
-    end
-
-    s
-end
-
-# LinearAlgebra.dot(x::AbstractVector, C::CanonicalSymplecticVector) = LinearAlgebra.dot(C, x)
-
-function canonical_one_form(z, t, p)
+writes the canonical one form ``\\vartheta`` at the phase space point `z` into `out`, following
+the in-place `form(out, t, z, p)` convention. For a phase space point `z = (q, p)` of even
+length `n = 2m`, the canonical one form is ``\\vartheta = (p, 0)``, i.e. `out[1:m] .= z[m+1:n]`
+and `out[m+1:n] .= 0`. The time `t` and parameters `p` are ignored.
+"""
+function canonical_one_form!(out, t, z, p)
     n = length(z)
     iseven(n) || throw(ArgumentError("z must have even length"))
     mid = n ÷ 2
-    CanonicalSymplecticVector(view(z, mid+1:n))
+    @inbounds @views begin
+        out[1:mid] .= z[mid+1:n]
+        out[mid+1:n] .= zero(eltype(out))
+    end
+    return out
 end
 
 """
@@ -128,7 +96,5 @@ function LinearAlgebra.dot(x::AbstractVector, C::CanonicalSymplecticMatrix, y::A
 
     s
 end
-
-canonical_two_form(z, t, p) = CanonicalSymplecticMatrix{eltype(z)}(length(z))
 
 end  # module

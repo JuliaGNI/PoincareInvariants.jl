@@ -53,16 +53,14 @@ nothing # hide
 
 The first invariant uses the one-form $\vartheta = A(x)$ (the magnetic vector potential), and
 the second uses the two-form $\omega = d\vartheta$ (the magnetic field). As in the
-Lotka-Volterra example, both belong to the `LODEProblem` itself, so we take them straight from
-the problem's function tuple with `functions(prob)` — guaranteeing the invariant forms are
-exactly the (in-place, parameter-carrying) functions the problem was integrated with — and
-only adapt them to the `form(z, t, p)` interface, forwarding the parameters `par` through `p`.
+Lotka-Volterra example, both belong to the `LODEProblem` itself. `PoincareInvariants` expects a
+differential form as an **in-place** function `form(out, t, z, p)`, which is exactly the
+convention `GeometricProblems` uses (`ϑ(Θ, t, q, params)`, `ω(Ω, t, q, params)`), so we take
+them from the problem's function tuple with `functions(prob)` and pass `fs.ϑ` / `fs.ω`
+**directly** to `FirstPI` / `SecondPI`, with no wrapper:
 
 ```@example particle
 fs = functions(prob)
-
-oneform(z, t, p) = (Θ = zeros(eltype(z), 2);    fs.ϑ(Θ, t, z, p); SVector{2}(Θ))
-twoform(z, t, p) = (Ω = zeros(eltype(z), 2, 2); fs.ω(Ω, t, z, p); SMatrix{2, 2}(Ω))
 nothing # hide
 ```
 
@@ -79,7 +77,7 @@ the parameters `par` to [`compute!`](@ref) (via `plot_invariant`) so the form ca
 q₀ = SVector(1.0, 1.0)
 ρ  = 0.2
 
-pi1  = FirstPI{Float64, 2}(oneform, 500)
+pi1  = FirstPI{Float64, 2}(fs.ϑ, 500)
 sol1 = integrate(PIEnsembleProblem(prob, pi1, ϕ -> q₀ .+ ρ .* (cospi(2ϕ), sinpi(2ϕ))), DVRK(Gauss(2)))
 nothing # hide
 ```
@@ -103,13 +101,13 @@ I_{2} = \int_{S} \omega = \int_{S} B(x) \, dx_1 \, dx_2
 is the magnetic flux through the surface $S$. We advect a small square around $(1, 1)$.
 
 ```@example particle
-pi2  = SecondPI{Float64, 2}(twoform, 2_000)
+pi2  = SecondPI{Float64, 2}(fs.ω, 2_000)
 sol2 = integrate(PIEnsembleProblem(prob, pi2, (x, y) -> q₀ .+ ρ .* (2x - 1, 2y - 1)), DVRK(Gauss(2)))
 nothing # hide
 ```
 
 ```@example particle
-grid = SecondPI{Float64, 2}(twoform, (15, 15), SecondFinDiffPlan)
+grid = SecondPI{Float64, 2}(fs.ω, (15, 15), SecondFinDiffPlan)
 solg = integrate(PIEnsembleProblem(prob, grid, (x, y) -> q₀ .+ ρ .* (2x - 1, 2y - 1)), DVRK(Gauss(2)))
 
 plot_surface(grid, solg; xlabel = "x₁", ylabel = "x₂")
