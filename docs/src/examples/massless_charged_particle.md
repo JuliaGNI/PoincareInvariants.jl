@@ -9,52 +9,60 @@ L(x, \dot{x}) = A(x) \cdot \dot{x} - \phi(x) ,
 ```
 
 with magnetic vector potential $A$, electrostatic potential $\phi$ and magnetic field
-$B(x) = \nabla \times A(x)$. The Hamiltonian form of the equations of motion,
+$B(x) = \nabla \times A(x)$. We use the `MasslessChargedParticleSingular` variant from
+[GeometricProblems.jl](https://github.com/JuliaGNI/GeometricProblems.jl), which describes the
+same physical system in a "singular" magnetic gauge whose vector potential has only one
+nonzero component,
+
+```math
+A(x) = - A_0 \, x_2 \, \big( 1 + 2 x_1^2 + \tfrac{2}{3} x_2^2 \big) \begin{pmatrix} 1 \\ 0 \end{pmatrix} ,
+\qquad
+\phi(x) = E_0 \, \big( \cos x_1 + \sin x_2 \big) ,
+\qquad
+B(x) = A_0 \, (1 + 2 x_1^2 + 2 x_2^2) .
+```
+
+The magnetic field $B$, the electric field and hence the Hamiltonian form of the equations of
+motion,
 
 ```math
 \dot{x} = \frac{1}{B(x)} \begin{pmatrix} 0 & -1 \\ +1 & 0 \end{pmatrix} \nabla \phi(x) ,
 ```
 
-carries a state-dependent (noncanonical) symplectic structure. We use the problem and its
-exported forms from
-[GeometricProblems.jl](https://github.com/JuliaGNI/GeometricProblems.jl), integrating the
-degenerate `IODEProblem` with a **Degenerate Variational Runge-Kutta** method, `DVRK`, which
-preserves the noncanonical structure. The plotting functions `plot_loop`, `plot_surface` and
-`plot_invariant` come from the package's Makie extension, activated by loading `CairoMakie`.
+are identical to the standard gauge — only the vector potential differs by a gauge
+transformation. This singular one-form $\vartheta = A(x)$ is exactly the form of the
+symplectic potential that the `DVRK` (**Degenerate Variational Runge-Kutta**) integrator
+expects, so integrating the degenerate `LODEProblem` with `DVRK` preserves the noncanonical
+symplectic structure $\omega = d\vartheta$ — and with it the Poincaré invariants — to machine
+accuracy. The plotting functions `plot_loop`, `plot_surface` and `plot_invariant` come from
+the package's Makie extension, activated by loading `CairoMakie`.
 
 ```@example particle
 using PoincareInvariants
 using GeometricIntegrators
-import GeometricProblems.MasslessChargedParticle as MCP
+import GeometricProblems.MasslessChargedParticleSingular as MCP
 using StaticArrays
 using CairoMakie
 
-par  = MCP.default_parameters()
-prob = MCP.iodeproblem([1.0, 1.0]; timespan = (0.0, 5.0), timestep = 0.1)
+prob = MCP.lodeproblem([1.0, 1.0]; timespan = (0.0, 5.0), timestep = 0.1)
+par  = parameters(prob)
 nothing # hide
 ```
 
 ## The invariant forms
 
 The first invariant uses the one-form $\vartheta = A(x)$ (the magnetic vector potential), and
-the second uses the two-form $\omega = d\vartheta$, which for this system is
-
-```math
-\omega = \begin{pmatrix} 0 & B(x) \\ -B(x) & 0 \end{pmatrix} .
-```
-
-Both are provided directly by the problem module (`ϑ` and `B`), so we only reshape them into
-the `form(z, t, p)` interface expected by `PoincareInvariants`. The parameter slot `p`
-carries the physical parameters `par`.
+the second uses the two-form $\omega = d\vartheta$ (the magnetic field). As in the
+Lotka-Volterra example, both belong to the `LODEProblem` itself, so we take them straight from
+the problem's function tuple with `functions(prob)` — guaranteeing the invariant forms are
+exactly the (in-place, parameter-carrying) functions the problem was integrated with — and
+only adapt them to the `form(z, t, p)` interface, forwarding the parameters `par` through `p`.
 
 ```@example particle
-oneform(z, t, p) = SVector{2}(MCP.ϑ(t, z, p))
+fs = functions(prob)
 
-function twoform(z, t, p)
-    b = MCP.B(z, p)
-    @SMatrix [0.0  b;
-              -b   0.0]
-end
+oneform(z, t, p) = (Θ = zeros(eltype(z), 2);    fs.ϑ(Θ, t, z, p); SVector{2}(Θ))
+twoform(z, t, p) = (Ω = zeros(eltype(z), 2, 2); fs.ω(Ω, t, z, p); SMatrix{2, 2}(Ω))
 nothing # hide
 ```
 
@@ -112,6 +120,6 @@ plot_invariant(pi2, sol2; p = par, title = "Second Poincaré invariant")
 ```
 
 The `DVRK(Gauss(2))` method is a fourth-order variational integrator for noncanonical
-symplectic systems, so both invariants are conserved with high accuracy as the curve and
-surface are advected by the flow. A standard, structure-agnostic integrator would let them
-drift.
+symplectic systems. Because the singular gauge provides exactly the symplectic potential it
+expects, both invariants are conserved to machine precision as the curve and surface are
+advected by the flow. A standard, structure-agnostic integrator would let them drift.

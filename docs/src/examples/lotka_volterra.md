@@ -30,23 +30,23 @@ using StaticArrays
 using CairoMakie
 
 prob = lodeproblem([2.0, 1.0]; timespan = (0.0, 1.0), timestep = 0.02)
+par  = parameters(prob)
 nothing # hide
 ```
 
 ## The invariant forms
 
-The one-form $\vartheta$ and the two-form $\omega = d\vartheta$ are exported by the problem
-module (`ϑ` and the in-place `ω`); we only adapt them to the `form(z, t, p)` interface.
-Neither depends on the physical parameters, so `p` is ignored.
+The noncanonical symplectic one-form $\vartheta$ and two-form $\omega = d\vartheta$ belong to
+the `LODEProblem` itself. We take them straight from the problem's function tuple with
+`functions(prob)`, so the invariant forms are guaranteed to be exactly the (in-place,
+parameter-carrying) functions the problem was integrated with; we only adapt them to the
+`form(z, t, p)` interface, forwarding the parameters `par` through the `p` slot.
 
 ```@example lotka
-oneform(z, t, p) = SVector{2}(ϑ(t, z))
+fs = functions(prob)
 
-function twoform(z, t, p)
-    Ω = zeros(eltype(z), 2, 2)
-    ω(Ω, t, z)
-    SMatrix{2, 2}(Ω)
-end
+oneform(z, t, p) = (Θ = zeros(eltype(z), 2);    fs.ϑ(Θ, t, z, p); SVector{2}(Θ))
+twoform(z, t, p) = (Ω = zeros(eltype(z), 2, 2); fs.ω(Ω, t, z, p); SMatrix{2, 2}(Ω))
 nothing # hide
 ```
 
@@ -74,7 +74,7 @@ plot_loop(sol1; xlabel = "q₁", ylabel = "q₂")
 ```
 
 ```@example lotka
-plot_invariant(pi1, sol1; title = "First Poincaré invariant")
+plot_invariant(pi1, sol1; p = par, title = "First Poincaré invariant")
 ```
 
 ## Second invariant
@@ -99,7 +99,7 @@ plot_surface(grid, solg; xlabel = "q₁", ylabel = "q₂")
 ```
 
 ```@example lotka
-plot_invariant(pi2, sol2; title = "Second Poincaré invariant")
+plot_invariant(pi2, sol2; p = par, title = "Second Poincaré invariant")
 ```
 
 The relative errors stay at the level of machine precision: with the correct form of the
