@@ -16,7 +16,7 @@ function SecondFinDiffPlan{T, D}(ω, ps::NTuple{2, Int}) where {T, D}
 end
 
 function compute!(
-    pinv::SecondPoincareInvariant{T, D, ωT, <:Any, P}, t::Real, p
+        pinv::SecondPoincareInvariant{T, D, ωT, <:Any, P}, t::Real, p
 ) where {T, D, ωT, P <: SecondFinDiffPlan}
     nx, ny = pinv.pointspec
     points = pinv.points
@@ -73,15 +73,15 @@ function getpointspec(N::Integer, ::Type{<:SecondFinDiffPlan})
     return (n, n)
 end
 
-function getpoints(f, ::Type{T}, dims::NTuple{2, Integer}, ::Type{<:SecondFinDiffPlan}) where T
+function getpoints(f, ::Type{T}, dims::NTuple{2, Integer}, ::Type{<:SecondFinDiffPlan}) where {T}
     D = length(f(zero(T), zero(T)))
     nx, ny = dims
     N = nx * ny
     out = Matrix{T}(undef, N, D)
 
     i = 1
-    for x in range(0, 1, length=nx)
-        for y in range(0, 1, length=ny)
+    for x in range(0, 1, length = nx)
+        for y in range(0, 1, length = ny)
             out[i, :] .= f(x, y)
             i += 1
         end
@@ -123,18 +123,20 @@ end
 # evaluate derivative of quadratic approxmiation around (x0, y0) at (x0 + x, y0 + y)
 # We have approximation f(x, y) = c + cx*x + cy*y + cxx*x^2 + cxy*x*y + cyy*y^2
 function differentiate(
-    vals::AbstractVector{T}, ix::Integer, iy::Integer, (nx, ny)::NTuple{2, Integer}
-) where T
+        vals::AbstractVector{T}, ix::Integer, iy::Integer, (nx, ny)::NTuple{2, Integer}
+) where {T}
     x0, y0, edge = _getmid(ix, iy, nx, ny)
 
     mat = reshape(vals, ny, nx)
     f(x, y) = @inbounds mat[y0 + y, x0 + x]
 
     # All coefficients are multiplied by 2*Δx or 2*Δy
-    bx = f(1, 0); ax = f(-1, 0)
+    bx = f(1, 0)
+    ax = f(-1, 0)
     fx = bx - ax  # cx
 
-    by = f(0, 1); ay = f(0, -1)
+    by = f(0, 1)
+    ay = f(0, -1)
     fy = by - ay  # cy
 
     if edge
@@ -144,11 +146,12 @@ function differentiate(
         cxy = (f(1, 1) + f(-1, -1) - f(1, -1) - f(-1, 1)) / 2
 
         dx, dy = ix - x0, iy - y0
-        fx += 2*cxx * dx + cxy * dy
-        fy += 2*cyy * dy + cxy * dx
+        fx += 2 * cxx * dx + cxy * dy
+        fy += 2 * cyy * dy + cxy * dx
     end
 
-    invΔx = nx - 1; invΔy = ny - 1
+    invΔx = nx - 1
+    invΔy = ny - 1
     return fx * invΔx / 2, fy * invΔy / 2
 end
 
@@ -165,7 +168,7 @@ function _sw(i, n)
     end
 end
 
-function getsimpweight(::Type{T}, x, y, (nx, ny)) where T
+function getsimpweight(::Type{T}, x, y, (nx, ny)) where {T}
     return T(_sw(x, nx) * _sw(y, ny)) / (9 * (nx - 1) * (ny - 1))
 end
 

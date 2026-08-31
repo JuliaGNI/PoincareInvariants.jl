@@ -18,8 +18,10 @@ DocMeta.setdocmeta!(
 
 makedocs(
     sitename = "PoincareInvariants.jl",
-    modules=[PoincareInvariants],
-    warnonly = Documenter.except(:autodocs_block, :cross_references, :docs_block, :doctest, :eval_block, :example_block, :footnote, :linkcheck_remotes, :linkcheck, :meta_block, :parse_error, :setup_block),
+    modules = [PoincareInvariants],
+    warnonly = Documenter.except(:autodocs_block, :cross_references, :docs_block, :doctest,
+        :eval_block, :example_block, :footnote, :linkcheck_remotes,
+        :linkcheck, :meta_block, :parse_error, :setup_block),
     pages = [
         "Home" => "index.md",
         "Tutorial" => "tutorial.md",
@@ -30,7 +32,7 @@ makedocs(
             "Harmonic Oscillator" => "examples/harmonic_oscillator.md",
             "Pendulum" => "examples/pendulum.md",
             "Massless Charged Particle" => "examples/massless_charged_particle.md",
-            "Lotka-Volterra" => "examples/lotka_volterra.md",
+            "Lotka-Volterra" => "examples/lotka_volterra.md"
         ],
         "Reference" => "reference.md"
     ],

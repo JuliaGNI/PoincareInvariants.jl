@@ -20,7 +20,7 @@ export canonical_one_form!, CanonicalSymplecticMatrix
 # JuliaGNI ecosystem integration
 
 using GeometricEquations: EnsembleProblem, ODE, HODE, PODE, IODE, LODE,
-    equation, timespan, timestep, parameters
+                          equation, timespan, timestep, parameters
 using GeometricSolutions: EnsembleSolution, GeometricSolution, nsamples, ntime
 
 export PIEnsembleProblem
@@ -58,9 +58,9 @@ Plan implementations should define a method `compute!(pinv, t::Real, p)`, which 
 internal points storage `pinv.points`.
 """
 function compute!(
-    pinv::AbstractPoincareInvariant,
-    points::AbstractMatrix,
-    t::Real=NaN, p=nothing
+        pinv::AbstractPoincareInvariant,
+        points::AbstractMatrix,
+        t::Real = NaN, p = nothing
 )
     pinv.points .= points
     compute!(pinv, t, p)
@@ -86,10 +86,10 @@ was evaluated at time `times[i]`. `p` is an arbitrary optional parameter which i
 to the differential form, like the the time.
 """
 function compute!(
-    pinv::AbstractPoincareInvariant,
-    points::AbstractVector{<:AbstractVector},
-    times::Union{AbstractVector{<:Real}, Real}=NaN,
-    p=nothing
+        pinv::AbstractPoincareInvariant,
+        points::AbstractVector{<:AbstractVector},
+        times::Union{AbstractVector{<:Real}, Real} = NaN,
+        p = nothing
 )
     indices = eachindex(points[1])
     @argcheck all(idx -> idx == indices, eachindex.(points)) "indices of vectors of points must match"
@@ -151,13 +151,11 @@ get invariant one- or two-form.
 """
 function getform end
 
-
 ## Canonical Forms ##
 
 include("CanonicalSymplecticForms.jl")
 
 using .CanonicalSymplecticForms: canonical_one_form!, CanonicalSymplecticMatrix
-
 
 ## FirstPoincareInvariant ##
 
@@ -203,7 +201,7 @@ a numeric type `T`, a phase space dimension `D`, a differential form `θ`, a num
 The plan type defaults to `DEFAULT_FIRST_PLAN`, which is currently set to `FirstFourierPlan`.
 """
 function FirstPoincareInvariant{T, D}(
-    θ::θT, N::Integer, P::Type=DEFAULT_FIRST_PLAN
+        θ::θT, N::Integer, P::Type = DEFAULT_FIRST_PLAN
 ) where {T, D, θT}
     plan = P{T, D}(θ, getpointspec(N, P))
     FirstPoincareInvariant{T, D}(θ, N, plan)
@@ -217,7 +215,7 @@ creates a setup object to compute the first integral invariant using the canonic
 in phase space of dimension `D` with numeric type `T`, `N` points and plan type `P`.
 """
 function FirstPoincareInvariant{T, D, typeof(canonical_one_form!)}(
-    N::Integer, P=DEFAULT_FIRST_PLAN
+        N::Integer, P = DEFAULT_FIRST_PLAN
 ) where {T, D}
     FirstPoincareInvariant{T, D}(canonical_one_form!, N, P)
 end
@@ -231,7 +229,7 @@ getpointspec(pinv::FirstPoincareInvariant) = pinv.N
 getpoints(pinv::FirstPoincareInvariant) = getpoints(identity, pinv)
 getform(pinv::FirstPoincareInvariant) = pinv.θ
 getplan(pinv::FirstPoincareInvariant) = pinv.plan
-getdim(::FirstPoincareInvariant{<:Any, D}) where D = D
+getdim(::FirstPoincareInvariant{<:Any, D}) where {D} = D
 
 # Implementations
 
@@ -295,7 +293,7 @@ not too much larger. For the `SecondFinDiffPlan`, the grid of points may also be
 as a tuple `(Nx, Ny)`, if non-square grids are sought.
 """
 function SecondPoincareInvariant{T, D}(
-    ω, N, P::Type=DEFAULT_SECOND_PLAN
+        ω, N, P::Type = DEFAULT_SECOND_PLAN
 ) where {T, D}
     plan = P{T, D}(ω, getpointspec(N, P))
     SecondPoincareInvariant{T, D}(ω, N, plan)
@@ -310,7 +308,7 @@ in phase space of dimension `D` with numeric type `T`, point specification `N` a
 type `P`.
 """
 function SecondPoincareInvariant{T, D, CanonicalSymplecticMatrix{T}}(
-    N, P::Type=DEFAULT_SECOND_PLAN
+        N, P::Type = DEFAULT_SECOND_PLAN
 ) where {T, D}
     ω = CanonicalSymplecticMatrix{T}(D)
     SecondPoincareInvariant{T, D}(ω, N, P)
@@ -321,7 +319,7 @@ const CanonicalSecondPI{T, D} = SecondPoincareInvariant{T, D, CanonicalSymplecti
 
 # Interface
 
-getdim(::SecondPoincareInvariant{<:Any, D, <:Any, <:Any, <:Any}) where D = D
+getdim(::SecondPoincareInvariant{<:Any, D, <:Any, <:Any, <:Any}) where {D} = D
 getform(pinv::SecondPoincareInvariant) = pinv.ω
 getplan(pinv::SecondPoincareInvariant) = pinv.plan
 
@@ -372,7 +370,7 @@ _ensemble_ics(::ODE, point, t₀, params) = (q = collect(point),)
 
 function _ensemble_ics(::Union{HODE, PODE}, point, t₀, params)
     mid = length(point) ÷ 2
-    (q = collect(point[1:mid]), p = collect(point[mid+1:end]))
+    (q = collect(point[1:mid]), p = collect(point[(mid + 1):end]))
 end
 
 function _ensemble_ics(equ::Union{IODE, LODE}, point, t₀, params)
@@ -393,9 +391,9 @@ point on the curve or surface. Returns a `Vector` holding one invariant value pe
 The optional parameter `p` is passed to the differential form, just like the time.
 """
 function compute!(
-    pinv::AbstractPoincareInvariant,
-    sol::EnsembleSolution,
-    p=nothing
+        pinv::AbstractPoincareInvariant,
+        sol::EnsembleSolution,
+        p = nothing
 )
     D = getdim(pinv)
     n = nsamples(sol)
@@ -410,7 +408,7 @@ function compute!(
                 # canonical (q, p) phase space: stack position and momentum halves
                 mid = length(q)
                 @views pinv.points[j, 1:mid] .= q
-                @views pinv.points[j, mid+1:D] .= m.p[i]
+                @views pinv.points[j, (mid + 1):D] .= m.p[i]
             else
                 # phase space coincides with the position variable q
                 @views pinv.points[j, 1:D] .= q

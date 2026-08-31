@@ -3,7 +3,7 @@ module PoincareInvariantsMakieExt
 using Makie
 using PoincareInvariants
 using PoincareInvariants: FirstPoincareInvariant, SecondPoincareInvariant,
-    AbstractPoincareInvariant, compute!, getpointspec
+                          AbstractPoincareInvariant, compute!, getpointspec
 using GeometricSolutions: EnsembleSolution, nsamples, ntime
 
 # shared 3D view for the advected curve/surface plots
@@ -20,9 +20,11 @@ timeslices(sol, nsteps) = round.(Int, range(0, ntime(sol[1]), length = nsteps))
 function phasepoints(sol, n)
     m1 = sol[1]
     if hasproperty(m1, :p) && length(m1.q[n]) == 1
-        ([sol[j].q[n][1] for j in 1:nsamples(sol)], [sol[j].p[n][1] for j in 1:nsamples(sol)])
+        ([sol[j].q[n][1] for j in 1:nsamples(sol)],
+            [sol[j].p[n][1] for j in 1:nsamples(sol)])
     else
-        ([sol[j].q[n][1] for j in 1:nsamples(sol)], [sol[j].q[n][2] for j in 1:nsamples(sol)])
+        ([sol[j].q[n][1] for j in 1:nsamples(sol)],
+            [sol[j].q[n][2] for j in 1:nsamples(sol)])
     end
 end
 
@@ -84,7 +86,8 @@ end
 function PoincareInvariants.plot_loop(sol::EnsembleSolution;
         xlabel = "q₁", ylabel = "q₂", title = "Advected Loop", nsteps = 10)
     fig = Figure()
-    ax = Axis3(fig[1, 1]; xlabel = xlabel, ylabel = ylabel, zlabel = "t", VIEW3..., title = title)
+    ax = Axis3(
+        fig[1, 1]; xlabel = xlabel, ylabel = ylabel, zlabel = "t", VIEW3..., title = title)
     plot_loop!(ax, sol; nsteps = nsteps)
     fig
 end
@@ -105,10 +108,12 @@ function PoincareInvariants.plot_surface!(ax, grid::SecondPoincareInvariant,
     ax
 end
 
-function PoincareInvariants.plot_surface(grid::SecondPoincareInvariant, sol::EnsembleSolution;
+function PoincareInvariants.plot_surface(
+        grid::SecondPoincareInvariant, sol::EnsembleSolution;
         xlabel = "q₁", ylabel = "q₂", title = "Advected Surface", nsteps = 10)
     fig = Figure()
-    ax = Axis3(fig[1, 1]; xlabel = xlabel, ylabel = ylabel, zlabel = "t", VIEW3..., title = title)
+    ax = Axis3(
+        fig[1, 1]; xlabel = xlabel, ylabel = ylabel, zlabel = "t", VIEW3..., title = title)
     plot_surface!(ax, grid, sol; nsteps = nsteps)
     fig
 end

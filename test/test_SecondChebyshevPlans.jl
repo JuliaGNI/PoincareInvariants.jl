@@ -3,23 +3,23 @@ using PoincareInvariants.SecondChebyshevPlans
 @safetestset "Differentiation" begin
     using ..SecondChebyshevPlans: DiffPlan, differentiate!
 
-    @test DiffPlan{Float64}(5).D == [0  1  0  3  0   5;
-                                     0  0  4  0  8   0;
-                                     0  0  0  6  0  10;
-                                     0  0  0  0  8   0;
-                                     0  0  0  0  0  10;
-                                     0  0  0  0  0   0]
+    @test DiffPlan{Float64}(5).D == [0 1 0 3 0 5;
+           0 0 4 0 8 0;
+           0 0 0 6 0 10;
+           0 0 0 0 8 0;
+           0 0 0 0 0 10;
+           0 0 0 0 0 0]
 
-    @test DiffPlan{Float64}(4).D == [0  1  0  3  0;
-                                     0  0  4  0  8;
-                                     0  0  0  6  0;
-                                     0  0  0  0  8;
-                                     0  0  0  0  0]
+    @test DiffPlan{Float64}(4).D == [0 1 0 3 0;
+                                     0 0 4 0 8;
+                                     0 0 0 6 0;
+                                     0 0 0 0 8;
+                                     0 0 0 0 0]
 
-    coeffs = [1  2  3  0;
-              4  5  0  0;
-              6  0  0  0;
-              0  0  0  0]
+    coeffs = [1 2 3 0;
+              4 5 0 0;
+              6 0 0 0;
+              0 0 0 0]
 
     P = DiffPlan{Float64}(3)
 
@@ -28,15 +28,15 @@ using PoincareInvariants.SecondChebyshevPlans
 
     differentiate!(∂x, ∂y, P, coeffs)
 
-    @test ∂x == [2  12  0  0;
-                 5   0  0  0;
-                 0   0  0  0;
-                 0   0  0  0]
+    @test ∂x == [2 12 0 0;
+                 5 0 0 0;
+                 0 0 0 0;
+                 0 0 0 0]
 
-    @test ∂y == [ 4  5  0  0;
-                 24  0  0  0;
-                  0  0  0  0;
-                  0  0  0  0]
+    @test ∂y == [4 5 0 0;
+                 24 0 0 0;
+                 0 0 0 0;
+                 0 0 0 0]
 
     ndcoeffs = ntuple(_ -> rand(4, 4), 6)
     nd∂x = ntuple(_ -> zeros(4, 4), 6)
@@ -61,7 +61,7 @@ end
     coeffs = [1 4 7 0;
               2 5 8 0;
               3 6 9 0;
-		      0 0 0 0]
+              0 0 0 0]
 
     @test integrate(coeffs, getintweights(3)) ≈ 1 * 4 + 3 * -4/3 + 7 * -4/3 + 9 * 4/9 atol=5eps()
 end
@@ -91,7 +91,8 @@ end
         iplan = InvPaduaTransformPlan{Float64}(degree)
         invpaduatransform!(phasepoints, iplan, phasecoeffs)
 
-        ω!(out, t, z, p) = (out[1, 1] = 0; out[1, 2] = -1; out[2, 1] = 1; out[2, 2] = 0; nothing)
+        ω!(out, t, z, p) = (
+            out[1, 1] = 0; out[1, 2] = -1; out[2, 1] = 1; out[2, 2] = 0; nothing)
 
         plan = CallIntPlan{Float64, D}(degree)
 
@@ -99,9 +100,9 @@ end
 
         getintegrand!(intcoeffs, plan, ω!, phasepoints, 0, nothing, ∂xcoeffs, ∂ycoeffs)
 
-        @test intcoeffs ≈ [-72   -82  -30;
-                           -82  -432    0;
-                           -30     0    0] atol=5eps()
+        @test intcoeffs ≈ [-72 -82 -30;
+                           -82 -432 0;
+                           -30 0 0] atol=5eps()
     end
 
     @testset "50 Points in 6 Dimensions" begin
@@ -173,7 +174,6 @@ end
     test∂x[1][1, 1] = 1
     test∂y[D ÷ 2 + 1][1, 1] = 1
 
-
     for d in 1:D
         @test maximum(abs, plan.phasecoeffs[d] .- testphasecoeffs[d]) / eps() < 10
         @test maximum(abs, plan.∂x[d] .- test∂x[d]) / eps() < 50
@@ -189,6 +189,7 @@ end
     using ..SecondChebyshevPlans: SecondChebyshevPlan, getpointspec, getpoints
 
     for N in [10, 321, 2178], T in [Float32, Float64]
+
         @test getpointspec(N, SecondChebyshevPlan) == nextpaduanum(N)
 
         @inferred Vector{T} getpoints((x, y) -> x, T, N, SecondChebyshevPlan)

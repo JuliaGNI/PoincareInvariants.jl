@@ -2,7 +2,10 @@
     @safetestset "FirstPoincareInvariant" begin
         using PoincareInvariants
 
-        D = 6; N = 123; θ = canonical_one_form!; P = FirstFinDiffPlan
+        D = 6
+        N = 123
+        θ = canonical_one_form!
+        P = FirstFinDiffPlan
         pinv = FirstPoincareInvariant{Float64, D}(θ, N, P)
 
         @test getdim(pinv) == D
@@ -23,7 +26,10 @@
     @safetestset "SecondPoincareInvariant" begin
         using PoincareInvariants
 
-        D = 4; N = 321; ω = CanonicalSymplecticMatrix{Float64}(D); P = SecondFinDiffPlan
+        D = 4
+        N = 321
+        ω = CanonicalSymplecticMatrix{Float64}(D)
+        P = SecondFinDiffPlan
         pinv = SecondPoincareInvariant{Float64, D}(ω, N, P)
 
         @test getdim(pinv) == D
@@ -67,14 +73,12 @@ end
             FirstPoincareInvariant{Ts[3], D}(canonical_one_form!, Ns[3], FirstFinDiffPlan),
             FirstPoincareInvariant{Ts[4], D}(canonical_one_form!, Ns[4], FirstFourierPlan),
             FirstPoincareInvariant{Ts[5], D}(canonical_one_form!, Ns[5], FirstFourierPlan),
-
             FirstPI{Ts[6], D}(canonical_one_form!, Ns[6]),
             FirstPI{Ts[7], D}(canonical_one_form!, Ns[7], FirstFinDiffPlan),
             FirstPI{Ts[8], D}(canonical_one_form!, Ns[8], FirstFourierPlan),
-
             CanonicalFirstPI{Ts[9], D}(Ns[9]),
             CanonicalFirstPI{Ts[10], D}(Ns[10], FirstFinDiffPlan),
-            CanonicalFirstPI{Ts[11], D}(Ns[11], FirstFourierPlan),
+            CanonicalFirstPI{Ts[11], D}(Ns[11], FirstFourierPlan)
         ]
 
         to_circle_line(θ) = (cospi(-2θ), sinpi(-2θ))
@@ -122,15 +126,12 @@ end
             SecondPoincareInvariant{Ts[3], D}(CanonicalSymplecticMatrix{Ts[3]}(D), ps[3], SecondChebyshevPlan),
             SecondPoincareInvariant{Ts[4], D}(CanonicalSymplecticMatrix{Ts[4]}(D), ps[4], SecondFinDiffPlan),
             SecondPoincareInvariant{Ts[5], D}(CanonicalSymplecticMatrix{Ts[5]}(D), ps[5], SecondFinDiffPlan),
-
             SecondPI{Ts[6], D}(CanonicalSymplecticMatrix{Ts[6]}(D), ps[6]),
             SecondPI{Ts[7], D}(CanonicalSymplecticMatrix{Ts[7]}(D), ps[7], SecondChebyshevPlan),
             SecondPI{Ts[8], D}(CanonicalSymplecticMatrix{Ts[8]}(D), ps[8], SecondFinDiffPlan),
-
             SecondPI{Ts[9], D}(CanonicalSymplecticMatrix{Float64}(D), ps[9]),
             SecondPI{Ts[10], D}(CanonicalSymplecticMatrix{Double64}(D), ps[10], SecondChebyshevPlan),
             SecondPI{Ts[11], D}(CanonicalSymplecticMatrix{Double64}(D), ps[11], SecondFinDiffPlan),
-
             CanonicalSecondPI{Ts[12], D}(ps[12]),
             CanonicalSecondPI{Ts[13], D}(ps[13], SecondChebyshevPlan),
             CanonicalSecondPI{Ts[14], D}(ps[14], SecondFinDiffPlan)
@@ -163,8 +164,12 @@ end
 
         D = 6
         function θ!(out, t, z, p)
-            out[1] = -z[4]; out[2] = -z[5]; out[3] = -p * z[6]
-            out[4] = t * z[1]; out[5] = p * z[2]; out[6] = z[3]
+            out[1] = -z[4]
+            out[2] = -z[5]
+            out[3] = -p * z[6]
+            out[4] = t * z[1]
+            out[5] = p * z[2]
+            out[6] = z[3]
             nothing
         end
 
@@ -195,12 +200,24 @@ end
         D = 6
         function ω!(out, t, z, p)
             out .= 0
-            out[1, 4] =  z[1]; out[1, 5] =  z[2]; out[1, 6] =  z[3]
-            out[2, 4] =  z[4]; out[2, 5] =  z[5]; out[2, 6] =  z[6]
-            out[3, 4] =     t; out[3, 5] =     p; out[3, 6] =     1
-            out[4, 1] = -z[1]; out[4, 2] = -z[4]; out[4, 3] =    -t
-            out[5, 1] = -z[2]; out[5, 2] = -z[5]; out[5, 3] =    -p
-            out[6, 1] = -z[3]; out[6, 2] = -z[6]; out[6, 3] =    -1
+            out[1, 4] = z[1]
+            out[1, 5] = z[2]
+            out[1, 6] = z[3]
+            out[2, 4] = z[4]
+            out[2, 5] = z[5]
+            out[2, 6] = z[6]
+            out[3, 4] = t
+            out[3, 5] = p
+            out[3, 6] = 1
+            out[4, 1] = -z[1]
+            out[4, 2] = -z[4]
+            out[4, 3] = -t
+            out[5, 1] = -z[2]
+            out[5, 2] = -z[5]
+            out[5, 3] = -p
+            out[6, 1] = -z[3]
+            out[6, 2] = -z[6]
+            out[6, 3] = -1
             nothing
         end
 
@@ -236,7 +253,7 @@ end
     D = 4
     N = 398
     Nsteps = 13
-    times = [2.0 + n * 0.15 for n in 0:Nsteps-1]
+    times = [2.0 + n * 0.15 for n in 0:(Nsteps - 1)]
 
     # in-place forms scaled by the time t, following the form(out, t, z, p) convention
     f1!(out, t, z, p) = (canonical_one_form!(out, t, z, p); out .*= t; nothing)
@@ -247,7 +264,7 @@ end
         mid = length(z) ÷ 2
         for i in 1:mid
             out[i, mid + i] = -t
-            out[mid + i, i] =  t
+            out[mid + i, i] = t
         end
         nothing
     end
@@ -279,7 +296,7 @@ end
 
         A = [1 5;
              0 1]
-        B = [2   0;
+        B = [2 0;
              0 0.5]
 
         # circle (negative orientation)
@@ -315,14 +332,14 @@ end
              0 0 0 0 0 0 1 0;
              0 0 0 0 0 0 0 1]
 
-        C = [1.0   0  2.0    0   0   0    0    0;
-               0 2.0    0  1.0   0   0    0    0;
-               0 1.0    0 -2.0   0   0    0    0;
-             2.0   0 -1.0    0   0   0    0    0;
-               0   0    0    0 0.2   0  0.4    0;
-               0   0    0    0   0 0.4    0  0.2;
-               0   0    0    0   0 0.2    0 -0.4;
-               0   0    0    0 0.4   0 -0.2    0]
+        C = [1.0 0 2.0 0 0 0 0 0;
+             0 2.0 0 1.0 0 0 0 0;
+             0 1.0 0 -2.0 0 0 0 0;
+             2.0 0 -1.0 0 0 0 0 0;
+             0 0 0 0 0.2 0 0.4 0;
+             0 0 0 0 0 0.4 0 0.2;
+             0 0 0 0 0 0.2 0 -0.4;
+             0 0 0 0 0.4 0 -0.2 0]
 
         # test if symplectic
         @test transpose(A * B * C) * (-A) * (A * B * C) ≈ -A
@@ -352,7 +369,8 @@ end
 
     # Area preserving Henon map
     function henon(q, p)
-        a = 1.4; b = 0.3
+        a = 1.4
+        b = 0.3
         q, p = q, 1 + p - a * q^2 # fold
         q, p = b * q, p / b # press
         q, p = -p, q  # rotate

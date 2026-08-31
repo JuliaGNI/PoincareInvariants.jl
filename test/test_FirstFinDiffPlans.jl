@@ -35,7 +35,7 @@ end
 
     # in-place one form following the form(out, t, z, p) convention
     θ!(out, t, z, p) = (out[1] = p * z[2]; out[2] = -t * z[1]; out[3] = z[3]; nothing)
-    f(x) = ((s, c) = sincospi(2x); SVector{3}(2c,  5s, c + s))
+    f(x) = ((s, c) = sincospi(2x); SVector{3}(2c, 5s, c + s))
 
     T = Float64
     D = 3
@@ -49,7 +49,7 @@ end
         elseif i == 6
             (fvals[1, :] .- fvals[5, :]) ./ (2 * Δx)
         else
-            (fvals[i+1, :] .- fvals[i-1, :]) ./ (2 * Δx)
+            (fvals[i + 1, :] .- fvals[i - 1, :]) ./ (2 * Δx)
         end
 
         fi = fvals[i, :]

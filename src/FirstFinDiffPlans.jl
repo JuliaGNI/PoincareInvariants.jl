@@ -12,7 +12,7 @@ struct FirstFinDiffPlan{T, D} end
 FirstFinDiffPlan{T, D}(θ, N) where {T, D} = FirstFinDiffPlan{T, D}()
 
 function compute!(
-    pinv::FirstPoincareInvariant{T, D, <:Any, <:FirstFinDiffPlan}, t::Real, p
+        pinv::FirstPoincareInvariant{T, D, <:Any, <:FirstFinDiffPlan}, t::Real, p
 ) where {T, D}
     zs = pinv.points
     N = getpointnum(pinv)
@@ -22,9 +22,9 @@ function compute!(
     dzi = MVector{D, T}(undef)
     θi = MVector{D, T}(undef)
 
-    for i in 2:N-1
+    for i in 2:(N - 1)
         zi = view(zs, i, :)
-        dzi .= @views (zs[i+1, :] .- zs[i-1, :]) ./ 2
+        dzi .= @views (zs[i + 1, :] .- zs[i - 1, :]) ./ 2
         θ(θi, t, zi, p)
         I += dot(θi, dzi)
     end
@@ -37,7 +37,7 @@ function compute!(
 
     # special cases i = N
     zN = view(zs, N, :)
-    dzi .= @views (zs[1, :] .- zs[N-1, :]) ./ 2
+    dzi .= @views (zs[1, :] .- zs[N - 1, :]) ./ 2
     θ(θi, t, zN, p)
     I += dot(θi, dzi)
 
@@ -57,11 +57,11 @@ function getpointspec(N::Integer, ::Type{<:FirstFinDiffPlan})::Int
     end
 end
 
-function getpoints(f, ::Type{T}, N::Integer, ::Type{<:FirstFinDiffPlan}) where T
+function getpoints(f, ::Type{T}, N::Integer, ::Type{<:FirstFinDiffPlan}) where {T}
     D = length(f(zero(T)))
     out = Matrix{T}(undef, N, D)
 
-    for (i, x) in enumerate(range(0, 1, length=N+1)[1:end-1])
+    for (i, x) in enumerate(range(0, 1, length = N+1)[1:(end - 1)])
         out[i, :] .= f(x)
     end
 

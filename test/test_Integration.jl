@@ -5,8 +5,8 @@ using GeometricProblems
 using StaticArrays
 using Test
 
-const HarmonicOscillator     = GeometricProblems.HarmonicOscillator
-const Pendulum               = GeometricProblems.Pendulum
+const HarmonicOscillator = GeometricProblems.HarmonicOscillator
+const Pendulum = GeometricProblems.Pendulum
 const MasslessChargedParticleSingular = GeometricProblems.MasslessChargedParticleSingular
 const LotkaVolterra2dSingular = GeometricProblems.LotkaVolterra2dSingular
 
@@ -70,7 +70,7 @@ end
 
 @testset "MasslessChargedParticleSingular (noncanonical)" begin
     prob = MasslessChargedParticleSingular.lodeproblem([1.0, 1.0]; timespan = (0.0, 1.0), timestep = 0.05)
-    par  = parameters(prob)
+    par = parameters(prob)
 
     # the in-place one-form ϑ and two-form ω = dϑ of the problem match the invariant form
     # convention `form(out, t, z, p)` exactly, so we pass them straight to FirstPI / SecondPI
@@ -97,7 +97,7 @@ end
     # the "singular" Lagrangian carries the form of the symplectic potential that DVRK
     # expects, so the noncanonical invariants are preserved to machine accuracy
     prob = LotkaVolterra2dSingular.lodeproblem([2.0, 1.0]; timespan = (0.0, 1.0), timestep = 0.05)
-    par  = parameters(prob)
+    par = parameters(prob)
 
     # the problem's in-place one-form ϑ and two-form ω = dϑ follow the `form(out, t, z, p)`
     # convention, so they are passed directly as the invariant forms

@@ -31,9 +31,8 @@ function FirstFourierPlan{T, D}(θ, N) where {T, D}
 end
 
 function compute!(
-    pinv::FirstPoincareInvariant{T, D, <:Any, <:FirstFourierPlan}, t::Real, p
+        pinv::FirstPoincareInvariant{T, D, <:Any, <:FirstFourierPlan}, t::Real, p
 ) where {T, D}
-
     zs = pinv.points
     N = getpointnum(pinv)
     plan = getplan(pinv)
@@ -67,11 +66,11 @@ function getpointspec(N::Integer, ::Type{<:FirstFourierPlan})::Int
     return N
 end
 
-function getpoints(f, ::Type{T}, N::Integer, ::Type{<:FirstFourierPlan}) where T
+function getpoints(f, ::Type{T}, N::Integer, ::Type{<:FirstFourierPlan}) where {T}
     D = length(f(zero(T)))
     out = Matrix{T}(undef, N, D)
 
-    for (i, x) in enumerate(range(0, 1, length=N+1)[1:end-1])
+    for (i, x) in enumerate(range(0, 1, length = N+1)[1:(end - 1)])
         out[i, :] .= f(x)
     end
 

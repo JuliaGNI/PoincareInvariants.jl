@@ -23,8 +23,8 @@ function canonical_one_form!(out, t, z, p)
     iseven(n) || throw(ArgumentError("z must have even length"))
     mid = n ÷ 2
     @inbounds @views begin
-        out[1:mid] .= z[mid+1:n]
-        out[mid+1:n] .= zero(eltype(out))
+        out[1:mid] .= z[(mid + 1):n]
+        out[(mid + 1):n] .= zero(eltype(out))
     end
     return out
 end
@@ -58,7 +58,7 @@ julia> CanonicalSymplecticMatrix{Int32}(6)
 """
 struct CanonicalSymplecticMatrix{T} <: AbstractMatrix{T}
     mid::Int
-    function CanonicalSymplecticMatrix{T}(n::Integer) where T
+    function CanonicalSymplecticMatrix{T}(n::Integer) where {T}
         checkn(CanonicalSymplecticMatrix, n)
         new{T}(n ÷ 2)
     end
@@ -68,7 +68,7 @@ CanonicalSymplecticMatrix(n::Integer) = CanonicalSymplecticMatrix{Int}(n)
 
 Base.size(C::CanonicalSymplecticMatrix) = (sz = C.mid * 2; (sz, sz))
 
-function Base.getindex(C::CanonicalSymplecticMatrix{T}, i1::Int, i2::Int) where T
+function Base.getindex(C::CanonicalSymplecticMatrix{T}, i1::Int, i2::Int) where {T}
     @boundscheck let n = C.mid * 2
         if !(1 ≤ i1 ≤ n && 1 ≤ i2 ≤ n)
             msg = "attempt to access $n-element CanonicalSymplecticMatrix{$T} at index [$i1, $i2]"
