@@ -1,20 +1,8 @@
 using Documenter, PoincareInvariants
 
-DocMeta.setdocmeta!(
-    PoincareInvariants,
-    :DocTestSetup,
-    quote
-        using PoincareInvariants
-    end
-)
-
-DocMeta.setdocmeta!(
-    PoincareInvariants.CanonicalSymplecticForms,
-    :DocTestSetup,
-    quote
-        using PoincareInvariants.CanonicalSymplecticForms
-    end
-)
+# What the doctests need in scope. Shared with the `doctest` job of `.github/workflows/CI.yml`,
+# which includes the same file, so a build and a doctest run cannot disagree.
+include(joinpath(@__DIR__, "doctestsetup.jl"))
 
 makedocs(
     sitename = "PoincareInvariants.jl",
