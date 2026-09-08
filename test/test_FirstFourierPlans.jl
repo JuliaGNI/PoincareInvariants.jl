@@ -35,8 +35,8 @@ end
     θ!(out, t, z, p) = (out[1] = -z[2]; out[2] = z[1]; nothing)
 
     # circular path with radius R
-    # ḟ = 2π .* R .* (-sinpi(2ϕ), cospi(2ϕ))
-    # ∫ ḟ⋅θ dϕ = 2π * R
+    # ḟ = 2π .* R .* (-sinpi(2ϕ), cospi(2ϕ))
+    # ∫ ḟ⋅θ dϕ = 2π * R
     R = 0.75
     f(ϕ) = R .* (cospi(2ϕ), sinpi(2ϕ))
 
