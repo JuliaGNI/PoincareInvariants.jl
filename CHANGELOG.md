@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 project follows [Semantic Versioning](https://semver.org/) — with the usual 0.x convention that
 a **minor** version bump may contain breaking changes.
 
+## [Unreleased]
+
+### Changed
+
+- `test/test_FirstFourierPlans.jl` is now Unicode NFC-normalised. It stored `ḟ` as a base letter
+  plus a combining mark, twice, inherited from macOS rather than chosen. Both occurrences are in
+  comments, so the parsed code is untouched — but a `grep` pattern or an editor search typed in NFC
+  now matches them, where before it silently matched nothing. The file is byte-equal to the NFC
+  normalisation of its predecessor, and no string literal was affected. Nothing under `src/` was
+  affected.
+
 ## [0.5.0] - 2026-07-24
 
 This release moves `PoincareInvariants` onto the [JuliaGNI](https://github.com/JuliaGNI)
