@@ -11,11 +11,11 @@ a **minor** version bump may contain breaking changes.
 ### Changed
 
 - `test/test_FirstFourierPlans.jl` is now Unicode NFC-normalised. It stored `ḟ` as a base letter
-  plus a combining mark, twice, inherited from macOS rather than chosen. Nothing about the tests
-  changes — Julia's parser normalises identifiers to NFC — but a `grep` pattern or an editor search
-  typed in NFC now matches, where before it silently matched nothing. The file is byte-equal to the
-  NFC normalisation of its predecessor, and no string literal was affected. Nothing under `src/`
-  was affected.
+  plus a combining mark, twice, inherited from macOS rather than chosen. Both occurrences are in
+  comments, so the parsed code is untouched — but a `grep` pattern or an editor search typed in NFC
+  now matches them, where before it silently matched nothing. The file is byte-equal to the NFC
+  normalisation of its predecessor, and no string literal was affected. Nothing under `src/` was
+  affected.
 
 ## [0.5.0] - 2026-07-24
 
