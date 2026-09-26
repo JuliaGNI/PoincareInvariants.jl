@@ -17,9 +17,12 @@ a **minor** version bump may contain breaking changes.
   `test/quality/aqua.jl` runs Aqua in `core`, and the new `test/quality/doctests.jl` runs the
   doctests in `slow`. Two test files fix their random seed. The test dependencies are in
   `test/Project.toml` only: the `[extras]` and `[targets]` sections of `Project.toml` are gone, and
-  `test/Project.toml` gains Aqua and Documenter. `Project.toml` gains the `[compat]` entry
-  `LinearAlgebra = "1"`, which Aqua requires. Every test count is unchanged, and nothing under
-  `src/` changed.
+  `test/Project.toml` gains Aqua and Documenter, and a `[compat]` section that gives
+  ChebyshevTransforms, GeometricEquations, GeometricSolutions, LinearAlgebra and StaticArrays the
+  bounds of the root `Project.toml`. `Project.toml` gains the `[compat]` entry
+  `LinearAlgebra = "1"`, which Aqua requires. Every moved test file keeps its test count, the Aqua
+  and Doctests testsets are new, and nothing under `src/` changed. `test/test_FirstFourierPlans.jl`,
+  named in the entry below, is now `test/FirstFourierPlans.jl`.
 - `test/test_FirstFourierPlans.jl` is now Unicode NFC-normalised. It stored `ḟ` as a base letter
   plus a combining mark, twice, inherited from macOS rather than chosen. Both occurrences are in
   comments, so the parsed code is untouched — but a `grep` pattern or an editor search typed in NFC
