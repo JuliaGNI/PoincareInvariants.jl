@@ -19,12 +19,3 @@
   displays (`src/CanonicalSymplecticForms.jl:41`), so a version-dependent output is unlikely.
 - **kind:** not verified
 - **found:** 2026-09-26
-
-### K3 · `docs/doctestsetup.jl` names two callers and has three.
-
-- **location:** `docs/doctestsetup.jl:3`
-- **evidence:** lines 3–6 name `docs/make.jl` and the `doctest` job of `.github/workflows/CI.yml`
-  as the callers ("One definition, two callers"). `test/quality/doctests.jl:9` includes the file
-  too.
-- **kind:** docs
-- **found:** 2026-09-26
