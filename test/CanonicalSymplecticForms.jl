@@ -1,7 +1,9 @@
 @safetestset "canonical_one_form!" begin
     using PoincareInvariants: canonical_one_form!
     using LinearAlgebra: dot
-    using Random: rand
+    using Random: rand, seed!
+
+    seed!(1234)
 
     @test_throws ArgumentError canonical_one_form!(zeros(3), 0.5, [1, 2, 3], nothing)
     @test_throws ArgumentError canonical_one_form!(zeros(1), 3.4, [0.3], nothing)
@@ -31,7 +33,9 @@ end
 @safetestset "CanonicalSymplecticMatrix" begin
     using PoincareInvariants: CanonicalSymplecticMatrix
     using LinearAlgebra: dot
-    using Random: rand
+    using Random: rand, seed!
+
+    seed!(1234)
 
     @test CanonicalSymplecticMatrix{Int}(2) == [0 -1; 1 0]
     @test CanonicalSymplecticMatrix{Int}(4) == [0 0 -1 0; 0 0 0 -1; 1 0 0 0; 0 1 0 0]
