@@ -2,6 +2,7 @@ using PoincareInvariants.SecondChebyshevPlans
 
 @safetestset "Differentiation" begin
     using ..SecondChebyshevPlans: DiffPlan, differentiate!
+    using Random
 
     @test DiffPlan{Float64}(5).D == [0 1 0 3 0 5;
            0 0 4 0 8 0;
@@ -38,6 +39,7 @@ using PoincareInvariants.SecondChebyshevPlans
                  0 0 0 0;
                  0 0 0 0]
 
+    Random.seed!(1234)
     ndcoeffs = ntuple(_ -> rand(4, 4), 6)
     nd∂x = ntuple(_ -> zeros(4, 4), 6)
     nd∂y = ntuple(_ -> zeros(4, 4), 6)

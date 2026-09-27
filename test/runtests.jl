@@ -1,33 +1,18 @@
-using SafeTestsets, Test
+using SafeTestsets
 
-@safetestset "CanonicalSymplecticForms" begin
-    include("test_CanonicalSymplecticForms.jl")
+const GROUPS = isempty(ARGS) ? ["core", "slow"] : ARGS
+
+if "core" in GROUPS
+    @safetestset "Aqua" include("quality/aqua.jl")
+    @safetestset "CanonicalSymplecticForms" include("CanonicalSymplecticForms.jl")
+    @safetestset "FirstFinDiffPlans" include("FirstFinDiffPlans.jl")
+    @safetestset "FirstFourierPlans" include("FirstFourierPlans.jl")
+    @safetestset "SecondChebyshevPlans" include("SecondChebyshevPlans.jl")
+    @safetestset "SecondFinDiffPlans" include("SecondFinDiffPlans.jl")
+    @safetestset "PoincareInvariants" include("PoincareInvariants.jl")
+    @safetestset "Integration with GeometricIntegrators" include("integration/geometric_integrators.jl")
+    @safetestset "Plotting extension" include("integration/makie_extension.jl")
 end
-
-@safetestset "Plan Unit Tests" begin
-    @safetestset "FirstFinDiffPlans" begin
-        include("test_FirstFinDiffPlans.jl")
-    end
-    @safetestset "FirstFourierPlans" begin
-        include("test_FirstFourierPlans.jl")
-    end
-
-    @safetestset "SecondChebyshevPlans" begin
-        include("test_SecondChebyshevPlans.jl")
-    end
-    @safetestset "SecondFinDiffPlans" begin
-        include("test_SecondFinDiffPlans.jl")
-    end
-end
-
-@safetestset "PoincareInvariants" begin
-    include("test_PoincareInvariants.jl")
-end
-
-@safetestset "Integration with GeometricIntegrators" begin
-    include("test_Integration.jl")
-end
-
-@safetestset "Plotting extension" begin
-    include("test_PlottingExtension.jl")
+if "slow" in GROUPS
+    @safetestset "Doctests" include("quality/doctests.jl")
 end
