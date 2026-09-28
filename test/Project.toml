@@ -19,6 +19,7 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 [compat]
 ChebyshevTransforms = "0.0.1"
 GeometricEquations = "0.21"
+GeometricIntegrators = "0.18.5"
 GeometricSolutions = "0.6"
 LinearAlgebra = "1"
 StaticArrays = "1"
