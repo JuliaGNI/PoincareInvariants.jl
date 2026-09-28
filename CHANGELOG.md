@@ -10,6 +10,12 @@ a **minor** version bump may contain breaking changes.
 
 ### Changed
 
+- `test/Project.toml` no longer carries `[compat]` entries for ChebyshevTransforms,
+  GeometricEquations, GeometricSolutions, LinearAlgebra and StaticArrays. They are dependencies of
+  the root `Project.toml`, whose bounds the test environment applies already; an entry in
+  `test/Project.toml` can only duplicate or narrow them. The test-only bounds of
+  GeometricIntegrators and GeometricProblems stay. This replaces the copied bounds that the entry
+  below describes.
 - The test suite follows the shared test convention of the JuliaGNI packages. Each test file
   mirrors the source file it tests (`test/<File>.jl` for `src/<File>.jl`); the tests of
   GeometricIntegrators integration and of the Makie extension are under `test/integration/`.
