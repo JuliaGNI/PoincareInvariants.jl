@@ -12,8 +12,7 @@ a **minor** version bump may contain breaking changes.
 
 - The `[compat]` floors are raised to `GeometricEquations = "0.21.5"`,
   `GeometricSolutions = "0.6.6"` and `julia = "1.11"`, because GeometricBase 0.15 declares its
-  stubs public and requires Julia 1.11. Julia 1.10 users keep 0.5.0. The floor raise changes no
-  source file.
+  stubs public and requires Julia 1.11.
 - `test/Project.toml` no longer carries `[compat]` entries for ChebyshevTransforms,
   GeometricEquations, GeometricSolutions, LinearAlgebra and StaticArrays. They are dependencies of
   the root `Project.toml`, whose bounds the test environment applies already; an entry in
