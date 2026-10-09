@@ -13,6 +13,6 @@ if "core" in GROUPS
     @safetestset "Integration with GeometricIntegrators" include("integration/geometric_integrators.jl")
     @safetestset "Plotting extension" include("integration/makie_extension.jl")
 end
-if "slow" in GROUPS
+if "doctests" in GROUPS
     @safetestset "Doctests" include("quality/doctests.jl")
 end
