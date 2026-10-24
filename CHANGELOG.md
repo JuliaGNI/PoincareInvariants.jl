@@ -6,12 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 project follows [Semantic Versioning](https://semver.org/) — with the usual 0.x convention that
 a **minor** version bump may contain breaking changes.
 
-## [Unreleased]
+## [0.5.2] — 2026-10-24
 
 ### Changed
 
-- **Julia 1.12 is the floor** (`[compat] julia = "1.12"`, from 1.11). A breaking change under
-  this package's pre-1.0 convention: a caller on Julia 1.11 can no longer install this version.
+- **Julia 1.12 is the floor** (`[compat] julia = "1.12"`, from 1.11). A patch release, because no
+  API changes: a caller on Julia 1.11 can no longer install this version.
   The Aqua check in `test/quality/aqua.jl` no longer overrides `tmax` of its persistent-tasks
   test: on Julia 1.12 the check takes 2.8 s, where the override of 300 s existed for a check that
   also built `PoincareInvariantsMakieExt` and took 58 s and 97 s on Julia 1.11.
