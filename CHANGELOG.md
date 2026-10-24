@@ -10,6 +10,11 @@ a **minor** version bump may contain breaking changes.
 
 ### Changed
 
+- **Julia 1.12 is the floor** (`[compat] julia = "1.12"`, from 1.11). A breaking change under
+  this package's pre-1.0 convention: a caller on Julia 1.11 can no longer install this version.
+  The Aqua check in `test/quality/aqua.jl` no longer overrides `tmax` of its persistent-tasks
+  test: on Julia 1.12 the check takes 2.8 s, where the override of 300 s existed for a check that
+  also built `PoincareInvariantsMakieExt` and took 58 s and 97 s on Julia 1.11.
 - CI uploads coverage from the `Julia 1 - ubuntu-latest` job instead of `Julia min`, and a test
   job saves the Julia cache only when it succeeds.
 - `Pkg.test()` no longer runs the doctests. `test/quality/doctests.jl` is now the group
