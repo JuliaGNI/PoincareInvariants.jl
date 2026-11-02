@@ -6,6 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 project follows [Semantic Versioning](https://semver.org/) — with the usual 0.x convention that
 a **minor** version bump may contain breaking changes.
 
+## [Unreleased]
+
+### Changed
+
+- The `[compat]` floors are raised so that the CI Downgrade job, which resolves `Project.toml`
+  and `test/Project.toml` together at their lower bounds on Julia 1.12, can install them:
+  - `FFTW = "1.3.1"`, from 1. FFTW 1.3.1 is the first release that allows AbstractFFTs 1, which
+    ContinuumArrays (through GeometricIntegrators) and FFTA (through Makie) require.
+  - `StaticArrays = "1.9.13"`, from 1. GeometricIntegrators 0.18.6 requires SimpleSolvers
+    0.14.1 or later in 0.14, and each of these releases requires StaticArrays 1.9.13.
+  - In `test/Project.toml`, `GeometricIntegrators = "0.18.6"` and `GeometricProblems = "0.9.1"`,
+    from 0.18.5 and 0.9.0: the joint resolve cannot install the old floors.
+- `test/Project.toml` has `[compat]` entries for its test-only dependencies Aqua, CairoMakie,
+  Documenter, DoubleFloats and SafeTestsets. Without an entry, the Downgrade job installs the
+  oldest release of each. `Aqua = "0.8.14"` because Aqua 0.8.14 is the first release whose piracy
+  check runs on Julia 1.12; 0.8.13 and older read the field `TypeName.mt`, which Julia 1.12 does
+  not have. `DoubleFloats = "1.2.5"` is the oldest release that the joint resolve can install.
+
 ## [0.5.2] — 2026-10-24
 
 ### Changed
