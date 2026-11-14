@@ -29,6 +29,9 @@ a **minor** version bump may contain breaking changes.
 - Compat: in `test/Project.toml`, `GeometricProblems` from `"0.9.1"` to `"0.10"`. The tests use
   none of the changed parts of GeometricProblems 0.10 (`LinearWave`, the symplectic Euler
   methods).
+- Compat: in `test/Project.toml`, `GeometricIntegrators` from `"0.18.6"` to `"0.18.6, 0.19"`.
+  Only GeometricIntegrators 0.19.1 and later accept GeometricSolutions 0.7. The tests use no
+  symplectic Euler method, whose letters GeometricIntegrators 0.19 exchanges.
 
 ## [0.5.2] — 2026-10-24
 
