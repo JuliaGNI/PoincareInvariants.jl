@@ -23,6 +23,10 @@ a **minor** version bump may contain breaking changes.
   oldest release of each. `Aqua = "0.8.14"` because Aqua 0.8.14 is the first release whose piracy
   check runs on Julia 1.12; 0.8.13 and older read the field `TypeName.mt`, which Julia 1.12 does
   not have. `DoubleFloats = "1.2.5"` is the oldest release that the joint resolve can install.
+- `deploydocs` names `devbranch = "main"`. Without it, Documenter reads the default branch with
+  `git remote show origin`. That call fails in a private repository whose checkout keeps no
+  token, and Documenter then falls back to `master`: a push to `main` deploys no development
+  docs, with the job green.
 - Compat: `GeometricSolutions` from `"0.6.6"` to `"0.6.6, 0.7"`. The breaking change of
   GeometricSolutions 0.7, a fifth type parameter of `EnsembleSolution`, does not reach the
   package: it names `EnsembleSolution` only without parameters, in method signatures.

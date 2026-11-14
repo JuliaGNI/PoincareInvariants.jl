@@ -27,4 +27,4 @@ makedocs(
     format = Documenter.HTML(prettyurls = get(ENV, "CI", nothing) == "true")
 )
 
-deploydocs(repo = "github.com/JuliaGNI/PoincareInvariants.jl")
+deploydocs(repo = "github.com/JuliaGNI/PoincareInvariants.jl", devbranch = "main")
