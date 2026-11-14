@@ -24,9 +24,9 @@ a **minor** version bump may contain breaking changes.
   check runs on Julia 1.12; 0.8.13 and older read the field `TypeName.mt`, which Julia 1.12 does
   not have. `DoubleFloats = "1.2.5"` is the oldest release that the joint resolve can install.
 - `deploydocs` names `devbranch = "main"`. Without it, Documenter reads the default branch with
-  `git remote show origin`. The Documentation workflow checks out without keeping the token, so
-  that call works only while the repository is public; on a failure Documenter falls back to
-  `master` and a push to `main` deploys no development docs, with the job green.
+  `git remote show origin`. That call fails in a private repository whose checkout keeps no
+  token, and Documenter then falls back to `master`: a push to `main` deploys no development
+  docs, with the job green.
 
 ## [0.5.2] — 2026-10-24
 
