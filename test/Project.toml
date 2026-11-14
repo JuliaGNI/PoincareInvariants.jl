@@ -22,7 +22,7 @@ CairoMakie = "0.15"
 Documenter = "1"
 DoubleFloats = "1.2.5"
 GeometricIntegrators = "0.18.6"
-GeometricProblems = "0.9.1"
+GeometricProblems = "0.10"
 SafeTestsets = "0.1"
 
 [sources]

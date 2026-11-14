@@ -23,6 +23,12 @@ a **minor** version bump may contain breaking changes.
   oldest release of each. `Aqua = "0.8.14"` because Aqua 0.8.14 is the first release whose piracy
   check runs on Julia 1.12; 0.8.13 and older read the field `TypeName.mt`, which Julia 1.12 does
   not have. `DoubleFloats = "1.2.5"` is the oldest release that the joint resolve can install.
+- Compat: `GeometricSolutions` from `"0.6.6"` to `"0.6.6, 0.7"`. The breaking change of
+  GeometricSolutions 0.7, a fifth type parameter of `EnsembleSolution`, does not reach the
+  package: it names `EnsembleSolution` only without parameters, in method signatures.
+- Compat: in `test/Project.toml`, `GeometricProblems` from `"0.9.1"` to `"0.10"`. The tests use
+  none of the changed parts of GeometricProblems 0.10 (`LinearWave`, the symplectic Euler
+  methods).
 
 ## [0.5.2] — 2026-10-24
 
