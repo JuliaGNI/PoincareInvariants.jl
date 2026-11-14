@@ -16,8 +16,8 @@ a **minor** version bump may contain breaking changes.
     ContinuumArrays (through GeometricIntegrators) and FFTA (through Makie) require.
   - `StaticArrays = "1.9.13"`, from 1. GeometricIntegrators 0.18.6 requires SimpleSolvers
     0.14.1 or later in 0.14, and each of these releases requires StaticArrays 1.9.13.
-  - In `test/Project.toml`, `GeometricIntegrators = "0.18.6"` and `GeometricProblems = "0.9.1"`,
-    from 0.18.5 and 0.9.0: the joint resolve cannot install the old floors.
+  - In `test/Project.toml`, the `GeometricIntegrators` floor is 0.18.6, from 0.18.5: the joint
+    resolve cannot install the old floor.
 - `test/Project.toml` has `[compat]` entries for its test-only dependencies Aqua, CairoMakie,
   Documenter, DoubleFloats and SafeTestsets. Without an entry, the Downgrade job installs the
   oldest release of each. `Aqua = "0.8.14"` because Aqua 0.8.14 is the first release whose piracy
@@ -26,11 +26,10 @@ a **minor** version bump may contain breaking changes.
 - Compat: `GeometricSolutions` from `"0.6.6"` to `"0.6.6, 0.7"`. The breaking change of
   GeometricSolutions 0.7, a fifth type parameter of `EnsembleSolution`, does not reach the
   package: it names `EnsembleSolution` only without parameters, in method signatures.
-- Compat: in `test/Project.toml`, `GeometricProblems` from `"0.9.1"` to `"0.10"`. The tests use
-  none of the changed parts of GeometricProblems 0.10 (`LinearWave`, the symplectic Euler
-  methods).
-- Compat: in `test/Project.toml`, `GeometricIntegrators` from `"0.18.6"` to `"0.18.6, 0.19"`.
-  Only GeometricIntegrators 0.19.1 and later accept GeometricSolutions 0.7. The tests use no
+- Compat: in `test/Project.toml`, `GeometricProblems` from `"0.9.0"` to `"0.10"`. The tests do
+  not use `LinearWave`, the one breaking change of GeometricProblems 0.10.
+- Compat: in `test/Project.toml`, `GeometricIntegrators` admits 0.19 (`"0.18.6, 0.19"`). Only
+  GeometricIntegrators 0.19.1 and later accept GeometricSolutions 0.7. The tests use no
   symplectic Euler method, whose letters GeometricIntegrators 0.19 exchanges.
 
 ## [0.5.2] — 2026-10-24
